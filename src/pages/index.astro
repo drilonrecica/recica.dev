@@ -1,29 +1,23 @@
 ---
-import "@fontsource/inter";
-import "@fontsource/jetbrains-mono";
-import "../styles/global.css";
+import BaseLayout from "@/layouts/BaseLayout.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<div class="max-w-4xl mx-auto py-24 px-6 space-y-8">
-			<h1 class="text-4xl font-bold text-indigo-500">recica.dev</h1>
-			<div class="p-6 bg-zinc-900 rounded-sm border border-zinc-800">
-				<p class="mt-4 text-lg">Typography and colors loaded.</p>
-				<div class="mt-4 flex gap-4">
-					<div class="w-12 h-12 bg-indigo-500 rounded-sm"></div>
-					<div class="w-12 h-12 bg-zinc-800 rounded-sm"></div>
-					<div class="w-12 h-12 bg-zinc-100 rounded-sm"></div>
-				</div>
+<BaseLayout
+	title="Drilon Recica | Senior Frontend Engineer"
+	description="The personal site and digital garden of Drilon Recica. Senior Frontend Engineer and Creative Technologist."
+>
+	<div class="max-w-4xl mx-auto py-24 px-6 space-y-8">
+		<h1 class="text-4xl font-bold text-indigo-500">recica.dev</h1>
+		<div class="p-6 bg-zinc-900 rounded-sm border border-zinc-800">
+			<p class="font-mono text-zinc-400">
+				$ system_status: <span class="text-green-400">online</span>
+			</p>
+			<p class="mt-4 text-lg">BaseLayout integraton successful.</p>
+			<div class="mt-4 flex gap-4">
+				<div class="w-12 h-12 bg-indigo-500 rounded-sm"></div>
+				<div class="w-12 h-12 bg-zinc-800 rounded-sm"></div>
+				<div class="w-12 h-12 bg-zinc-100 rounded-sm"></div>
 			</div>
 		</div>
-	</body>
-</html>
+	</div>
+</BaseLayout>
