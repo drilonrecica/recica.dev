@@ -1,0 +1,62 @@
+---
+interface Subdomain {
+    name: string;
+    url: string;
+    description: string;
+    status: "live" | "soon" | "archived";
+}
+
+const subdomains: Subdomain[] = [
+    {
+        name: "drilon",
+        url: "https://drilon.recica.dev",
+        description: "Personal profile, CV, and detailed professional history.",
+        status: "live",
+    },
+    {
+        name: "blog",
+        url: "https://blog.recica.dev",
+        description: "Long-form writing on engineering, systems, and design.",
+        status: "soon",
+    },
+    {
+        name: "labs",
+        url: "https://labs.recica.dev",
+        description: "Experimental projects, WebGL demos, and code sketches.",
+        status: "soon",
+    },
+    {
+        name: "tools",
+        url: "https://tools.recica.dev",
+        description: "Free developer utilities and micro-services.",
+        status: "soon",
+    },
+];
+---
+
+<section class="max-w-4xl mx-auto px-6 pb-24">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {
+            subdomains.map((sub) => (
+                <a
+                    href={sub.url}
+                    class="group block p-6 bg-zinc-900/50 border border-zinc-900 hover:border-indigo-500/50 hover:bg-zinc-900 transition-all duration-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                    <div class="flex items-start justify-between mb-4">
+                        <span class="font-mono text-indigo-400 group-hover:text-indigo-300 transition-colors">
+                            {sub.name}.recica.dev
+                        </span>
+                        {sub.status !== "live" && (
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-500 font-mono">
+                                {sub.status}
+                            </span>
+                        )}
+                    </div>
+                    <p class="text-zinc-400 group-hover:text-zinc-300 transition-colors leading-relaxed">
+                        {sub.description}
+                    </p>
+                </a>
+            ))
+        }
+    </div>
+</section>
