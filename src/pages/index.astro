@@ -1,5 +1,7 @@
 ---
-
+import "@fontsource/inter";
+import "@fontsource/jetbrains-mono";
+import "../styles/global.css";
 ---
 
 <html lang="en">
@@ -12,6 +14,16 @@
 		<title>Astro</title>
 	</head>
 	<body>
-		<h1>Astro</h1>
+		<div class="max-w-4xl mx-auto py-24 px-6 space-y-8">
+			<h1 class="text-4xl font-bold text-indigo-500">recica.dev</h1>
+			<div class="p-6 bg-zinc-900 rounded-sm border border-zinc-800">
+				<p class="mt-4 text-lg">Typography and colors loaded.</p>
+				<div class="mt-4 flex gap-4">
+					<div class="w-12 h-12 bg-indigo-500 rounded-sm"></div>
+					<div class="w-12 h-12 bg-zinc-800 rounded-sm"></div>
+					<div class="w-12 h-12 bg-zinc-100 rounded-sm"></div>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>
