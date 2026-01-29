@@ -14,7 +14,36 @@
             recica.dev
         </a>
 
-        <!-- Placeholder for future nav items if needed -->
-        <nav></nav>
+        <nav class="flex items-center">
+            <button
+                id="verbose-toggle"
+                class="font-mono text-xs text-zinc-500 hover:text-indigo-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-sm px-2 py-1"
+                aria-label="Toggle verbose mode"
+            >
+                [VERBOSE: OFF]
+            </button>
+        </nav>
     </div>
 </header>
+
+<script>
+    import { isVerbose, toggleVerbose, EVENT_NAME } from "@/lib/verbose";
+
+    const btn = document.getElementById("verbose-toggle");
+
+    const updateLabel = (active: boolean) => {
+        if (btn) btn.textContent = `[VERBOSE: ${active ? "ON" : "OFF"}]`;
+    };
+
+    // Init
+    if (btn) {
+        updateLabel(isVerbose());
+        btn.addEventListener("click", () => toggleVerbose());
+    }
+
+    // Listen for changes
+    window.addEventListener(EVENT_NAME, (e) => {
+        const customEvent = e as CustomEvent;
+        updateLabel(customEvent.detail.active);
+    });
+</script>

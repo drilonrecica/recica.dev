@@ -5,7 +5,9 @@
     --verbose-outline: rgba(0, 255, 255, 0.5);
 }
 
-html[data-mode="verbose"] body {
+html[data-mode="verbose"] body,
+html[data-mode="verbose"] header,
+html[data-mode="verbose"] footer {
     background-color: var(--verbose-bg);
     background-image:
         linear-gradient(var(--verbose-grid) 1px, transparent 1px),
@@ -14,6 +16,14 @@ html[data-mode="verbose"] body {
     background-size: 40px 40px, 40px 40px, 100% 100%;
     font-family: "JetBrains Mono", monospace;
     color: #a0a0a0;
+}
+
+html[data-mode="verbose"] header {
+    border-bottom: 1px solid var(--verbose-outline) !important;
+}
+
+html[data-mode="verbose"] footer {
+    border-top: 1px solid var(--verbose-outline) !important;
 }
 
 html[data-mode="verbose"] * {
