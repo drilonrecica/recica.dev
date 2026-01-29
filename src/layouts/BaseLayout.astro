@@ -1,6 +1,7 @@
 ---
 import Meta from "@/components/seo/Meta.astro";
 import Header from "@/components/site/Header.astro";
+import Footer from "@/components/site/Footer.astro";
 import "../styles/global.css";
 import "@fontsource/inter";
 import "@fontsource/jetbrains-mono";
@@ -41,5 +42,7 @@ const { title, description, image, type } = Astro.props;
         <main id="main-content" class="flex-grow w-full">
             <slot />
         </main>
+
+        <Footer />
     </body>
 </html>
