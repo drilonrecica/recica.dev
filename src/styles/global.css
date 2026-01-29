@@ -1,3 +1,4 @@
+@import "./verbose.css";
 @import "tailwindcss";
 
 @theme {
@@ -9,7 +10,7 @@
   html {
     @apply scroll-smooth;
   }
-  
+
   body {
     @apply bg-zinc-950 text-zinc-200 font-sans antialiased selection:bg-indigo-500 selection:text-white;
   }
