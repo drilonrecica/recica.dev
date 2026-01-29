@@ -1,5 +1,6 @@
 ---
 import Meta from "@/components/seo/Meta.astro";
+import Header from "@/components/site/Header.astro";
 import "../styles/global.css";
 import "@fontsource/inter";
 import "@fontsource/jetbrains-mono";
@@ -34,6 +35,8 @@ const { title, description, image, type } = Astro.props;
         >
             Skip to content
         </a>
+
+        <Header />
 
         <main id="main-content" class="flex-grow w-full">
             <slot />
