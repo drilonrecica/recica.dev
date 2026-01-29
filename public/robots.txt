@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://recica.dev/sitemap-index.xml
