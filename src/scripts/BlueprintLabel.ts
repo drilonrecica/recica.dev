@@ -35,6 +35,10 @@ class BlueprintLabel {
         document.addEventListener("mouseover", (e) => this.handleHover(e));
         document.addEventListener("click", (e) => this.handleClick(e), { capture: true });
 
+        // Sync position on scroll/resize
+        window.addEventListener("scroll", () => this.updatePosition(), { passive: true });
+        window.addEventListener("resize", () => this.updatePosition(), { passive: true });
+
         window.addEventListener(EVENT_NAME, (e) => {
             const customEvent = e as CustomEvent;
             if (!customEvent.detail.active && this.overlay) {
@@ -74,6 +78,12 @@ class BlueprintLabel {
         }
     }
 
+    private updatePosition() {
+        if (!this.activeTarget || this.overlay.classList.contains("hidden")) return;
+
+        this.renderOverlay(this.activeTarget);
+    }
+
     private handleHover(e: MouseEvent) {
         if (!isVerbose()) return;
 
@@ -107,11 +117,8 @@ class BlueprintLabel {
         return false;
     }
 
-    private show(target: HTMLElement) {
-        if (this.activeTarget === target) return;
-        this.activeTarget = target;
-        this.overlay.classList.remove("hidden");
-
+    // Extracted render logic for reuse
+    private renderOverlay(target: HTMLElement) {
         const rect = target.getBoundingClientRect();
 
         // Label Logic: Prefer data-blueprint, then ID, then Class, then Tag
@@ -149,6 +156,13 @@ class BlueprintLabel {
         metrics.textContent = metricsText;
         metrics.style.top = `${rect.bottom + 4}px`;
         metrics.style.left = `${rect.left}px`;
+    }
+
+    private show(target: HTMLElement) {
+        if (this.activeTarget === target) return;
+        this.activeTarget = target;
+        this.overlay.classList.remove("hidden");
+        this.renderOverlay(target);
     }
 
     private hide() {
