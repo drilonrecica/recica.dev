@@ -32,7 +32,10 @@
     const btn = document.getElementById("verbose-toggle");
 
     const updateLabel = (active: boolean) => {
-        if (btn) btn.textContent = `[VERBOSE: ${active ? "ON" : "OFF"}]`;
+        if (btn) {
+            btn.textContent = `[VERBOSE: ${active ? "ON" : "OFF"}]`;
+            btn.setAttribute("aria-pressed", active.toString());
+        }
     };
 
     // Init
