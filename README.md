@@ -2,12 +2,13 @@
 
 This repository contains the active public web properties for Drilon Reçica.
 
-It is intentionally split into two independent apps:
+It is intentionally split into 3 independent apps:
 
 - `recica/` for the flagship personal site at `https://recica.dev`
 - `tools/` for the standalone browser toolbox at `https://tools.recica.dev`
+- `labs/` for the experimental product layer at `https://labs.recica.dev`
 
-There is no root workspace runner, no shared monorepo build command, and no single root package manager setup. Each app is built, tested, and deployed independently because they solve different product problems and have different runtime needs.
+There is no root workspace runner, no shared root package manager flow, and no single monorepo build command. Each app is built, tested, and deployed independently because each one has a different product role and a different runtime profile.
 
 ## Domain Model
 
@@ -18,44 +19,62 @@ There is no root workspace runner, no shared monorepo build command, and no sing
 It owns:
 
 - professional identity
-- positioning
+- role positioning
 - selected case studies
 - contact paths
 - CV access
 - personal SEO and structured data
 
-It is intentionally small, curated, and static.
+It is intentionally curated, static, and small.
 
 ### `tools.recica.dev`
 
-`tools.recica.dev` is a standalone product surface.
+`tools.recica.dev` is the standalone tools product.
 
 It owns:
 
 - privacy-first browser utilities
 - tool-specific route pages
-- tool discovery/search
-- product SEO for utility pages
-- dynamic `robots.txt`, `sitemap.xml`, and health checks
+- search and tool discovery
+- utility SEO
+- operational endpoints such as `robots.txt`, `sitemap.xml`, and `health`
 
-It is intentionally separate from the flagship so the portfolio story and the utilities product do not blur into one another.
+It is intentionally separate from the flagship so the product can behave like a tools surface instead of a portfolio appendix.
+
+### `labs.recica.dev`
+
+`labs.recica.dev` is the experimental layer.
+
+It owns:
+
+- public prototypes
+- interaction experiments
+- reference-style product labs
+- concept work that is too exploratory for the flagship and too early for `tools`
+- experiment-specific SEO and operational endpoints
+
+It should stay selective. Labs is not a dumping ground for unfinished ideas.
 
 ### Historical Note
 
-This repository no longer contains a separate `drilon/` application. The old personal-site codebase was retired from the repo. The active public strategy is:
+This repository no longer contains a separate `drilon/` application. The old personal-site codebase was retired from the repo.
+
+The active public model is now:
 
 - one flagship personal domain: `recica.dev`
-- one standalone tools domain: `tools.recica.dev`
+- one stable tools product: `tools.recica.dev`
+- one experimental product layer: `labs.recica.dev`
 
-If legacy hostnames still exist at infrastructure level, they should be treated as aliases or redirects, not as separate products.
+If legacy hostnames still exist at infrastructure level, they should be treated as aliases or redirects, not separate products.
 
 ## Repository Layout
 
-| Path | Responsibility | Runtime Model |
-| --- | --- | --- |
-| [`recica/`](./recica) | Flagship personal site | Static Astro build |
-| [`tools/`](./tools) | Browser-based tools product | SvelteKit server build via adapter-node |
-| [`docs/`](./docs) | Reserved repo documentation area | No runtime role currently |
+| Path                  | Responsibility                                      | Runtime Model                           |
+| --------------------- | --------------------------------------------------- | --------------------------------------- |
+| [`recica/`](./recica) | Flagship personal site                              | Static Astro build                      |
+| [`tools/`](./tools)   | Stable browser tools product                        | SvelteKit server build via adapter-node |
+| [`labs/`](./labs)     | Experiments, prototypes, and interactive references | SvelteKit server build via adapter-node |
+| [`docs/`](./docs)     | Repo-level documentation area                       | No runtime role currently               |
 
 ## Product Boundaries
 
@@ -63,11 +82,11 @@ The most important repository rule is to keep the product boundaries clean.
 
 ### What belongs in `recica/`
 
-- professional positioning
+- identity and positioning
 - selected work
 - curated supporting proof
 - personal contact and CV
-- links out to `tools.recica.dev`
+- links out to the other product surfaces
 
 ### What belongs in `tools/`
 
@@ -75,31 +94,42 @@ The most important repository rule is to keep the product boundaries clean.
 - searchable tool catalog
 - privacy and local-processing guarantees
 - utility-specific SEO
-- machine endpoints like `/health`, `/robots.txt`, and `/sitemap.xml`
+- machine endpoints and operational server behavior
+
+### What belongs in `labs/`
+
+- public product experiments
+- live interaction references
+- concept-led explorations
+- local decision helpers and comparison flows
+- product ideas that are meaningful enough to publish, but not stable products yet
 
 ### What should not happen
 
-- `recica/` should not become a tools host shell
-- `tools/` should not become a portfolio or resume site
-- shared brand consistency is good, but the product responsibilities stay separate
+- `recica/` should not become a tools or experiment host shell
+- `tools/` should not become a portfolio or lab surface
+- `labs/` should not become a second flagship site or a backlog graveyard
+
+Shared branding is fine. Shared product responsibility is not.
 
 ## Technology Summary
 
-| App | Framework | Styling | Language | Package Manager | Build Output | Automated Tests |
-| --- | --- | --- | --- | --- | --- | --- |
-| `recica/` | Astro 5 | Tailwind CSS v4 + custom CSS | TypeScript | npm | Static `dist/` | No dedicated suite currently |
-| `tools/` | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm | Adapter-node server build | Vitest + Playwright |
+| App       | Framework              | Styling                                | Language   | Package Manager | Build Output              | Automated Tests              |
+| --------- | ---------------------- | -------------------------------------- | ---------- | --------------- | ------------------------- | ---------------------------- |
+| `recica/` | Astro 5                | Tailwind CSS v4 + custom CSS           | TypeScript | npm             | Static `dist/`            | No dedicated suite currently |
+| `tools/`  | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
+| `labs/`   | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
 
 ## Why the Apps Are Separate
 
-This split is deliberate, not accidental.
+This split is deliberate.
 
 `recica.dev` is optimized for:
 
-- clear identity
+- identity clarity
 - fast reading
-- SEO around a person and professional role
-- very small static footprint
+- curated proof
+- static delivery
 
 `tools.recica.dev` is optimized for:
 
@@ -107,9 +137,16 @@ This split is deliberate, not accidental.
 - utility landing pages
 - route-level discoverability
 - richer client interactivity
-- operational endpoints and server-style deployment
+- operational endpoints
 
-Trying to force both concerns into one runtime would create unnecessary coupling.
+`labs.recica.dev` is optimized for:
+
+- interactive experimentation
+- concept validation in public
+- reference-style product thinking
+- self-contained exploratory experiences
+
+Trying to force all 3 concerns into one runtime would create unnecessary coupling and muddy the product story.
 
 ## Local Development
 
@@ -127,6 +164,14 @@ npm run dev
 
 ```bash
 cd tools
+pnpm install
+pnpm dev
+```
+
+### `labs/`
+
+```bash
+cd labs
 pnpm install
 pnpm dev
 ```
@@ -155,12 +200,24 @@ pnpm build
 pnpm preview
 ```
 
+### `labs/`
+
+```bash
+cd labs
+pnpm check
+pnpm lint
+pnpm test:unit:run
+pnpm test:e2e
+pnpm build
+pnpm preview
+```
+
 ## Deployment Model
 
 ### `recica/`
 
 - static Astro site
-- canonical site configured directly in `astro.config.mjs`
+- canonical site configured directly in Astro
 - deploy the built `dist/` output to static hosting
 - no runtime server needed
 
@@ -168,9 +225,16 @@ pnpm preview
 
 - SvelteKit app built with `@sveltejs/adapter-node`
 - runs as a Node server with `node build`
-- can be deployed directly or through Docker
 - exposes `/health` for uptime probes
 - canonical origin is environment-aware via `PUBLIC_SITE_URL`
+
+### `labs/`
+
+- SvelteKit app built with `@sveltejs/adapter-node`
+- runs as a Node server with `node build`
+- exposes `/health`, `robots.txt`, and `sitemap.xml`
+- canonical origin is environment-aware via `PUBLIC_SITE_URL`
+- current live experiment routing stays inside the single Labs app
 
 ## Domain and Canonical Strategy
 
@@ -185,23 +249,31 @@ pnpm preview
 
 ### Tools domain
 
-`tools/` is operationally more flexible. It resolves its public origin like this:
+`tools/` resolves public origin like this:
 
 1. use `PUBLIC_SITE_URL` if set to a valid `http` or `https` URL
 2. otherwise fall back to the current request origin
 
-That strategy supports:
+That supports production, previews, and self-hosted environments.
 
-- production on `tools.recica.dev`
-- preview deployments
-- self-hosted internal environments
-- accurate `robots.txt` and `sitemap.xml` generation per environment
+### Labs domain
+
+`labs/` uses the same operational pattern as `tools/`:
+
+1. use `PUBLIC_SITE_URL` if set and valid
+2. otherwise fall back to the request origin
+
+That origin feeds:
+
+- canonical page URLs
+- `robots.txt`
+- `sitemap.xml`
 
 ## Security and Privacy Posture
 
 ### `recica/`
 
-The flagship is mostly static and has a small attack surface by design.
+The flagship is mostly static and has a deliberately small attack surface.
 
 - no auth
 - no forms
@@ -211,30 +283,43 @@ The flagship is mostly static and has a small attack surface by design.
 
 ### `tools/`
 
-The tools app takes privacy and operational hardening more seriously because it is an interactive utility surface.
+The tools app is interactive, so it needs stronger runtime hardening.
 
 - local-first tool behavior wherever possible
 - no account model
 - no analytics or tracking flow in the implemented app
 - no remote uploads for the built-in utilities
 - security headers in `src/hooks.server.ts`
-- CSP, referrer policy, X-Frame-Options, X-Content-Type-Options, Permissions-Policy
+
+### `labs/`
+
+The labs app is also interactive, but it still stays intentionally light:
+
+- no accounts
+- no persistence in the shipped experiment
+- no analytics in the shipped MVP
+- no remote uploads
+- security headers in `src/hooks.server.ts`
+- deterministic client-side logic where possible
 
 ## Editing Guidance
 
 Choose the right app first.
 
-- if the change is about identity, story, selected work, contact, or CV, edit `recica/`
-- if the change is about utilities, route tooling, search, tool SEO, or product mechanics, edit `tools/`
+- if the change is about identity, selected work, contact, or CV, edit `recica/`
+- if the change is about stable utilities, tool SEO, tool routing, or search, edit `tools/`
+- if the change is about experiments, prototypes, interactive references, or concept validation, edit `labs/`
 
 Keep changes scoped. This repository works best when each app remains boring in the right way:
 
 - clear ownership
-- minimal dependency surface
-- simple build story
+- small dependency surfaces
+- simple build stories
 - predictable deployment behavior
 
 ## App-Specific Documentation
 
 - [`recica/README.md`](./recica/README.md)
 - [`tools/README.md`](./tools/README.md)
+- [`labs/README.md`](./labs/README.md)
+- [`labs/src/routes/parental-gate-lab/README.md`](./labs/src/routes/parental-gate-lab/README.md)

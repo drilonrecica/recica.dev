@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <rect width="1200" height="630" fill="#0c1014"/>
+  <rect x="44" y="44" width="1112" height="542" rx="36" fill="#121821" stroke="#ffffff" stroke-opacity=".08"/>
+  <path d="M120 502h960" stroke="#ffffff" stroke-opacity=".08" stroke-width="2"/>
+  <path d="M780 118c54 0 92 40 92 94v48h-64v-46c0-17-11-30-28-30s-28 13-28 30v26h-64v-28c0-54 38-94 92-94Z" fill="#56c9ff" fill-opacity=".2"/>
+  <rect x="680" y="242" width="200" height="184" rx="28" fill="#56c9ff" fill-opacity=".12" stroke="#56c9ff" stroke-opacity=".4"/>
+  <circle cx="780" cy="332" r="30" fill="#ffce6c" fill-opacity=".8"/>
+  <text x="120" y="208" fill="#ecf4f7" font-family="Space Grotesk, sans-serif" font-size="44" font-weight="700">Parental Gate Lab</text>
+  <text x="120" y="300" fill="#ecf4f7" font-family="Space Grotesk, sans-serif" font-size="88" font-weight="700">Compare UX patterns</text>
+  <text x="120" y="392" fill="#ecf4f7" font-family="Space Grotesk, sans-serif" font-size="88" font-weight="700">for kids and family apps.</text>
+  <text x="120" y="474" fill="#9fb2bd" font-family="Manrope, sans-serif" font-size="34">Try six patterns live, compare tradeoffs, and get a practical recommendation.</text>
+</svg>

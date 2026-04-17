@@ -1,0 +1,8 @@
+build/
+.svelte-kit/
+coverage/
+playwright-report/
+test-results/
+pnpm-lock.yaml
+LABS_PLAN.md
+PLAN_PARENTAL_GATES.md

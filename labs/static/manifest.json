@@ -1,0 +1,16 @@
+{
+	"name": "Labs by Drilon Recica",
+	"short_name": "Recica Labs",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#f6f0e6",
+	"theme_color": "#111418",
+	"icons": [
+		{
+			"src": "/favicon.svg",
+			"sizes": "96x96",
+			"type": "image/svg+xml",
+			"purpose": "any"
+		}
+	]
+}

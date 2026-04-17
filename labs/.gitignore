@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Build output
+.svelte-kit/
+build/
+.output/
+dist/
+coverage/
+
+# Test artifacts
+playwright-report/
+test-results/
+blob-report/
+
+# Tool caches
+.vite/
+.cache/
+.eslintcache
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Deployment/platform artifacts
+.vercel/
+.netlify/
+.wrangler/
+
+# Local editor and agent files
+.codex
+.idea/
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
