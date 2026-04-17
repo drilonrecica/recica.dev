@@ -71,19 +71,46 @@
 				</p>
 			</div>
 
-			<div class="hero-poster hero-enter min-h-[26rem] p-6 sm:p-8">
-				<svg class="route-motif" viewBox="0 0 640 520" aria-hidden="true">
-					<path
-						d="M102 110C142 110 176 142 176 182V232C176 264 202 290 234 290H408C452 290 488 326 488 370V396"
-						stroke-width="3"
-						fill="none"
-					/>
-					<path d="M118 386H320C358 386 390 354 390 316V180" stroke-width="2.4" fill="none" />
-					<path d="M222 92H500V180" stroke-width="1.8" fill="none" stroke-dasharray="10 10" />
-					<circle cx="102" cy="110" r="12" fill="var(--accent)" stroke="none" />
-					<circle cx="488" cy="396" r="12" fill="var(--accent-secondary)" stroke="none" />
-					<circle cx="390" cy="180" r="8" fill="var(--accent)" stroke="none" />
-					<circle cx="320" cy="386" r="8" fill="var(--accent-secondary)" stroke="none" />
+			<div class="hero-poster hero-poster--labs-home hero-enter min-h-[26rem] p-6 sm:p-8">
+				<svg class="route-motif route-motif--trace" viewBox="0 0 640 520" aria-hidden="true">
+					<g class="route-motif__base">
+						<path
+							d="M102 110C142 110 176 142 176 182V232C176 264 202 290 234 290H408C452 290 488 326 488 370V396"
+							stroke-width="3"
+							fill="none"
+						/>
+						<path
+							d="M118 386H320C358 386 390 354 390 316V180"
+							stroke-width="2.4"
+							fill="none"
+						/>
+						<path d="M222 92H500V180" stroke-width="1.8" fill="none" stroke-dasharray="10 10" />
+						<circle cx="102" cy="110" r="12" fill="var(--accent)" stroke="none" />
+						<circle cx="488" cy="396" r="12" fill="var(--accent-secondary)" stroke="none" />
+						<circle cx="390" cy="180" r="8" fill="var(--accent)" stroke="none" />
+						<circle cx="320" cy="386" r="8" fill="var(--accent-secondary)" stroke="none" />
+					</g>
+
+					<g class="route-trace">
+						<path
+							class="route-trace__line route-trace__line--primary"
+							d="M102 110C142 110 176 142 176 182V232C176 264 202 290 234 290H408C452 290 488 326 488 370V396"
+							pathLength="100"
+							stroke-width="4"
+							fill="none"
+						/>
+						<path
+							class="route-trace__line route-trace__line--secondary"
+							d="M118 386H320C358 386 390 354 390 316V180"
+							pathLength="100"
+							stroke-width="3"
+							fill="none"
+						/>
+						<circle class="route-trace__node route-trace__node--one" cx="102" cy="110" r="12" />
+						<circle class="route-trace__node route-trace__node--two" cx="390" cy="180" r="10" />
+						<circle class="route-trace__node route-trace__node--three" cx="320" cy="386" r="10" />
+						<circle class="route-trace__node route-trace__node--four" cx="488" cy="396" r="12" />
+					</g>
 				</svg>
 
 				<div class="relative z-10 flex h-full flex-col justify-between gap-6">

@@ -873,6 +873,49 @@ select:focus-visible {
 	stroke: color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
+.route-trace__line {
+	stroke: color-mix(in srgb, var(--accent) 82%, white 18%);
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-dasharray: 100;
+	stroke-dashoffset: 100;
+	opacity: 0;
+	filter: drop-shadow(0 0 10px color-mix(in srgb, var(--accent) 42%, transparent));
+	animation: route-trace-draw 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.route-trace__line--secondary {
+	stroke: color-mix(in srgb, var(--accent-secondary) 78%, white 22%);
+	animation-delay: 1.05s;
+}
+
+.route-trace__node {
+	transform-box: fill-box;
+	transform-origin: center;
+	opacity: 0;
+	animation: route-node-pulse 640ms ease-out forwards;
+}
+
+.route-trace__node--one {
+	fill: var(--accent);
+	animation-delay: 0.18s;
+}
+
+.route-trace__node--two {
+	fill: color-mix(in srgb, var(--accent) 88%, white 12%);
+	animation-delay: 0.92s;
+}
+
+.route-trace__node--three {
+	fill: color-mix(in srgb, var(--accent-secondary) 78%, white 22%);
+	animation-delay: 1.36s;
+}
+
+.route-trace__node--four {
+	fill: var(--accent-secondary);
+	animation-delay: 1.82s;
+}
+
 .hero-enter {
 	animation: hero-enter 620ms ease both;
 }
@@ -886,6 +929,46 @@ select:focus-visible {
 	to {
 		opacity: 1;
 		transform: translateY(0);
+	}
+}
+
+@keyframes route-trace-draw {
+	0% {
+		opacity: 0;
+		stroke-dashoffset: 100;
+	}
+
+	12% {
+		opacity: 1;
+	}
+
+	82% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0.18;
+		stroke-dashoffset: 0;
+	}
+}
+
+@keyframes route-node-pulse {
+	0% {
+		opacity: 0;
+		transform: scale(0.72);
+		filter: drop-shadow(0 0 0 transparent);
+	}
+
+	40% {
+		opacity: 1;
+		transform: scale(1.45);
+		filter: drop-shadow(0 0 14px color-mix(in srgb, currentColor 40%, transparent));
+	}
+
+	100% {
+		opacity: 0;
+		transform: scale(1);
+		filter: drop-shadow(0 0 0 transparent);
 	}
 }
 
@@ -938,5 +1021,13 @@ select:focus-visible {
 
 	.compare-table {
 		min-width: 46rem;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.route-trace__line,
+	.route-trace__node {
+		animation: none;
+		opacity: 0;
 	}
 }
