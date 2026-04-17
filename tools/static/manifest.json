@@ -1,0 +1,26 @@
+{
+	"name": "Recica Tools",
+	"short_name": "Recica Tools",
+	"description": "Essential browser tools for developers: QR codes, JSON formatter, Base64 encoder, URL tools, timestamps, hashing, and more.",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#0b0f14",
+	"theme_color": "#1ec8a5",
+	"icons": [
+		{
+			"src": "/favicons/web-app-manifest-192x192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "/favicons/web-app-manifest-512x512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any maskable"
+		}
+	],
+	"categories": ["developer", "productivity", "utilities"],
+	"lang": "en",
+	"dir": "ltr"
+}
