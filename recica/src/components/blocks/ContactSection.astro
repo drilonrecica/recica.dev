@@ -1,0 +1,36 @@
+---
+import { contactLinks, siteConfig } from '@/lib/site-content';
+---
+
+<section id="contact" class="section-shell anchor-target">
+	<div class="section-grid">
+		<div class="section-heading-block">
+			<p class="kicker">Contact</p>
+			<h2 class="section-title">Make the next step simple.</h2>
+			<p class="section-copy">
+				If the work feels relevant, use the direct route. Email is the best starting point. The rest is here when you want more context, code, or background.
+			</p>
+			<p class="contact-address">
+				Direct email:
+				<a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+			</p>
+		</div>
+
+		<div class="contact-list">
+			{
+				contactLinks.map((link) => (
+					<a
+						href={link.href}
+						class={`contact-item${link.primary ? ' contact-item--primary' : ''}`}
+						target={link.href.startsWith('http') ? '_blank' : undefined}
+						rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
+					>
+						<p class="contact-item__eyebrow">{link.eyebrow}</p>
+						<h3>{link.label}</h3>
+						<p>{link.description}</p>
+					</a>
+				))
+			}
+		</div>
+	</div>
+</section>

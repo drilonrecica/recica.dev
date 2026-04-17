@@ -17,7 +17,7 @@ const { title, description, image, type } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth bg-zinc-950">
+<html lang="en" class="scroll-smooth">
     <head>
         <Meta
             title={title}
@@ -26,20 +26,18 @@ const { title, description, image, type } = Astro.props;
             type={type}
         />
     </head>
-    <body
-        class="bg-zinc-950 text-zinc-200 antialiased font-sans selection:bg-indigo-500 selection:text-white min-h-screen flex flex-col"
-    >
+    <body class="min-h-screen font-sans antialiased">
         <!-- Accessibility Skip Link -->
         <a
             href="#main-content"
-            class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 z-50 px-4 py-2 bg-indigo-500 text-white font-medium rounded-sm ring-2 ring-white"
+            class="skip-link"
         >
             Skip to content
         </a>
 
         <Header />
 
-        <main id="main-content" class="flex-grow w-full">
+        <main id="main-content" class="main-site">
             <slot />
         </main>
 

@@ -1,0 +1,38 @@
+---
+import { featuredTools } from '@/lib/site-content';
+---
+
+<section id="tools" class="tools-band anchor-target">
+	<div class="tools-band__shell">
+		<div class="section-heading-block section-heading-block--on-dark">
+			<p class="kicker kicker--on-dark">Featured Tools</p>
+			<h2 class="section-title section-title--on-dark">Useful products, not side-note links.</h2>
+			<p class="section-copy section-copy--on-dark">
+				Recica Tools stays standalone by design. The flagship should still make it obvious that useful, privacy-first products are part of the broader builder story.
+			</p>
+		</div>
+
+		<div class="tool-highlight-list">
+			{
+				featuredTools.map((tool) => (
+					<a href={tool.href} target="_blank" rel="noreferrer" class="tool-highlight">
+						<div>
+							<p class="tool-highlight__category">{tool.category}</p>
+							<h3>{tool.name}</h3>
+						</div>
+						<p>{tool.description}</p>
+					</a>
+				))
+			}
+		</div>
+
+		<div class="tools-band__footer">
+			<p>
+				Local-first, fast, and practical. No accounts. No upload dependency. No product theater.
+			</p>
+			<a href="https://tools.recica.dev" target="_blank" rel="noreferrer" class="action-link action-link--secondary-on-dark">
+				Explore Recica Tools
+			</a>
+		</div>
+	</div>
+</section>

@@ -249,9 +249,9 @@
 			</p>
 			<div class="mt-4 text-xs text-[var(--text-muted)]">
 				Crafted with care by <a
-					href="https://drilon.recica.dev"
-					class="text-[var(--primary)] hover:underline">Drilon Recica</a
-				>, Senior Software Developer
+					href="https://recica.dev"
+					class="text-[var(--primary)] hover:underline">Drilon Reçica</a
+				>, Senior Mobile & Product Engineer
 			</div>
 		</div>
 	</section>

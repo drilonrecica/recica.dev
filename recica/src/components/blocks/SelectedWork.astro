@@ -1,0 +1,50 @@
+---
+import { caseStudies } from '@/lib/site-content';
+---
+
+<section id="work" class="section-shell anchor-target">
+	<div class="section-heading-block">
+		<p class="kicker">Selected Work</p>
+		<h2 class="section-title">Three projects that carry the flagship story.</h2>
+		<p class="section-copy">
+			Not a career dump. Just the work that best shows mobile depth, product judgment, and the ability to move complex systems forward.
+		</p>
+	</div>
+
+	<div class="story-list">
+		{
+			caseStudies.map((study) => (
+				<article class={`story-row story-row--${study.tone}`}>
+					<div class="story-row__meta">
+						<div>
+							<p class="story-row__eyebrow">{study.period}</p>
+							<h3 class="story-row__title">{study.title}</h3>
+							<p class="story-row__role">{study.role}</p>
+						</div>
+						<a href={study.href} target="_blank" rel="noreferrer" class="story-row__link">
+							{study.linkLabel}
+						</a>
+					</div>
+
+					<div class="story-row__body">
+						<p class="story-row__summary">{study.summary}</p>
+						<ul class="story-row__bullets">
+							{
+								study.bullets.map((bullet) => (
+									<li>{bullet}</li>
+								))
+							}
+						</ul>
+						<div class="tag-row">
+							{
+								study.stack.map((tag) => (
+									<span>{tag}</span>
+								))
+							}
+						</div>
+					</div>
+				</article>
+			))
+		}
+	</div>
+</section>

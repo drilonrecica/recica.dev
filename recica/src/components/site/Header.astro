@@ -1,52 +1,60 @@
 ---
+import { navigation, siteConfig } from "@/lib/site-content";
 
 ---
 
-<header
-    class="w-full border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-sm sticky top-0 z-40"
->
-    <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+<header class="site-header" data-scrolled="false">
+    <div class="site-header__shell">
         <a
             href="/"
-            class="text-lg font-bold text-zinc-100 hover:text-indigo-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-sm px-1 py-0.5"
+            class="site-brand"
             aria-label="recica.dev home"
         >
-            recica.dev
+            {siteConfig.domain}
         </a>
 
-        <nav class="flex items-center">
-            <button
-                id="verbose-toggle"
-                class="font-mono text-xs text-zinc-500 hover:text-indigo-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-sm px-2 py-1"
-                aria-label="Toggle verbose mode"
-            >
-                [VERBOSE: OFF]
-            </button>
+        <nav class="site-nav" aria-label="Primary">
+            <div class="site-nav__links">
+                {
+                    navigation.map((item) => (
+                        <a href={item.href}>{item.label}</a>
+                    ))
+                }
+            </div>
+            <div class="site-nav__utilities">
+                <a href={siteConfig.cvPath} class="utility-link">CV</a>
+                <a href={`mailto:${siteConfig.email}`} class="utility-link utility-link--strong">Email</a>
+            </div>
         </nav>
+
+        <details class="site-nav-mobile">
+            <summary
+                class="site-nav-mobile__summary"
+                aria-label="Open navigation"
+            >
+                Menu
+            </summary>
+            <div class="site-nav-mobile__panel">
+                {
+                    navigation.map((item) => (
+                        <a href={item.href}>{item.label}</a>
+                    ))
+                }
+                <a href={siteConfig.cvPath}>Download CV</a>
+                <a href={`mailto:${siteConfig.email}`}>Email</a>
+            </div>
+        </details>
     </div>
 </header>
 
 <script>
-    import { isVerbose, toggleVerbose, EVENT_NAME } from "@/lib/verbose";
+    const header = document.querySelector(".site-header");
 
-    const btn = document.getElementById("verbose-toggle");
-
-    const updateLabel = (active: boolean) => {
-        if (btn) {
-            btn.textContent = `[VERBOSE: ${active ? "ON" : "OFF"}]`;
-            btn.setAttribute("aria-pressed", active.toString());
-        }
+    const syncHeaderState = () => {
+        if (!header) return;
+        header.setAttribute("data-scrolled", window.scrollY > 24 ? "true" : "false");
     };
 
-    // Init
-    if (btn) {
-        updateLabel(isVerbose());
-        btn.addEventListener("click", () => toggleVerbose());
-    }
-
-    // Listen for changes
-    window.addEventListener(EVENT_NAME, (e) => {
-        const customEvent = e as CustomEvent;
-        updateLabel(customEvent.detail.active);
-    });
+    syncHeaderState();
+    window.addEventListener("scroll", syncHeaderState, { passive: true });
 </script>

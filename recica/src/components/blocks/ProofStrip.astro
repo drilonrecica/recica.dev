@@ -1,0 +1,26 @@
+---
+import { proofItems } from '@/lib/site-content';
+---
+
+<section class="section-shell section-shell--tight">
+	<div class="section-grid">
+		<div class="section-heading-block">
+			<p class="kicker">Proof</p>
+			<h2 class="section-title">Evidence first, resume second.</h2>
+			<p class="section-copy">
+				The flagship should communicate depth in seconds: long-running Android work, serious modernization, and real product ownership.
+			</p>
+		</div>
+
+		<div class="proof-grid">
+			{
+				proofItems.map((item) => (
+					<article class="proof-item">
+						<h3>{item.title}</h3>
+						<p>{item.description}</p>
+					</article>
+				))
+			}
+		</div>
+	</div>
+</section>

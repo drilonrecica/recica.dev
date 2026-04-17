@@ -1,48 +1,26 @@
 ---
+import { footerLinks, siteConfig } from "@/lib/site-content";
+
 const year = new Date().getFullYear();
 ---
 
-<footer
-    data-blueprint="Footer.astro"
-    class="w-full border-t border-zinc-900 bg-zinc-950 mt-auto py-8"
->
-    <div
-        class="max-w-4xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-zinc-500 font-mono"
-    >
+<footer data-blueprint="Footer.astro" class="site-footer">
+    <div class="site-footer__shell">
         <p>
-            &copy; {year} Drilon Recica. All rights reserved.
+            &copy; {year} {siteConfig.name}. All rights reserved.
         </p>
-        <div class="flex items-center gap-4">
-            <a
-                href="/about"
-                class="hover:text-indigo-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-sm px-1"
-            >
-                about
-            </a>
-            <a
-                href="https://linkedin.com/in/drilonrecica"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="hover:text-indigo-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-sm px-1"
-            >
-                linkedin
-            </a>
-            <a
-                href="https://x.com/drilonre"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="hover:text-indigo-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-sm px-1"
-            >
-                x
-            </a>
-            <a
-                href="https://github.com/drilonrecica/recica.dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="hover:text-indigo-400 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-sm px-1"
-            >
-                source_code @ github
-            </a>
+        <div class="site-footer__links">
+            {
+                footerLinks.map((link) => (
+                    <a
+                        href={link.href}
+                        target={link.external ? "_blank" : undefined}
+                        rel={link.external ? "noreferrer" : undefined}
+                    >
+                        {link.label}
+                    </a>
+                ))
+            }
         </div>
     </div>
 </footer>

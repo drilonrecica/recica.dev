@@ -43,9 +43,9 @@ export function buildOrganizationSchema(origin: string) {
 		url: origin,
 		founder: {
 			'@type': 'Person',
-			name: 'Drilon Recica',
-			jobTitle: 'Senior Software Developer',
-			url: 'https://drilon.recica.dev'
+			name: 'Drilon Reçica',
+			jobTitle: 'Senior Mobile & Product Engineer',
+			url: 'https://recica.dev'
 		}
 	};
 }

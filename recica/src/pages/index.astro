@@ -1,13 +1,26 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import Hero from "@/components/blocks/Hero.astro";
-import SubdomainGrid from "@/components/blocks/SubdomainGrid.astro";
+import ContactSection from "@/components/blocks/ContactSection.astro";
+import CollaborationSection from "@/components/blocks/CollaborationSection.astro";
+import ExperienceSnapshot from "@/components/blocks/ExperienceSnapshot.astro";
+import FeaturedTools from "@/components/blocks/FeaturedTools.astro";
+import FlagshipHero from "@/components/blocks/FlagshipHero.astro";
+import HowIWork from "@/components/blocks/HowIWork.astro";
+import ProofStrip from "@/components/blocks/ProofStrip.astro";
+import SelectedWork from "@/components/blocks/SelectedWork.astro";
+import { siteConfig } from "@/lib/site-content";
 ---
 
 <BaseLayout
-	title="Drilon Recica | Senior Frontend Engineer"
-	description="The personal site and digital garden of Drilon Recica. Senior Frontend Engineer and Creative Technologist."
+	title={siteConfig.title}
+	description={siteConfig.description}
 >
-	<Hero />
-	<SubdomainGrid />
+	<FlagshipHero />
+	<ProofStrip />
+	<SelectedWork />
+	<FeaturedTools />
+	<ExperienceSnapshot />
+	<HowIWork />
+	<CollaborationSection />
+	<ContactSection />
 </BaseLayout>

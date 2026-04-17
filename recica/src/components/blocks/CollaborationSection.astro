@@ -1,0 +1,18 @@
+---
+import { collaboration, siteConfig } from '@/lib/site-content';
+---
+
+<section class="section-shell section-shell--tight">
+	<div class="collaboration-band">
+		<div>
+			<p class="kicker">Collaboration</p>
+			<h2 class="collaboration-band__title">{collaboration.title}</h2>
+			<p class="collaboration-band__copy">{collaboration.description}</p>
+		</div>
+
+		<div class="collaboration-band__actions">
+			<a href={`mailto:${siteConfig.email}`} class="action-link action-link--primary">Start a conversation</a>
+			<a href={siteConfig.cvPath} class="action-link action-link--secondary">Review the CV</a>
+		</div>
+	</div>
+</section>
