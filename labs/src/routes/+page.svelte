@@ -49,11 +49,12 @@
 						class="font-display text-[clamp(3.4rem,8vw,7rem)] leading-[0.88] font-bold tracking-[-0.08em] text-[var(--ink)]"
 						data-testid="labs-home-hero"
 					>
-						Public experiments with product taste, technical depth, and room to grow.
+						Public product experiments.
 					</h1>
 					<p class="max-w-3xl text-lg leading-8 text-[var(--ink-soft)] sm:text-xl">
 						The exploratory layer of the Recica ecosystem: interactive references, useful
-						prototypes, and product ideas that are still early enough to stay sharp.
+						prototypes, and product ideas that are still early enough to stay sharp, but real
+						enough to test, compare, and learn from in public.
 					</p>
 				</div>
 
