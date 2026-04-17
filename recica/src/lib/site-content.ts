@@ -60,7 +60,6 @@ export type ContactLink = {
 
 export type SectionCopy = {
 	hero: {
-		kicker: string;
 		intro: string;
 	};
 	proof: {
@@ -82,7 +81,6 @@ export type SectionCopy = {
 	experience: {
 		kicker: string;
 		title: string;
-		description: string;
 	};
 	about: {
 		kicker: string;
@@ -123,52 +121,49 @@ export const siteConfig = {
 
 export const sectionCopy: SectionCopy = {
 	hero: {
-		kicker: 'Recica.dev / flagship',
-		intro:
-			'I build mobile products, modernize legacy systems, and lead delivery with product judgment across architecture and execution.'
+		intro: 'I build mobile products, modernize existing systems, and lead delivery with product judgment.'
 	},
 	proof: {
 		kicker: 'Proof',
-		title: 'Evidence first, resume second.',
+		title: 'Depth that shows up in production.',
 		description:
-			'Long-running Android depth, real modernization work, and product ownership that goes beyond implementation.'
+			'Android depth, modernization work, accessibility, and 0-to-1 delivery across very different product environments.'
 	},
 	work: {
 		kicker: 'Selected Work',
-		title: 'Three projects that show how I work in production.',
+		title: 'Selected work that shows the level I operate at.',
 		description:
-			'Public mobility, early-stage product building, and customer-facing retail, chosen because they reflect the kind of ownership and delivery I bring to real teams.'
+			'Three projects that show delivery ownership across public mobility, 0-to-1 product work, and customer-facing retail.'
 	},
 	tools: {
 		kicker: 'Featured Tools',
-		title: 'Useful tools, built with the same standards.',
+		title: 'Practical tools, built the same way.',
 		description:
-			'I also build privacy-first utilities for everyday technical work. They are small on purpose, fast to use, and focused on removing friction.',
+			'I build browser-based utilities for the kind of technical work teams do every day: fast, local-first, and useful without extra ceremony.',
 		footer:
-			'Local-first, fast, and built for real day-to-day work without accounts, uploads, or unnecessary ceremony.'
+			'Runs locally, needs no account, and stays focused on the task.'
 	},
 	experience: {
 		kicker: 'Experience Snapshot',
-		title: 'Enough context to scan quickly, with the full CV one click away.',
-		description: 'A quick scan of the roles behind the work, with the full timeline in the CV.'
+		title: 'Enough context to scan quickly, with the full CV one click away.'
 	},
 	about: {
 		kicker: 'How I Work',
 		title: 'Clear thinking, durable systems, and product-minded execution.',
 		description:
-			'A few principles that shape how I build software, modernize existing systems, and work with teams.'
+			'Principles that shape how I build software, make systems safer to evolve, and work with teams.'
 	},
 	collaboration: {
 		kicker: 'Collaboration',
-		title: 'Best fit: senior mobile product work, modernization, and selective consulting.',
+		title: 'Open to senior mobile product work, modernization, and selective consulting.',
 		description:
-			'Most useful in roles and projects that need ownership, technical judgment, and delivery beyond ticket-by-ticket execution.'
+			'Best fit where product judgment, technical ownership, and reliable delivery matter as much as implementation.'
 	},
 	contact: {
 		kicker: 'Contact',
-		title: 'Start with a direct conversation.',
+		title: 'Email is the fastest way in.',
 		description:
-			'Email is the best place to start for senior roles, consulting, or product conversations. The rest is here if you want more context first.',
+			'Best for senior roles, consulting, and product conversations.',
 		emailLabel: 'Direct email'
 	}
 };
@@ -192,11 +187,6 @@ export const proofItems: ProofItem[] = [
 		title: 'Android since 2012',
 		description:
 			'Built through every major platform shift, from Java and XML to modern Kotlin-first Android stacks.'
-	},
-	{
-		title: '13+ years in production software',
-		description:
-			'Long-running experience across enterprise mobility, retail, fintech, insurance, and startup product work.'
 	},
 	{
 		title: 'Legacy systems modernized',
@@ -226,14 +216,13 @@ export const caseStudies: CaseStudy[] = [
 		role: 'Senior Android Developer',
 		period: 'Nov 2023 — Present',
 		summary:
-			'Large public mobility product balancing legacy architecture, accessibility demands, and continuous delivery in a live Android codebase.',
+			'Large public mobility product balancing legacy architecture, accessibility requirements, and continuous delivery in a live Android codebase.',
 		bullets: [
-			'Led migration paths from MVP and RxJava toward MVVM, Coroutines, and Flow in key parts of the app.',
-			'Improved accessibility and UI consistency for a broad public user base with real WCAG expectations.',
-			'Helped decouple core features to reduce delivery friction across a large production system.'
+			'Led migration paths from MVP and RxJava toward MVVM, Coroutines, and Flow in critical parts of the app.',
+			'Improved accessibility and UI consistency while reducing coupling in core product flows.'
 		],
 		outcome:
-			'Raised long-term maintainability and delivery confidence without relying on a disruptive rewrite.',
+			'Made ongoing delivery safer in a large public mobility app without relying on a disruptive rewrite.',
 		stack: ['Kotlin', 'Jetpack Compose', 'Coroutines', 'Flow', 'Accessibility'],
 		href: 'https://play.google.com/store/apps/details?id=de.dbregio.wohinduwillst',
 		linkLabel: 'Open on Play Store',
@@ -244,14 +233,13 @@ export const caseStudies: CaseStudy[] = [
 		role: 'Tech Lead & Senior Software Engineer',
 		period: '2023 — 2024',
 		summary:
-			'Early-stage product moving from concept to a shippable foundation across app architecture, backend systems, and deployment.',
+			'Early-stage product moving from concept to a launch-ready foundation across app architecture, backend systems, and deployment.',
 		bullets: [
-			'Led ideation, technical direction, and end-to-end implementation as an early team member.',
-			'Built the backend in Deno and TypeScript, and shipped the Flutter app from scratch.',
-			'Owned core product foundations including navigation, localization, payments, persistence, and deployment.'
+			'Owned ideation, technical direction, and end-to-end implementation as an early core team member.',
+			'Built the backend in Deno and TypeScript, shipped the Flutter app from scratch, and set up the product foundations around it.'
 		],
 		outcome:
-			'Turned an early concept into a launch-ready product foundation with coherent decisions across the whole stack.',
+			'Took a 0-to-1 product from concept to a launch-ready foundation across product, app, backend, and deployment.',
 		stack: ['Flutter', 'Deno', 'TypeScript', 'Coolify', 'VPS Infrastructure'],
 		href: 'https://qisara.com/',
 		linkLabel: 'Visit product',
@@ -262,14 +250,13 @@ export const caseStudies: CaseStudy[] = [
 		role: 'Senior Android Developer',
 		period: 'Aug 2022 — Nov 2023',
 		summary:
-			'Customer-facing retail product where scan-led shopping flows need to stay quick, clear, and reliable in real store use.',
+			'Customer-facing retail product where scan-led shopping flows need to stay fast, clear, and reliable in real store use.',
 		bullets: [
-			'Built shopping flows linking scanning, in-store actions, and checkout-adjacent interactions.',
-			'Worked inside a large production Android codebase with cross-disciplinary teams spanning mobile, backend, and product.',
-			'Improved modernization and UI quality in a high-usage retail environment where speed and clarity matter.'
+			'Built shopping flows linking scanning, in-store actions, and checkout-adjacent interactions inside a large production Android app.',
+			'Improved UI quality and modernization in a retail environment where hesitation directly damages the experience.'
 		],
 		outcome:
-			'Strengthened a production retail experience where usability and reliability directly affect everyday customer behavior.',
+			'Improved in-store reliability and UX clarity in a product where shopper confidence depends on speed and low friction.',
 		stack: ['Android', 'Kotlin', 'Jetpack Compose', 'Retail UX'],
 		href: 'https://play.google.com/store/apps/details?id=de.edeka.genuss',
 		linkLabel: 'Open on Play Store',
@@ -306,36 +293,31 @@ export const experienceItems: ExperienceItem[] = [
 		title: 'Deutsche Bahn – Wohin Du Willst',
 		role: 'Senior Android Developer',
 		period: 'Nov 2023 — Present',
-		summary:
-			'Architecture modernization, accessibility improvements, and long-term maintainability for a public mobility product.'
+		summary: 'Modernizing a live public mobility app without slowing delivery.'
 	},
 	{
 		title: 'Qisara',
 		role: 'Tech Lead & Senior Software Engineer',
 		period: '2023 — 2024',
-		summary:
-			'Greenfield product work across mobile, backend, infrastructure, and technical ownership.'
+		summary: '0-to-1 product delivery across product, app, backend, and infrastructure.'
 	},
 	{
 		title: 'EDEKA – Scan & Go',
 		role: 'Senior Android Developer',
 		period: 'Aug 2022 — Nov 2023',
-		summary:
-			'Retail app engineering for scan-led shopping flows and production Android delivery.'
+		summary: 'Shipping retail flows where scan-to-checkout speed and clarity mattered in store.'
 	},
 	{
 		title: 'RMVGo',
 		role: 'Senior Android Developer',
 		period: 'Jun 2020 — Aug 2022',
-		summary:
-			'Transit app stabilization and modernization across reliability, mobility features, and delivery quality.'
+		summary: 'Stabilized and improved a transit app under everyday production use.'
 	},
 	{
 		title: 'easyCredit / Fymio & ErgoDirekt',
 		role: 'Senior Android Developer',
 		period: '2015 — 2020',
-		summary:
-			'FinTech and insurance product development across Kotlin, Java, architectural setup, and early Flutter work.'
+		summary: 'Built fintech and insurance products across Kotlin, Java, architecture, and early Flutter.'
 	}
 ];
 
@@ -343,22 +325,22 @@ export const principles: Principle[] = [
 	{
 		title: 'Product-minded engineering',
 		description:
-			'I care about what the product is doing for users and the business, not just whether the ticket is technically complete.'
+			'I treat product context as part of engineering, not as a separate concern handed over later.'
 	},
 	{
 		title: 'Modernization without reckless rewrites',
 		description:
-			'I like moving legacy systems forward carefully: clearer boundaries, better delivery confidence, and less long-term chaos.'
+			'I move legacy systems forward incrementally, with cleaner boundaries and safer delivery at each step.'
 	},
 	{
 		title: 'Strong mobile foundations',
 		description:
-			'I default to maintainable architecture, readable code, and mobile experiences that stay reliable as products grow.'
+			'I bias toward mobile architectures teams can maintain under real release pressure.'
 	},
 	{
 		title: 'Ownership beyond the app surface',
 		description:
-			'I operate comfortably where product direction, backend systems, infrastructure, and execution all meet.'
+			'I am comfortable owning the seams between app, backend, infrastructure, and product decisions.'
 	}
 ];
 
@@ -366,14 +348,14 @@ export const contactLinks: ContactLink[] = [
 	{
 		label: 'Email',
 		href: `mailto:${siteConfig.email}`,
-		description: 'Best route for senior roles, consulting, or product conversations.',
+		description: 'Best route for roles, consulting, or product conversations.',
 		eyebrow: 'Primary',
 		primary: true
 	},
 	{
 		label: 'LinkedIn',
 		href: 'https://linkedin.com/in/drilonrecica',
-		description: 'Professional background, work history, and the easiest social checkpoint.',
+		description: 'Background, work history, and the quickest professional checkpoint.',
 		eyebrow: 'Network'
 	},
 	{
@@ -391,7 +373,7 @@ export const contactLinks: ContactLink[] = [
 	{
 		label: 'X / Twitter',
 		href: 'https://x.com/drilonre',
-		description: 'Occasional updates and lightweight public context.',
+		description: 'Occasional public notes.',
 		eyebrow: 'Optional',
 		subdued: true
 	}
