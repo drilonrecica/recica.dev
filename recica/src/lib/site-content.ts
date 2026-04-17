@@ -79,22 +79,16 @@ export const siteConfig = {
 
 export const navigation: NavItem[] = [
 	{ label: 'Work', href: '#work' },
-	{ label: 'Tools', href: '#tools' },
 	{ label: 'Experience', href: '#experience' },
 	{ label: 'About', href: '#about' },
-	{ label: 'Contact', href: '#contact' }
+	{ label: 'Contact', href: '#contact' },
+	{ label: 'Tools', href: '#tools' }
 ];
 
 export const heroActions: ActionLink[] = [
 	{ label: 'View selected work', href: '#work', style: 'primary' },
 	{ label: 'Get in touch', href: '#contact', style: 'secondary' },
-	{ label: 'Download CV', href: siteConfig.cvPath, style: 'text' },
-	{
-		label: 'Explore tools',
-		href: 'https://tools.recica.dev',
-		style: 'text',
-		external: true
-	}
+	{ label: 'Download CV', href: siteConfig.cvPath, style: 'text' }
 ];
 
 export const proofItems: ProofItem[] = [
