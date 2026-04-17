@@ -23,6 +23,7 @@ export type CaseStudy = {
 	period: string;
 	summary: string;
 	bullets: string[];
+	outcome: string;
 	stack: string[];
 	href: string;
 	linkLabel: string;
@@ -54,6 +55,51 @@ export type ContactLink = {
 	description: string;
 	eyebrow: string;
 	primary?: boolean;
+	subdued?: boolean;
+};
+
+export type SectionCopy = {
+	hero: {
+		kicker: string;
+		intro: string;
+	};
+	proof: {
+		kicker: string;
+		title: string;
+		description: string;
+	};
+	work: {
+		kicker: string;
+		title: string;
+		description: string;
+	};
+	tools: {
+		kicker: string;
+		title: string;
+		description: string;
+		footer: string;
+	};
+	experience: {
+		kicker: string;
+		title: string;
+		description: string;
+	};
+	about: {
+		kicker: string;
+		title: string;
+		description: string;
+	};
+	collaboration: {
+		kicker: string;
+		title: string;
+		description: string;
+	};
+	contact: {
+		kicker: string;
+		title: string;
+		description: string;
+		emailLabel: string;
+	};
 };
 
 export const siteConfig = {
@@ -64,9 +110,7 @@ export const siteConfig = {
 	description:
 		'Senior Mobile & Product Engineer specializing in Android, product architecture, legacy modernization, and practical developer tools.',
 	supportingLine:
-		'Building polished mobile apps, practical developer tools, and modern digital products.',
-	intro:
-		'I design and ship mobile products, modernize legacy systems, and lead product-minded engineering work across architecture, delivery, and user experience.',
+		'Mobile products, practical tools, and modern engineering that holds up in production.',
 	email: 'drilonrecica.dev@gmail.com',
 	cvPath: '/cv.pdf',
 	image: '/og-image.png',
@@ -76,6 +120,58 @@ export const siteConfig = {
 		'https://x.com/drilonre'
 	]
 } as const;
+
+export const sectionCopy: SectionCopy = {
+	hero: {
+		kicker: 'Recica.dev / flagship',
+		intro:
+			'I build mobile products, modernize legacy systems, and lead delivery with product judgment across architecture and execution.'
+	},
+	proof: {
+		kicker: 'Proof',
+		title: 'Evidence first, resume second.',
+		description:
+			'Long-running Android depth, real modernization work, and product ownership that goes beyond implementation.'
+	},
+	work: {
+		kicker: 'Selected Work',
+		title: 'Three projects that show how I work in production.',
+		description:
+			'Public mobility, early-stage product building, and customer-facing retail, chosen because they reflect the kind of ownership and delivery I bring to real teams.'
+	},
+	tools: {
+		kicker: 'Featured Tools',
+		title: 'Useful tools, built with the same standards.',
+		description:
+			'I also build privacy-first utilities for everyday technical work. They are small on purpose, fast to use, and focused on removing friction.',
+		footer:
+			'Local-first, fast, and built for real day-to-day work without accounts, uploads, or unnecessary ceremony.'
+	},
+	experience: {
+		kicker: 'Experience Snapshot',
+		title: 'Enough context to scan quickly, with the full CV one click away.',
+		description: 'A quick scan of the roles behind the work, with the full timeline in the CV.'
+	},
+	about: {
+		kicker: 'How I Work',
+		title: 'Clear thinking, durable systems, and product-minded execution.',
+		description:
+			'A few principles that shape how I build software, modernize existing systems, and work with teams.'
+	},
+	collaboration: {
+		kicker: 'Collaboration',
+		title: 'Best fit: senior mobile product work, modernization, and selective consulting.',
+		description:
+			'Most useful in roles and projects that need ownership, technical judgment, and delivery beyond ticket-by-ticket execution.'
+	},
+	contact: {
+		kicker: 'Contact',
+		title: 'Start with a direct conversation.',
+		description:
+			'Email is the best place to start for senior roles, consulting, or product conversations. The rest is here if you want more context first.',
+		emailLabel: 'Direct email'
+	}
+};
 
 export const navigation: NavItem[] = [
 	{ label: 'Work', href: '#work' },
@@ -120,7 +216,7 @@ export const proofItems: ProofItem[] = [
 	{
 		title: 'Practical builder mindset',
 		description:
-			'Employer and client work is backed by independent products, useful tools, and a strong bias toward real utility.'
+			'Backed by independent products and tools with a bias toward real utility over demo work.'
 	}
 ];
 
@@ -130,12 +226,14 @@ export const caseStudies: CaseStudy[] = [
 		role: 'Senior Android Developer',
 		period: 'Nov 2023 — Present',
 		summary:
-			'Modernizing a large public mobility product with stronger architecture, better accessibility, and more reliable delivery.',
+			'Large public mobility product balancing legacy architecture, accessibility demands, and continuous delivery in a live Android codebase.',
 		bullets: [
-			'Led migration from legacy MVP and RxJava patterns toward MVVM, Coroutines, and Flow.',
-			'Improved accessibility and UI quality for a broad public user base with real WCAG expectations.',
-			'Helped decouple core features to improve build times, maintainability, and team velocity.'
+			'Led migration paths from MVP and RxJava toward MVVM, Coroutines, and Flow in key parts of the app.',
+			'Improved accessibility and UI consistency for a broad public user base with real WCAG expectations.',
+			'Helped decouple core features to reduce delivery friction across a large production system.'
 		],
+		outcome:
+			'Raised long-term maintainability and delivery confidence without relying on a disruptive rewrite.',
 		stack: ['Kotlin', 'Jetpack Compose', 'Coroutines', 'Flow', 'Accessibility'],
 		href: 'https://play.google.com/store/apps/details?id=de.dbregio.wohinduwillst',
 		linkLabel: 'Open on Play Store',
@@ -146,12 +244,14 @@ export const caseStudies: CaseStudy[] = [
 		role: 'Tech Lead & Senior Software Engineer',
 		period: '2023 — 2024',
 		summary:
-			'0-to-1 product work spanning product direction, Flutter app architecture, backend foundations, and infrastructure setup.',
+			'Early-stage product moving from concept to a shippable foundation across app architecture, backend systems, and deployment.',
 		bullets: [
-			'Led ideation, architecture, and end-to-end implementation as an early-stage startup team member.',
-			'Built the backend with Deno.js and TypeScript, and shipped the Flutter app from scratch.',
+			'Led ideation, technical direction, and end-to-end implementation as an early team member.',
+			'Built the backend in Deno and TypeScript, and shipped the Flutter app from scratch.',
 			'Owned core product foundations including navigation, localization, payments, persistence, and deployment.'
 		],
+		outcome:
+			'Turned an early concept into a launch-ready product foundation with coherent decisions across the whole stack.',
 		stack: ['Flutter', 'Deno', 'TypeScript', 'Coolify', 'VPS Infrastructure'],
 		href: 'https://qisara.com/',
 		linkLabel: 'Visit product',
@@ -162,12 +262,14 @@ export const caseStudies: CaseStudy[] = [
 		role: 'Senior Android Developer',
 		period: 'Aug 2022 — Nov 2023',
 		summary:
-			'Mobile retail work focused on scan-based shopping flows, customer-facing reliability, and the bridge between in-store and digital behavior.',
+			'Customer-facing retail product where scan-led shopping flows need to stay quick, clear, and reliable in real store use.',
 		bullets: [
-			'Built practical shopping flows connecting scanning, checkout-adjacent interactions, and customer-facing retail UX.',
+			'Built shopping flows linking scanning, in-store actions, and checkout-adjacent interactions.',
 			'Worked inside a large production Android codebase with cross-disciplinary teams spanning mobile, backend, and product.',
-			'Contributed to modernization and UI quality in a high-usage retail environment where speed and clarity matter.'
+			'Improved modernization and UI quality in a high-usage retail environment where speed and clarity matter.'
 		],
+		outcome:
+			'Strengthened a production retail experience where usability and reliability directly affect everyday customer behavior.',
 		stack: ['Android', 'Kotlin', 'Jetpack Compose', 'Retail UX'],
 		href: 'https://play.google.com/store/apps/details?id=de.edeka.genuss',
 		linkLabel: 'Open on Play Store',
@@ -260,43 +362,38 @@ export const principles: Principle[] = [
 	}
 ];
 
-export const collaboration = {
-	title: 'Open to senior roles, consulting engagements, and selected product collaborations.',
-	description:
-		'Especially interested in mobile product engineering, architecture modernization, and practical product work where strong execution matters.'
-} as const;
-
 export const contactLinks: ContactLink[] = [
 	{
 		label: 'Email',
 		href: `mailto:${siteConfig.email}`,
-		description: 'Best route for serious conversations, consulting, or role discussions.',
+		description: 'Best route for senior roles, consulting, or product conversations.',
 		eyebrow: 'Primary',
 		primary: true
 	},
 	{
 		label: 'LinkedIn',
 		href: 'https://linkedin.com/in/drilonrecica',
-		description: 'Professional profile, background, and the easiest social touchpoint.',
+		description: 'Professional background, work history, and the easiest social checkpoint.',
 		eyebrow: 'Network'
 	},
 	{
 		label: 'GitHub',
 		href: 'https://github.com/drilonrecica',
-		description: 'Public code, current experiments, and technical context beyond the homepage.',
+		description: 'Public code, tools, and current technical context.',
 		eyebrow: 'Code'
 	},
 	{
 		label: 'Download CV',
 		href: siteConfig.cvPath,
-		description: 'Clean chronological history for recruiters, hiring managers, and formal review.',
+		description: 'Formal timeline for hiring loops and structured review.',
 		eyebrow: 'Document'
 	},
 	{
 		label: 'X / Twitter',
 		href: 'https://x.com/drilonre',
-		description: 'Lower-priority public channel for lightweight updates and shared work.',
-		eyebrow: 'Optional'
+		description: 'Occasional updates and lightweight public context.',
+		eyebrow: 'Optional',
+		subdued: true
 	}
 ];
 

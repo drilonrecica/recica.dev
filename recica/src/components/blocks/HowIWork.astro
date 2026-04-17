@@ -1,15 +1,13 @@
 ---
-import { principles } from '@/lib/site-content';
+import { principles, sectionCopy } from '@/lib/site-content';
 ---
 
 <section id="about" class="section-shell anchor-target">
 	<div class="section-grid">
 		<div class="section-heading-block">
-			<p class="kicker">How I Work</p>
-			<h2 class="section-title">Clear thinking, durable systems, and product-minded execution.</h2>
-			<p class="section-copy">
-				This is where the old expertise cards become something more useful: a short view into how I approach architecture, delivery, and the messy reality around software work.
-			</p>
+			<p class="kicker">{sectionCopy.about.kicker}</p>
+			<h2 class="section-title">{sectionCopy.about.title}</h2>
+			<p class="section-copy">{sectionCopy.about.description}</p>
 		</div>
 
 		<div class="principle-list">

@@ -503,8 +503,27 @@
   }
 
   .hero-poster__frame::before {
+    content: "R";
+    position: absolute;
+    right: 1rem;
+    top: 1.7rem;
+    z-index: 0;
+    color: rgba(255, 255, 255, 0.045);
+    font-size: clamp(8rem, 20vw, 13rem);
+    font-weight: 700;
+    line-height: 0.84;
+    text-shadow: 0 0 28px rgba(94, 168, 162, 0.12);
+  }
+
+  .hero-poster__mesh::before,
+  .hero-poster__mesh::after {
     content: "";
     position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero-poster__mesh::before {
     inset: -18% -12% auto auto;
     width: 19rem;
     height: 19rem;
@@ -514,9 +533,7 @@
     opacity: 0.9;
   }
 
-  .hero-poster__frame::after {
-    content: "";
-    position: absolute;
+  .hero-poster__mesh::after {
     inset: auto auto -22% -18%;
     width: 20rem;
     height: 20rem;
@@ -645,17 +662,6 @@
     color: rgba(238, 243, 245, 0.64);
   }
 
-  .hero-poster__monogram {
-    position: absolute;
-    right: 1rem;
-    top: 1.7rem;
-    font-size: clamp(8rem, 20vw, 13rem);
-    line-height: 0.84;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.045);
-    text-shadow: 0 0 28px rgba(94, 168, 162, 0.12);
-  }
-
   .hero-poster__stack {
     position: relative;
     z-index: 1;
@@ -704,7 +710,32 @@
   }
 
   .section-heading-block {
+    position: relative;
     max-width: 43rem;
+    padding-bottom: 1.35rem;
+    animation: fade-up 700ms ease both;
+  }
+
+  .section-heading-block::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 5.75rem;
+    height: 1px;
+    background: linear-gradient(90deg, var(--accent-strong), transparent);
+  }
+
+  .section-heading-block::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.23rem;
+    width: 0.52rem;
+    height: 0.52rem;
+    border-radius: 999px;
+    background: var(--accent-strong);
+    box-shadow: 0 0 0 6px rgba(94, 168, 162, 0.08);
   }
 
   .section-title {
@@ -735,6 +766,7 @@
   .proof-item {
     padding: 1.15rem 0 1.3rem;
     border-bottom: 1px solid var(--line);
+    transition: transform 160ms ease, border-color 160ms ease;
   }
 
   .proof-item,
@@ -761,6 +793,11 @@
   .tool-highlight p {
     margin-top: 0.55rem;
     font-size: 0.96rem;
+  }
+
+  .proof-item:hover {
+    transform: translateX(4px);
+    border-bottom-color: rgba(94, 168, 162, 0.18);
   }
 
   .story-list {
@@ -823,6 +860,11 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
+    padding-left: 0.95rem;
+  }
+
+  .story-row__body {
+    padding-left: 0.95rem;
   }
 
   .story-row__eyebrow,
@@ -836,6 +878,7 @@
     color: var(--ink);
     font-size: clamp(1.55rem, 2.5vw, 2.1rem);
     line-height: 1;
+    transition: color 160ms ease;
   }
 
   .story-row__role,
@@ -850,7 +893,7 @@
     width: fit-content;
     color: var(--accent-strong);
     font-weight: 600;
-    transition: color 160ms ease;
+    transition: color 160ms ease, transform 160ms ease;
   }
 
   .story-row__summary {
@@ -869,6 +912,33 @@
 
   .story-row__bullets li::marker {
     color: var(--accent-strong);
+  }
+
+  .story-row__outcome {
+    margin-top: 1rem;
+    padding-left: 1rem;
+    border-left: 1px solid var(--story-border, rgba(94, 168, 162, 0.24));
+    color: var(--ink);
+    font-size: 0.98rem;
+    line-height: 1.75;
+  }
+
+  .story-row__outcome span {
+    display: inline-block;
+    margin-right: 0.75rem;
+    color: var(--accent-strong);
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .story-row:hover .story-row__title {
+    color: #f8fbfc;
+  }
+
+  .story-row:hover .story-row__link {
+    transform: translateX(2px);
   }
 
   .tag-row {
@@ -931,6 +1001,10 @@
 
   .tool-highlight:hover {
     transform: translateY(-1px);
+  }
+
+  .tool-highlight:hover {
+    border-color: rgba(94, 168, 162, 0.18);
   }
 
   .tools-band__footer {
@@ -1021,6 +1095,21 @@
   .contact-item--primary {
     border-color: rgba(94, 168, 162, 0.24);
     background: linear-gradient(135deg, rgba(47, 124, 120, 0.14), rgba(18, 25, 32, 0.72));
+    box-shadow: 0 20px 46px rgba(4, 12, 15, 0.24);
+    padding: 1.35rem;
+  }
+
+  .contact-item--primary h3 {
+    font-size: 1.2rem;
+  }
+
+  .contact-item--subdued {
+    opacity: 0.76;
+    border-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .contact-item--subdued:hover {
+    opacity: 0.9;
   }
 
   .collaboration-band {
@@ -1162,6 +1251,10 @@
   .principle-list,
   .contact-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contact-item--primary {
+    grid-column: 1 / -1;
   }
 
   .collaboration-band {

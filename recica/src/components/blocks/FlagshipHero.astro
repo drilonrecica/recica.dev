@@ -1,5 +1,5 @@
 ---
-import { heroActions, siteConfig } from '@/lib/site-content';
+import { heroActions, sectionCopy, siteConfig } from '@/lib/site-content';
 
 const posterLines = [
 	'Android since 2012',
@@ -13,11 +13,11 @@ const posterLines = [
 	<div class="hero-stage__wash" aria-hidden="true"></div>
 	<div class="hero-stage__shell">
 		<div class="hero-copy">
-			<p class="kicker">Recica.dev / flagship</p>
+			<p class="kicker">{sectionCopy.hero.kicker}</p>
 			<h1 class="hero-title">{siteConfig.name}</h1>
 			<p class="hero-role">{siteConfig.role}</p>
 			<p class="hero-support">{siteConfig.supportingLine}</p>
-			<p class="hero-intro">{siteConfig.intro}</p>
+			<p class="hero-intro">{sectionCopy.hero.intro}</p>
 
 			<div class="hero-actions" aria-label="Primary actions">
 				{
@@ -48,7 +48,6 @@ const posterLines = [
 				<div class="hero-poster__signal hero-poster__signal--east">Modernization</div>
 				<div class="hero-poster__signal hero-poster__signal--south">Product delivery</div>
 				<div class="hero-poster__kicker">Mobile / Product / Systems</div>
-				<div class="hero-poster__monogram">R</div>
 				<div class="hero-poster__stack">
 					{
 						posterLines.map((line) => (

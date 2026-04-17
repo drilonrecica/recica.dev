@@ -1,15 +1,13 @@
 ---
-import { proofItems } from '@/lib/site-content';
+import { proofItems, sectionCopy } from '@/lib/site-content';
 ---
 
 <section class="section-shell section-shell--tight">
 	<div class="section-grid">
 		<div class="section-heading-block">
-			<p class="kicker">Proof</p>
-			<h2 class="section-title">Evidence first, resume second.</h2>
-			<p class="section-copy">
-				The flagship should communicate depth in seconds: long-running Android work, serious modernization, and real product ownership.
-			</p>
+			<p class="kicker">{sectionCopy.proof.kicker}</p>
+			<h2 class="section-title">{sectionCopy.proof.title}</h2>
+			<p class="section-copy">{sectionCopy.proof.description}</p>
 		</div>
 
 		<div class="proof-grid">

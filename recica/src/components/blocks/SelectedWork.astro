@@ -1,14 +1,12 @@
 ---
-import { caseStudies } from '@/lib/site-content';
+import { caseStudies, sectionCopy } from '@/lib/site-content';
 ---
 
 <section id="work" class="section-shell anchor-target">
 	<div class="section-heading-block">
-		<p class="kicker">Selected Work</p>
-		<h2 class="section-title">Three projects that carry the flagship story.</h2>
-		<p class="section-copy">
-			Not a career dump. Just the work that best shows mobile depth, product judgment, and the ability to move complex systems forward.
-		</p>
+		<p class="kicker">{sectionCopy.work.kicker}</p>
+		<h2 class="section-title">{sectionCopy.work.title}</h2>
+		<p class="section-copy">{sectionCopy.work.description}</p>
 	</div>
 
 	<div class="story-list">
@@ -35,6 +33,10 @@ import { caseStudies } from '@/lib/site-content';
 								))
 							}
 						</ul>
+						<p class="story-row__outcome">
+							<span>Outcome</span>
+							{study.outcome}
+						</p>
 						<div class="tag-row">
 							{
 								study.stack.map((tag) => (

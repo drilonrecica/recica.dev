@@ -1,15 +1,13 @@
 ---
-import { experienceItems, siteConfig } from '@/lib/site-content';
+import { experienceItems, sectionCopy, siteConfig } from '@/lib/site-content';
 ---
 
 <section id="experience" class="section-shell anchor-target">
 	<div class="section-grid">
 		<div class="section-heading-block">
-			<p class="kicker">Experience Snapshot</p>
-			<h2 class="section-title">Enough context to scan quickly, with the full CV one click away.</h2>
-			<p class="section-copy">
-				The homepage stays selective. The timeline is here to show continuity, range, and depth without turning the page back into a resume export.
-			</p>
+			<p class="kicker">{sectionCopy.experience.kicker}</p>
+			<h2 class="section-title">{sectionCopy.experience.title}</h2>
+			<p class="section-copy">{sectionCopy.experience.description}</p>
 			<a href={siteConfig.cvPath} class="action-link action-link--text">Download the full CV</a>
 		</div>
 

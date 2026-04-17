@@ -1,13 +1,13 @@
 ---
-import { collaboration, siteConfig } from '@/lib/site-content';
+import { sectionCopy, siteConfig } from '@/lib/site-content';
 ---
 
 <section class="section-shell section-shell--tight">
 	<div class="collaboration-band">
 		<div>
-			<p class="kicker">Collaboration</p>
-			<h2 class="collaboration-band__title">{collaboration.title}</h2>
-			<p class="collaboration-band__copy">{collaboration.description}</p>
+			<p class="kicker">{sectionCopy.collaboration.kicker}</p>
+			<h2 class="collaboration-band__title">{sectionCopy.collaboration.title}</h2>
+			<p class="collaboration-band__copy">{sectionCopy.collaboration.description}</p>
 		</div>
 
 		<div class="collaboration-band__actions">
