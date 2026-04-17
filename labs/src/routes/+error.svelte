@@ -17,7 +17,7 @@
 	const details = $derived(error?.message ? String(error.message) : '');
 </script>
 
-<SeoHead {title} {description} path="/404" />
+<SeoHead {title} {description} path="/404" noindex={true} />
 
 <section class="section-shell">
 	<div class="section-frame">

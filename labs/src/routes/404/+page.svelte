@@ -7,6 +7,7 @@
 	title="404 — Labs not found"
 	description="This Labs route does not exist. Head back to the main experiments page."
 	path="/404"
+	noindex={true}
 />
 
 <section class="section-shell">

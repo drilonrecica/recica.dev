@@ -1,4 +1,8 @@
-export const publicPageRoutes = ['/', '/parental-gate-lab'] as const;
+export const publicPageRoutes = [
+	{ path: '/', changeFrequency: 'weekly', priority: '1.0' },
+	{ path: '/parental-gate-lab', changeFrequency: 'monthly', priority: '0.9' }
+] as const;
+export const robotsDisallowRoutes = ['/404'] as const;
 
 export function resolveSiteOrigin(configuredUrl: string | undefined, requestUrl: URL): string {
 	const candidate = configuredUrl?.trim();
@@ -22,22 +26,36 @@ export function resolveSiteOrigin(configuredUrl: string | undefined, requestUrl:
 
 export function buildRobotsTxt(origin: string): string {
 	const sitemapUrl = new URL('/sitemap.xml', origin).toString();
+	const host = new URL(origin).host;
 
-	return ['User-agent: *', 'Allow: /', '', `Sitemap: ${sitemapUrl}`].join('\n');
+	return [
+		'User-agent: *',
+		'Allow: /',
+		...robotsDisallowRoutes.map((route) => `Disallow: ${route}`),
+		'',
+		`Sitemap: ${sitemapUrl}`,
+		`Host: ${host}`
+	].join('\n');
 }
 
 export function buildSitemapXml(
 	origin: string,
-	routes: readonly string[] = publicPageRoutes
+	routes: ReadonlyArray<{
+		path: string;
+		changeFrequency?: string;
+		priority?: string;
+	}> = publicPageRoutes
 ): string {
 	const today = new Date().toISOString().split('T')[0] ?? '';
 	const urls = [...new Set(routes)].map((route) => {
-		const url = new URL(route, origin).toString();
-		const priority = route === '/' ? '1.0' : '0.8';
+		const url = new URL(route.path, origin).toString();
+		const priority = route.priority ?? (route.path === '/' ? '1.0' : '0.8');
+		const changeFrequency = route.changeFrequency;
 
 		return `  <url>
     <loc>${escapeXml(url)}</loc>
     <lastmod>${today}</lastmod>
+    ${changeFrequency ? `<changefreq>${changeFrequency}</changefreq>` : ''}
     <priority>${priority}</priority>
   </url>`;
 	});

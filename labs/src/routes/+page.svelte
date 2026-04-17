@@ -3,12 +3,16 @@
 	import ExperimentCard from '$lib/components/experiments/ExperimentCard.svelte';
 	import SeoHead from '$lib/components/seo/SeoHead.svelte';
 	import { featuredExperiments, liveExperimentCount } from '$lib/data/experiments';
-	import { buildCollectionPageSchema, buildPersonSchema, buildWebsiteSchema } from '$lib/utils/seo';
+	import {
+		buildCollectionPageSchema,
+		buildItemListSchema,
+		buildPersonSchema,
+		buildWebsiteSchema
+	} from '$lib/utils/seo';
 
-	const title = 'Labs by Drilon Recica — Experiments, Prototypes, and Product Explorations';
+	const title = 'Labs by Drilon Recica — Public Product Experiments, UX Labs, and Prototypes';
 	const description =
-		'The public experimentation layer of the Recica ecosystem: interactive prototypes, product explorations, and concept work with one live experiment today.';
-	const origin = 'https://labs.recica.dev';
+		'Public product experiments by Drilon Reçica, including Parental Gate Lab, interactive UX references, and concept work around mobile products, product engineering, and privacy-first tools.';
 
 	const aboutPoints = [
 		'Labs sits between the flagship site and the stable tools layer: earlier than a finished product, but real enough to open and use.',
@@ -30,9 +34,19 @@
 	{description}
 	path="/"
 	socialImagePath="/og-labs.svg"
-	schema={[
+	socialImageAlt="Labs by Drilon Recica homepage preview"
+	schemaBuilder={(origin) => [
 		buildWebsiteSchema(origin, description),
-		buildCollectionPageSchema(origin, description),
+		buildCollectionPageSchema(origin, '/', title, description),
+		buildItemListSchema(
+			origin,
+			'Featured Labs Experiments',
+			featuredExperiments.map((experiment) => ({
+				name: experiment.title,
+				path: experiment.ctaHref ?? '/',
+				description: experiment.summary
+			}))
+		),
 		buildPersonSchema()
 	]}
 />
@@ -53,8 +67,8 @@
 					</h1>
 					<p class="max-w-3xl text-lg leading-8 text-[var(--ink-soft)] sm:text-xl">
 						The exploratory layer of the Recica ecosystem: interactive references, useful
-						prototypes, and product ideas that are still early enough to stay sharp, but real
-						enough to test, compare, and learn from in public.
+						prototypes, and product ideas that are still early enough to stay sharp, but real enough
+						to test, compare, and learn from in public.
 					</p>
 				</div>
 
@@ -79,11 +93,7 @@
 							stroke-width="3"
 							fill="none"
 						/>
-						<path
-							d="M118 386H320C358 386 390 354 390 316V180"
-							stroke-width="2.4"
-							fill="none"
-						/>
+						<path d="M118 386H320C358 386 390 354 390 316V180" stroke-width="2.4" fill="none" />
 						<path d="M222 92H500V180" stroke-width="1.8" fill="none" stroke-dasharray="10 10" />
 						<circle cx="102" cy="110" r="12" fill="var(--accent)" stroke="none" />
 						<circle cx="488" cy="396" r="12" fill="var(--accent-secondary)" stroke="none" />

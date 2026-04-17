@@ -14,6 +14,8 @@
 	import {
 		buildBreadcrumbSchema,
 		buildFaqSchema,
+		buildPersonSchema,
+		buildWebApplicationSchema,
 		buildWebPageSchema,
 		buildWebsiteSchema
 	} from '$lib/utils/seo';
@@ -26,8 +28,7 @@
 
 	const title = 'Parental Gate Lab — Compare UX Patterns for Kids & Family Apps';
 	const description =
-		'Try six parental gate patterns, compare their tradeoffs, and get a practical recommendation for settings, purchases, and adult-only flows in kids and family apps.';
-	const origin = 'https://labs.recica.dev';
+		'Compare parental gate UX patterns for kids and family apps. Try live demos, review tradeoffs, and get a practical recommendation for settings, purchases, subscriptions, and other adult-only flows.';
 
 	const patterns = parentalGatePatterns;
 	const whatItIsPoints = [
@@ -298,14 +299,23 @@
 	{description}
 	path="/parental-gate-lab"
 	socialImagePath="/og-parental-gate.svg"
-	schema={[
+	socialImageAlt="Parental Gate Lab social preview"
+	schemaBuilder={(origin) => [
 		buildWebsiteSchema(origin, description),
 		buildWebPageSchema(origin, '/parental-gate-lab', title, description),
+		buildWebApplicationSchema(
+			origin,
+			'/parental-gate-lab',
+			'Parental Gate Lab',
+			description,
+			'/og-parental-gate.svg'
+		),
 		buildFaqSchema(parentalGateFaq),
 		buildBreadcrumbSchema(origin, [
 			{ name: 'Labs', path: '/' },
 			{ name: 'Parental Gate Lab', path: '/parental-gate-lab' }
-		])
+		]),
+		buildPersonSchema()
 	]}
 />
 

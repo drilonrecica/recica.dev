@@ -8,6 +8,14 @@ test('loads the parental gate route with canonical metadata', async ({ page }) =
 	await expect(page.getByTestId('guidance-section')).toBeVisible();
 	await expect(page.getByTestId('pattern-rows')).toBeVisible();
 	await expect(page.locator('[data-testid^="pattern-row-"]')).toHaveCount(6);
+	await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+		'content',
+		'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+	);
+	await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
+		'content',
+		'Parental Gate Lab social preview'
+	);
 	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 		'href',
 		'http://127.0.0.1:4173/parental-gate-lab'
