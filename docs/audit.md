@@ -330,6 +330,11 @@ Sorted by severity, importance, and priority.
   - It undermines polish and suggests incomplete template cleanup.
 - `Recommendation`:
   - Replace the remaining Svelte default favicon asset with branded Recica Tools assets and verify both normal and error routes.
+- `Status`:
+  - Done by Codex on 2026-04-19.
+  - Removed the layout-level Svelte starter favicon override so production now uses the branded static favicon set defined in `tools/src/app.html`.
+  - Deleted the unused starter asset at `tools/src/lib/assets/favicon.svg`.
+  - Local verification: `tools` build passed.
 
 ### AUD-010
 
@@ -399,7 +404,7 @@ These are repo-local engineering tasks that can be implemented, tested, and veri
   - align root documentation with the real verification posture
 - [x] `AUD-008` local hygiene fix in `tools`:
   - format the two failing files and return the lint gate to green
-- `AUD-009` replace the remaining Svelte favicon artifact in `tools`
+- [x] `AUD-009` replace the remaining Svelte favicon artifact in `tools`
 - `AUD-010` normalize error-route canonical strategy in `tools` and `labs`
 
 ### Should be done by the developer

@@ -8,7 +8,6 @@
 	import { goto, afterNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
-	import favicon from '$lib/assets/favicon.svg';
 	import type { ToolDefinition } from '$lib/types/tool';
 	import { onMount, tick } from 'svelte';
 
@@ -91,7 +90,6 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
 	<meta name="theme-color" content="#0b0f14" />
 	<meta name="color-scheme" content="dark light" />
 </svelte:head>
