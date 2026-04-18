@@ -240,6 +240,14 @@ Sorted by severity, importance, and priority.
 - `Recommendation`:
   - Upgrade `astro` to at least `5.18.1` immediately, then refresh the lockfile and re-run the audit.
   - Reassess the remaining transitive advisories after that update before escalating further.
+- `Status`:
+  - Done by Codex on 2026-04-19.
+  - Upgraded `recica` from `astro@^5.17.1` to `astro@^5.18.1` and refreshed related package versions:
+    - `@astrojs/sitemap` to `^3.7.2`
+    - `@tailwindcss/vite` to `^4.2.2`
+    - `tailwindcss` to `^4.2.2`
+  - Local verification: `recica` build passed after the upgrade.
+  - Reassessment: the original unpatched Astro condition is resolved; `npm audit --omit=dev` still reports 7 transitive build-time advisories in the current Astro 5/Tailwind graph, which is a narrower residual maintenance issue than the original version-floor finding.
 
 ### AUD-006
 
@@ -397,7 +405,7 @@ These are repo-local engineering tasks that can be implemented, tested, and veri
   - tighten CSP generation in `tools` and `labs` to reduce or remove `unsafe-inline`
 - `AUD-004` runtime image hardening for `tools` and `labs`:
   - refactor Dockerfiles to ship runtime-only dependencies
-- `AUD-005` `recica` dependency remediation:
+- [x] `AUD-005` `recica` dependency remediation:
   - upgrade Astro and related packages,
   - refresh lockfile,
   - re-run build and audit checks
