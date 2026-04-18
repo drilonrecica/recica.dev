@@ -34,11 +34,11 @@ This app is deliberately narrow in scope. It should answer five questions quickl
 
 ### Routes
 
-| Route | Purpose | Notes |
-| --- | --- | --- |
-| `/` | One-page flagship homepage | Main public entry point |
-| `/about` | Compatibility redirect | Redirects to `/#about` |
-| `/cv.pdf` | Public CV download | Static file in `public/` |
+| Route     | Purpose                    | Notes                    |
+| --------- | -------------------------- | ------------------------ |
+| `/`       | One-page flagship homepage | Main public entry point  |
+| `/about`  | Compatibility redirect     | Redirects to `/#about`   |
+| `/cv.pdf` | Public CV download         | Static file in `public/` |
 
 ### Anchored Sections
 
@@ -102,19 +102,19 @@ That order is part of the product design. It puts identity and proof ahead of ch
 
 ### Content Model
 
-| Export in `site-content.ts` | Responsibility |
-| --- | --- |
-| `siteConfig` | Name, role, title, description, email, CV path, OG image, social links |
-| `sectionCopy` | Section kickers, titles, and intros |
-| `navigation` | Header anchor navigation |
-| `heroActions` | Hero CTA stack |
-| `proofItems` | Short evidence statements for the proof strip |
-| `caseStudies` | The three flagship work stories, including stacks and qualitative outcomes |
-| `featuredTools` | Curated links into `tools.recica.dev` |
-| `experienceItems` | Short timeline snapshot |
-| `principles` | "How I Work" section content |
-| `contactLinks` | Contact destinations and hierarchy |
-| `footerLinks` | Footer utilities |
+| Export in `site-content.ts` | Responsibility                                                             |
+| --------------------------- | -------------------------------------------------------------------------- |
+| `siteConfig`                | Name, role, title, description, email, CV path, OG image, social links     |
+| `sectionCopy`               | Section kickers, titles, and intros                                        |
+| `navigation`                | Header anchor navigation                                                   |
+| `heroActions`               | Hero CTA stack                                                             |
+| `proofItems`                | Short evidence statements for the proof strip                              |
+| `caseStudies`               | The three flagship work stories, including stacks and qualitative outcomes |
+| `featuredTools`             | Curated links into `tools.recica.dev`                                      |
+| `experienceItems`           | Short timeline snapshot                                                    |
+| `principles`                | "How I Work" section content                                               |
+| `contactLinks`              | Contact destinations and hierarchy                                         |
+| `footerLinks`               | Footer utilities                                                           |
 
 ## Technical Architecture
 
@@ -122,30 +122,30 @@ That order is part of the product design. It puts identity and proof ahead of ch
 
 `recica.dev` is built with Astro as a static site.
 
-| Concern | Implementation |
-| --- | --- |
-| Framework | Astro 5 |
-| Build output | Static `dist/` output |
-| Styling | Tailwind CSS v4 via Vite plugin plus custom global CSS |
-| Fonts | `@fontsource/inter` and `@fontsource/jetbrains-mono` |
-| Type safety | `astro/tsconfigs/strict` |
-| Sitemap generation | `@astrojs/sitemap` |
-| Package manager | npm |
+| Concern            | Implementation                                         |
+| ------------------ | ------------------------------------------------------ |
+| Framework          | Astro 5                                                |
+| Build output       | Static `dist/` output                                  |
+| Styling            | Tailwind CSS v4 via Vite plugin plus custom global CSS |
+| Fonts              | `@fontsource/inter` and `@fontsource/jetbrains-mono`   |
+| Type safety        | `astro/tsconfigs/strict`                               |
+| Sitemap generation | `@astrojs/sitemap`                                     |
+| Package manager    | npm                                                    |
 
 There is no React, no server runtime, no API layer, and no CMS dependency. That is intentional. The site does not need dynamic infrastructure.
 
 ### Astro Structure
 
-| Path | Responsibility |
-| --- | --- |
-| [`src/pages/index.astro`](./src/pages/index.astro) | Homepage composition |
-| [`src/pages/about.astro`](./src/pages/about.astro) | Static compatibility redirect to `/#about` |
-| [`src/layouts/BaseLayout.astro`](./src/layouts/BaseLayout.astro) | Global document shell, fonts, skip link, header/footer |
-| [`src/components/blocks/`](./src/components/blocks) | Page sections |
-| [`src/components/site/`](./src/components/site) | Header and footer |
-| [`src/components/seo/Meta.astro`](./src/components/seo/Meta.astro) | Canonical tags, social tags, JSON-LD |
-| [`src/styles/global.css`](./src/styles/global.css) | Theme tokens and main visual system |
-| [`src/styles/verbose.css`](./src/styles/verbose.css) | Verbose/debug styling |
+| Path                                                               | Responsibility                                         |
+| ------------------------------------------------------------------ | ------------------------------------------------------ |
+| [`src/pages/index.astro`](./src/pages/index.astro)                 | Homepage composition                                   |
+| [`src/pages/about.astro`](./src/pages/about.astro)                 | Static compatibility redirect to `/#about`             |
+| [`src/layouts/BaseLayout.astro`](./src/layouts/BaseLayout.astro)   | Global document shell, fonts, skip link, header/footer |
+| [`src/components/blocks/`](./src/components/blocks)                | Page sections                                          |
+| [`src/components/site/`](./src/components/site)                    | Header and footer                                      |
+| [`src/components/seo/Meta.astro`](./src/components/seo/Meta.astro) | Canonical tags, social tags, JSON-LD                   |
+| [`src/styles/global.css`](./src/styles/global.css)                 | Theme tokens and main visual system                    |
+| [`src/styles/verbose.css`](./src/styles/verbose.css)               | Verbose/debug styling                                  |
 
 ### TypeScript Configuration
 
@@ -215,14 +215,14 @@ Behavior:
 If you need to force it on locally:
 
 ```js
-localStorage.setItem('recica.verbose', 'true');
+localStorage.setItem("recica.verbose", "true");
 location.reload();
 ```
 
 Disable it with:
 
 ```js
-localStorage.setItem('recica.verbose', 'false');
+localStorage.setItem("recica.verbose", "false");
 location.reload();
 ```
 
@@ -287,6 +287,24 @@ npm run dev
 npm run build
 ```
 
+### Run Astro/type checks
+
+```bash
+npm run check
+```
+
+### Run formatting lint
+
+```bash
+npm run lint
+```
+
+### Run end-to-end tests
+
+```bash
+npm run test:e2e
+```
+
 ### Preview the production build
 
 ```bash
@@ -295,8 +313,11 @@ npm run preview
 
 ## Operational Notes
 
-- There is currently no dedicated automated test suite for `recica`.
-- The primary automated quality gate is a successful Astro build.
+- `recica` now has 3 routine automated quality gates:
+  - `npm run check` for Astro/type diagnostics
+  - `npm run lint` for Prettier formatting consistency
+  - `npm run test:e2e` for browser-level regression coverage
+- `npm run build` remains the final static-output verification step.
 - Content changes usually belong in `site-content.ts`.
 - Layout or presentation changes usually belong in block components or `global.css`.
 - SEO changes usually belong in `Meta.astro` and `astro.config.mjs`.

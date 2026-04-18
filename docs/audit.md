@@ -297,6 +297,24 @@ Sorted by severity, importance, and priority.
     - `astro check`
     - a lint step
   - Then update the root docs so the flagship’s real quality gate is accurately documented.
+- `Status`:
+  - Done by Codex on 2026-04-19.
+  - Added `recica` quality-gate scripts:
+    - `npm run check`
+    - `npm run lint`
+    - `npm run format`
+  - Added the required dev tooling for those gates:
+    - `@astrojs/check`
+    - `typescript`
+    - `prettier`
+    - `prettier-plugin-astro`
+  - Added `recica/.prettierignore` and cleaned the app to a passing formatting baseline.
+  - Updated the root and app READMEs so the flagship verification posture is documented accurately.
+  - Local verification:
+    - `recica`: `npm run check` passed
+    - `recica`: `npm run lint` passed
+    - `recica`: `npm run build` passed
+    - `recica`: `npm run test:e2e` passed
 
 ### AUD-008
 
@@ -411,7 +429,7 @@ These are repo-local engineering tasks that can be implemented, tested, and veri
   - re-run build and audit checks
 - `AUD-006` root verification orchestration:
   - add a minimal root-level task runner, script wrapper, or Makefile for install/build/test/audit
-- `AUD-007` `recica` quality-gate improvements:
+- [x] `AUD-007` `recica` quality-gate improvements:
   - add `astro check`,
   - add linting,
   - align root documentation with the real verification posture

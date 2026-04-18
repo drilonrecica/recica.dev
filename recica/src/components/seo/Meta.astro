@@ -83,7 +83,7 @@ const schema = {
 
 <!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL.toString()} />
-<script type="application/ld+json" set:html={serializeJsonLd(schema)} />
+<script type="application/ld+json" is:inline set:html={serializeJsonLd(schema)} />
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>

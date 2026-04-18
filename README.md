@@ -116,7 +116,7 @@ Shared branding is fine. Shared product responsibility is not.
 
 | App       | Framework              | Styling                                | Language   | Package Manager | Build Output              | Automated Tests              |
 | --------- | ---------------------- | -------------------------------------- | ---------- | --------------- | ------------------------- | ---------------------------- |
-| `recica/` | Astro 5                | Tailwind CSS v4 + custom CSS           | TypeScript | npm             | Static `dist/`            | No dedicated suite currently |
+| `recica/` | Astro 5                | Tailwind CSS v4 + custom CSS           | TypeScript | npm             | Static `dist/`            | Astro check + Prettier + Playwright |
 | `tools/`  | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
 | `labs/`   | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
 
@@ -182,11 +182,12 @@ pnpm dev
 
 ```bash
 cd recica
+npm run check
+npm run lint
 npm run build
+npm run test:e2e
 npm run preview
 ```
-
-`recica` currently relies mainly on a successful build as its quality gate.
 
 ### `tools/`
 
