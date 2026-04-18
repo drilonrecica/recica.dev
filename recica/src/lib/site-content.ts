@@ -103,15 +103,20 @@ export type SectionCopy = {
 export const siteConfig = {
 	name: 'Drilon Reçica',
 	domain: 'recica.dev',
+	origin: 'https://recica.dev',
+	labsUrl: 'https://labs.recica.dev',
+	toolsUrl: 'https://tools.recica.dev',
 	role: 'Senior Mobile & Product Engineer',
-	title: 'Drilon Reçica — Senior Mobile & Product Engineer',
+	title: 'Drilon Reçica — Senior Mobile, Android & Product Engineer',
 	description:
-		'Senior Mobile & Product Engineer specializing in Android, product architecture, legacy modernization, and practical developer tools.',
+		'Senior Mobile, Android & Product Engineer specializing in product architecture, legacy modernization, accessible mobile delivery, and practical developer tools.',
 	supportingLine:
-		'Mobile products, practical tools, and modern engineering that holds up in production.',
+		'Android products, practical developer tools, and modern engineering that holds up in production.',
 	email: 'drilonrecica.dev@gmail.com',
 	cvPath: '/cv.pdf',
 	image: '/og-image.png',
+	imageAlt: 'Drilon Reçica flagship site preview',
+	twitterHandle: '@drilonre',
 	socialLinks: [
 		'https://github.com/drilonrecica',
 		'https://linkedin.com/in/drilonrecica',
@@ -121,7 +126,8 @@ export const siteConfig = {
 
 export const sectionCopy: SectionCopy = {
 	hero: {
-		intro: 'I build mobile products, modernize existing systems, and lead delivery with product judgment.'
+		intro:
+			'I lead Android and mobile product engineering, modernize existing systems, and ship delivery that stands up in production.'
 	},
 	proof: {
 		kicker: 'Proof',
@@ -139,9 +145,9 @@ export const sectionCopy: SectionCopy = {
 		kicker: 'Featured Tools',
 		title: 'Practical tools, built the same way.',
 		description:
-			'I build browser-based utilities for the kind of technical work teams do every day: fast, local-first, and useful without extra ceremony.',
+			'I build browser-based utilities and public experiments for the kind of technical work teams do every day: fast, local-first, and useful without extra ceremony.',
 		footer:
-			'Runs locally, needs no account, and stays focused on the task.'
+			'Tools stay privacy-first. Labs stays public and exploratory.'
 	},
 	experience: {
 		kicker: 'Experience Snapshot',
@@ -380,7 +386,8 @@ export const contactLinks: ContactLink[] = [
 ];
 
 export const footerLinks: ActionLink[] = [
-	{ label: 'Tools', href: 'https://tools.recica.dev', external: true },
+	{ label: 'Tools', href: siteConfig.toolsUrl, external: true },
+	{ label: 'Labs', href: siteConfig.labsUrl, external: true },
 	{ label: 'CV', href: siteConfig.cvPath },
 	{ label: 'GitHub', href: 'https://github.com/drilonrecica', external: true },
 	{ label: 'LinkedIn', href: 'https://linkedin.com/in/drilonrecica', external: true },

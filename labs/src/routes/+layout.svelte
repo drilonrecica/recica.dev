@@ -9,9 +9,10 @@
 </script>
 
 <div class={`app-shell theme-lab-dark ${homeRoute ? 'theme-lab-home' : ''}`}>
+	<a href="#main-content" class="skip-link">Skip to content</a>
 	<LabsHeader {pathname} />
 
-	<main><slot /></main>
+	<main id="main-content"><slot /></main>
 
 	<LabsFooter dark={true} />
 </div>

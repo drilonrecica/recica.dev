@@ -10,12 +10,13 @@
 		buildWebsiteSchema
 	} from '$lib/utils/seo';
 
-	const title = 'Labs by Drilon Recica — Public Product Experiments, UX Labs, and Prototypes';
+	const title =
+		'Labs by Drilon Recica — Product Experiments, UX References, and Interactive Prototypes';
 	const description =
-		'Public product experiments by Drilon Reçica, including Parental Gate Lab, interactive UX references, and concept work around mobile products, product engineering, and privacy-first tools.';
+		'Public product experiments by Drilon Reçica, including Parental Gate Lab, interactive UX references, and concept work around mobile products, product engineering, and privacy-first tooling.';
 
 	const aboutCopy =
-		'Labs is where interaction studies and product concepts go public before they harden into products.';
+		'Labs publishes interactive product experiments, UX references, and early prototypes with real constraints and honest status.';
 
 	const nextExperiments = [
 		'Privacy-first mobile analytics and crash reporting',
@@ -56,6 +57,13 @@
 	path="/"
 	socialImagePath="/og-labs.svg"
 	socialImageAlt="Labs by Drilon Recica homepage preview"
+	keywords={[
+		'product experiments',
+		'ux references',
+		'interactive prototypes',
+		'public product lab',
+		'Drilon Recica labs'
+	]}
 	schemaBuilder={(origin) => [
 		buildWebsiteSchema(origin, description),
 		buildCollectionPageSchema(origin, '/', title, description),

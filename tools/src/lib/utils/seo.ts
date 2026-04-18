@@ -41,6 +41,7 @@ export function buildOrganizationSchema(origin: string) {
 		'@type': 'Organization',
 		name: siteName,
 		url: origin,
+		sameAs: ['https://recica.dev', 'https://labs.recica.dev', 'https://github.com/drilonrecica'],
 		founder: {
 			'@type': 'Person',
 			name: 'Drilon Reçica',
@@ -103,6 +104,7 @@ export function buildToolSchema(
 		},
 		url: new URL(tool.route, origin).toString(),
 		description,
+		keywords: tool.keywords.join(', '),
 		featureList: tool.localOnly
 			? ['Runs locally in your browser', 'No account required', 'No upload required']
 			: ['No account required'],

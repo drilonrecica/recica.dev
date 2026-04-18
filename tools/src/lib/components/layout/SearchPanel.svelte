@@ -13,7 +13,10 @@
 	}>();
 
 	let inputEl: HTMLInputElement | null = null;
+	let dialogEl: HTMLDivElement | null = null;
 	let activeIndex = 0;
+	const dialogTitleId = 'tool-search-title';
+	const dialogDescriptionId = 'tool-search-description';
 
 	$: if (open) {
 		tick().then(() => inputEl?.focus());
@@ -27,8 +30,9 @@
 		activeIndex = Math.max(results.length - 1, 0);
 	}
 
-	function handleKeydown(event: KeyboardEvent) {
+	function handleInputKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape') {
+			event.preventDefault();
 			dispatch('close');
 			return;
 		}
@@ -53,33 +57,91 @@
 			}
 		}
 	}
+
+	function handleDialogKeydown(event: KeyboardEvent) {
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			dispatch('close');
+			return;
+		}
+
+		if (event.key !== 'Tab' || !dialogEl) {
+			return;
+		}
+
+		const focusableElements = [
+			...dialogEl.querySelectorAll<HTMLElement>(
+				'a[href], button:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+			)
+		].filter((element) => !element.hasAttribute('hidden'));
+
+		if (!focusableElements.length) {
+			return;
+		}
+
+		const first = focusableElements[0];
+		const last = focusableElements[focusableElements.length - 1];
+		const active = document.activeElement;
+
+		if (!event.shiftKey && active === last) {
+			event.preventDefault();
+			first?.focus();
+		}
+
+		if (event.shiftKey && active === first) {
+			event.preventDefault();
+			last?.focus();
+		}
+	}
 </script>
 
 {#if open}
 	<div class="fixed inset-0 z-40 px-3 py-20 md:px-6">
 		<button
 			type="button"
+			tabindex="-1"
+			aria-hidden="true"
 			class="absolute inset-0 bg-[rgba(7,10,14,0.4)] backdrop-blur-sm md:bg-transparent"
-			aria-label="Close tool search"
 			on:click={() => dispatch('close')}
 		></button>
 		<div
+			bind:this={dialogEl}
+			id="tool-search-dialog"
 			class="surface-panel-elevated relative mx-auto w-full max-w-2xl overflow-hidden md:mt-2 md:max-w-[31rem]"
 			role="dialog"
+			tabindex="-1"
 			aria-modal="true"
-			aria-label="Tool search"
+			aria-labelledby={dialogTitleId}
+			aria-describedby={dialogDescriptionId}
+			on:keydown={handleDialogKeydown}
 		>
 			<div class="border-b border-[var(--border-subtle)] p-4">
-				<div class="kicker">Tool Search</div>
+				<div class="flex items-start justify-between gap-4">
+					<div>
+						<div class="kicker" id={dialogTitleId}>Tool Search</div>
+						<p class="mt-2 text-sm leading-6 text-[var(--text-secondary)]" id={dialogDescriptionId}>
+							Search by tool name, task, or keyword. Use Arrow keys to move through results and
+							Enter to open the active tool.
+						</p>
+					</div>
+					<button
+						type="button"
+						class="button-base button-ghost"
+						aria-label="Close tool search"
+						on:click={() => dispatch('close')}
+					>
+						Close
+					</button>
+				</div>
 				<div class="mt-3">
 					<input
 						bind:this={inputEl}
 						value={query}
 						on:input={(event) =>
 							dispatch('querychange', (event.currentTarget as HTMLInputElement).value)}
-						on:keydown={handleKeydown}
+						on:keydown={handleInputKeydown}
 						class="input-base"
-						placeholder="Search tools by name, task, or keyword"
+						placeholder="Search tools by name, task, or keyword…"
 						aria-label="Search tools"
 					/>
 				</div>
@@ -99,6 +161,7 @@
 									}`}
 									on:mouseenter={() => (activeIndex = index)}
 									on:click={() => dispatch('choose', tool)}
+									aria-current={index === activeIndex ? 'true' : undefined}
 								>
 									<div class="flex items-center justify-between gap-3">
 										<div class="text-sm font-semibold text-[var(--text)]">{tool.name}</div>

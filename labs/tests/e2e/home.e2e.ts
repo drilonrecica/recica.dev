@@ -25,18 +25,18 @@ test('renders the Labs homepage hero and featured experiments', async ({ page })
 	);
 	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 		'href',
-		'http://127.0.0.1:4173/'
+		'http://127.0.0.1:4175/'
 	);
 });
 
 test('serves robots and sitemap endpoints', async ({ page }) => {
 	await page.goto('/robots.txt');
-	await expect(page.locator('body')).toContainText('Sitemap: http://127.0.0.1:4173/sitemap.xml');
+	await expect(page.locator('body')).toContainText('Sitemap: http://127.0.0.1:4175/sitemap.xml');
 	await expect(page.locator('body')).toContainText('Disallow: /404');
-	await expect(page.locator('body')).toContainText('Host: 127.0.0.1:4173');
+	await expect(page.locator('body')).toContainText('Host: 127.0.0.1:4175');
 
 	await page.goto('/sitemap.xml');
-	await expect(page.locator('body')).toContainText('http://127.0.0.1:4173/');
-	await expect(page.locator('body')).toContainText('http://127.0.0.1:4173/parental-gate-lab');
+	await expect(page.locator('body')).toContainText('http://127.0.0.1:4175/');
+	await expect(page.locator('body')).toContainText('http://127.0.0.1:4175/parental-gate-lab');
 	await expect(page.locator('body')).toContainText('<changefreq>weekly</changefreq>');
 });

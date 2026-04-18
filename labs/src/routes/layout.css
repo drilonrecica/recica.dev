@@ -54,6 +54,24 @@ a {
 	text-decoration: none;
 }
 
+.skip-link {
+	position: absolute;
+	left: 1rem;
+	top: 1rem;
+	z-index: 60;
+	transform: translateY(-220%);
+	border-radius: 999px;
+	background: var(--accent);
+	color: #03131a;
+	padding: 0.82rem 1rem;
+	font-weight: 700;
+	transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+	transform: translateY(0);
+}
+
 button,
 input,
 textarea,
@@ -283,6 +301,12 @@ select:focus-visible {
 
 .section-shell {
 	padding-inline: 1rem;
+}
+
+.section-shell[id],
+#faq,
+#recommendation {
+	scroll-margin-top: 7.5rem;
 }
 
 .section-frame {

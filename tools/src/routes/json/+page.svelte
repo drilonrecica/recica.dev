@@ -3,6 +3,7 @@
 	import Button from '$lib/components/ui/Button.svelte';
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
+	import type { JsonErrorDetails } from '$lib/tools/json';
 	import { extractJsonError, formatJson, minifyJson, validateJson } from '$lib/tools/json';
 
 	let input = '{\n  "lab": "recica",\n  "localOnly": true,\n  "tools": 7\n}';
@@ -10,8 +11,17 @@
 	let status = 'Choose an action to validate, format, or minify the current input.';
 	let tone: 'neutral' | 'success' | 'error' = 'neutral';
 
+	function isJsonErrorDetails(error: unknown): error is JsonErrorDetails {
+		return Boolean(
+			error &&
+				typeof error === 'object' &&
+				'message' in error &&
+				typeof error.message === 'string'
+		);
+	}
+
 	function setError(error: unknown) {
-		const details = extractJsonError(input, error);
+		const details = isJsonErrorDetails(error) ? error : extractJsonError(input, error);
 		output = '';
 		status =
 			details.line && details.column

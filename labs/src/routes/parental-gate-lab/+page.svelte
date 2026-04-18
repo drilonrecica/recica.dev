@@ -28,26 +28,26 @@
 
 	const title = 'Parental Gate Lab — Compare UX Patterns for Kids & Family Apps';
 	const description =
-		'Compare parental gate UX patterns for kids and family apps. Try live demos, review tradeoffs, and get a practical recommendation for settings, purchases, subscriptions, and other adult-only flows.';
+		'Compare six parental gate UX patterns for kids and family apps. Try live demos, review accessibility and implementation tradeoffs, and get a practical recommendation for settings, purchases, subscriptions, and other adult-only flows.';
 
 	const patterns = parentalGatePatterns;
 	const quickStartLinks = [
 		{
 			label: 'Try patterns',
-			href: '#demos',
+			href: '/parental-gate-lab#demos',
 			description: 'Open the six live demos and start with the pattern that feels closest.'
 		},
 		{
 			label: 'Compare tradeoffs',
-			href: '#compare',
+			href: '/parental-gate-lab#compare',
 			description: 'Scan the matrix when the right pattern is not obvious at first glance.'
 		},
 		{
 			label: 'Get a recommendation',
-			href: '#recommendation',
+			href: '/parental-gate-lab#recommendation',
 			description: 'Use the six-question helper for one primary fit and one backup.'
 		}
-	];
+	] as const;
 	const whatItIsPoints = [
 		'Used for settings, purchases, subscriptions, and other adult-only surfaces.',
 		'Choose the pattern based on risk, frequency, literacy, and accessibility.',
@@ -366,6 +366,13 @@
 	path="/parental-gate-lab"
 	socialImagePath="/og-parental-gate.svg"
 	socialImageAlt="Parental Gate Lab social preview"
+	keywords={[
+		'parental gate ux',
+		'kids app parental gate',
+		'family app ux',
+		'parental gate patterns',
+		'parental gate accessibility'
+	]}
 	schemaBuilder={(origin) => [
 		buildWebsiteSchema(origin, description),
 		buildWebPageSchema(origin, '/parental-gate-lab', title, description),
@@ -738,7 +745,13 @@
 							</div>
 						{/if}
 
-						<div class={`demo-status demo-status--${activeStatus}`} data-testid="demo-status">
+						<div
+							class={`demo-status demo-status--${activeStatus}`}
+							data-testid="demo-status"
+							role="status"
+							aria-live="polite"
+							aria-atomic="true"
+						>
 							{activeMessage}
 						</div>
 					</div>
@@ -934,6 +947,14 @@
 			</div>
 
 			<div class="surface-panel-strong p-6 sm:p-8" data-testid="recommendation-panel">
+				<p class="sr-only" aria-live="polite" aria-atomic="true">
+					{#if recommendation}
+						Primary recommendation {recommendation.primary.name}. Backup option {recommendation
+							.backup.name}.
+					{:else if recommendationError}
+						{recommendationError}
+					{/if}
+				</p>
 				{#if recommendation}
 					<div class="space-y-6">
 						<div class="space-y-3">

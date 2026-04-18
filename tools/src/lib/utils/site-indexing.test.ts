@@ -24,12 +24,16 @@ describe('site indexing helpers', () => {
 
 	it('builds a permissive robots.txt with a sitemap reference', () => {
 		expect(buildRobotsTxt('https://recica.dev')).toBe(
-			'User-agent: *\nAllow: /\n\nSitemap: https://recica.dev/sitemap.xml'
+			'User-agent: *\nAllow: /\n\nSitemap: https://recica.dev/sitemap.xml\nHost: recica.dev'
 		);
 	});
 
 	it('builds a sitemap that includes the homepage and public tool routes', () => {
-		const xml = buildSitemapXml('https://recica.dev', ['/', '/json', '/robots']);
+		const xml = buildSitemapXml('https://recica.dev', [
+			{ path: '/', changeFrequency: 'weekly', priority: '1.0' },
+			{ path: '/json', changeFrequency: 'monthly', priority: '0.8' },
+			{ path: '/robots', changeFrequency: 'monthly', priority: '0.8' }
+		]);
 
 		expect(xml).toContain('<?xml version="1.0" encoding="UTF-8"?>');
 		expect(xml).toContain('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
@@ -39,10 +43,10 @@ describe('site indexing helpers', () => {
 	});
 
 	it('keeps the public sitemap route list aligned with the homepage and tools', () => {
-		expect(publicPageRoutes[0]).toBe('/');
-		expect(publicPageRoutes).toContain('/json');
-		expect(publicPageRoutes).toContain('/sitemap');
-		expect(publicPageRoutes).toContain('/robots');
+		expect(publicPageRoutes[0]?.path).toBe('/');
+		expect(publicPageRoutes.map((route) => route.path)).toContain('/json');
+		expect(publicPageRoutes.map((route) => route.path)).toContain('/sitemap');
+		expect(publicPageRoutes.map((route) => route.path)).toContain('/robots');
 		expect(publicPageRoutes).toHaveLength(25);
 	});
 });

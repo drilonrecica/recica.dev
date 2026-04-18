@@ -23,14 +23,14 @@ It is related to the flagship personal site, but it is not a subpage of the flag
 
 The app is intentionally opinionated.
 
-| Principle | Meaning in this codebase |
-| --- | --- |
-| Local-first | User input should be processed in the browser whenever practical |
-| Privacy-first | No accounts, no tracking flow, no "upload your file to our server" pattern for built-in tools |
-| Route-based | Each serious utility gets a dedicated URL and its own metadata |
-| Small runtime surface | Runtime dependencies are kept intentionally minimal |
-| No tool engine abstraction | Tool logic stays explicit and readable instead of disappearing into a generic framework |
-| Searchable catalog | The homepage and quick-search model should make discovery fast |
+| Principle                  | Meaning in this codebase                                                                      |
+| -------------------------- | --------------------------------------------------------------------------------------------- |
+| Local-first                | User input should be processed in the browser whenever practical                              |
+| Privacy-first              | No accounts, no tracking flow, no "upload your file to our server" pattern for built-in tools |
+| Route-based                | Each serious utility gets a dedicated URL and its own metadata                                |
+| Small runtime surface      | Runtime dependencies are kept intentionally minimal                                           |
+| No tool engine abstraction | Tool logic stays explicit and readable instead of disappearing into a generic framework       |
+| Searchable catalog         | The homepage and quick-search model should make discovery fast                                |
 
 ## Public Surface
 
@@ -51,95 +51,95 @@ The current app ships 24 tool pages.
 
 #### Format
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
+| Route   | Tool                       | Purpose                                                        |
+| ------- | -------------------------- | -------------------------------------------------------------- |
 | `/json` | JSON Formatter / Validator | Format, validate, and minify JSON with readable parse feedback |
-| `/sql` | SQL Formatter / Minifier | Format or minify SQL locally without executing queries |
+| `/sql`  | SQL Formatter / Minifier   | Format or minify SQL locally without executing queries         |
 
 #### Encoding
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
-| `/base64` | Base64 Encoder / Decoder | UTF-8 text encoding and decoding with validation |
-| `/url` | URL Encoder / Decoder | Encode/decode full URLs or URL components |
-| `/query` | Query String Parser / Builder | Parse and rebuild query strings while preserving repeated keys |
+| Route     | Tool                          | Purpose                                                        |
+| --------- | ----------------------------- | -------------------------------------------------------------- |
+| `/base64` | Base64 Encoder / Decoder      | UTF-8 text encoding and decoding with validation               |
+| `/url`    | URL Encoder / Decoder         | Encode/decode full URLs or URL components                      |
+| `/query`  | Query String Parser / Builder | Parse and rebuild query strings while preserving repeated keys |
 
 #### Share
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
-| `/qr` | QR Code Generator | Generate QR codes for text, URL, Wi-Fi, email, phone, and SMS with PNG/SVG export |
-| `/barcode` | Barcode Generator | Generate Code 128, EAN-13, and UPC-A barcodes with local export |
+| Route      | Tool              | Purpose                                                                           |
+| ---------- | ----------------- | --------------------------------------------------------------------------------- |
+| `/qr`      | QR Code Generator | Generate QR codes for text, URL, Wi-Fi, email, phone, and SMS with PNG/SVG export |
+| `/barcode` | Barcode Generator | Generate Code 128, EAN-13, and UPC-A barcodes with local export                   |
 
 #### Text
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
-| `/regex` | Regex Tester | Test ECMAScript patterns with flags, captures, and replace preview |
-| `/slug` | Slug Generator | Normalize titles into predictable slugs |
-| `/case` | Text Case Converter | Convert strings across common naming conventions |
+| Route      | Tool                     | Purpose                                                                |
+| ---------- | ------------------------ | ---------------------------------------------------------------------- |
+| `/regex`   | Regex Tester             | Test ECMAScript patterns with flags, captures, and replace preview     |
+| `/slug`    | Slug Generator           | Normalize titles into predictable slugs                                |
+| `/case`    | Text Case Converter      | Convert strings across common naming conventions                       |
 | `/counter` | Word / Character Counter | Count words, characters, lines, paragraphs, and reading-time estimates |
 
 #### Time
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
+| Route        | Tool                | Purpose                                       |
+| ------------ | ------------------- | --------------------------------------------- |
 | `/timestamp` | Timestamp Converter | Convert Unix timestamps to local time and UTC |
 
 #### Security
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
-| `/password` | Password Generator | Generate passwords with secure browser randomness |
-| `/hash` | Hash Generator | Create SHA-256, SHA-384, and SHA-512 digests locally |
-| `/jwt` | JWT Inspector | Decode JWT headers and payloads locally for inspection |
+| Route       | Tool               | Purpose                                                |
+| ----------- | ------------------ | ------------------------------------------------------ |
+| `/password` | Password Generator | Generate passwords with secure browser randomness      |
+| `/hash`     | Hash Generator     | Create SHA-256, SHA-384, and SHA-512 digests locally   |
+| `/jwt`      | JWT Inspector      | Decode JWT headers and payloads locally for inspection |
 
 #### Compare
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
+| Route   | Tool              | Purpose                                                          |
+| ------- | ----------------- | ---------------------------------------------------------------- |
 | `/diff` | Text Diff Checker | Compare two text blocks with line and inline change highlighting |
 
 #### Config
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
+| Route  | Tool                   | Purpose                                                        |
+| ------ | ---------------------- | -------------------------------------------------------------- |
 | `/env` | `.env` Parser / Viewer | Parse dotenv content and surface malformed rows and duplicates |
 
 #### Identity
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
+| Route   | Tool           | Purpose                                                        |
+| ------- | -------------- | -------------------------------------------------------------- |
 | `/uuid` | UUID Generator | Generate UUID v4 or v7 values locally, individually or in bulk |
 
 #### Design
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
+| Route    | Tool            | Purpose                                                    |
+| -------- | --------------- | ---------------------------------------------------------- |
 | `/color` | Color Converter | Convert between HEX, RGB(A), and HSL(A) with live swatches |
 
 #### Inspect
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
-| `/device` | Device / Browser Info | Inspect browser environment, viewport, storage support, and related client details |
-| `/robots` | `robots.txt` Parser / Validator | Parse pasted robots directives and flag malformed lines |
-| `/sitemap` | Sitemap XML Parser / Validator | Validate pasted XML and extract listed URLs or child sitemaps |
+| Route      | Tool                            | Purpose                                                                            |
+| ---------- | ------------------------------- | ---------------------------------------------------------------------------------- |
+| `/device`  | Device / Browser Info           | Inspect browser environment, viewport, storage support, and related client details |
+| `/robots`  | `robots.txt` Parser / Validator | Parse pasted robots directives and flag malformed lines                            |
+| `/sitemap` | Sitemap XML Parser / Validator  | Validate pasted XML and extract listed URLs or child sitemaps                      |
 
 #### Preview
 
-| Route | Tool | Purpose |
-| --- | --- | --- |
-| `/markdown` | Markdown Previewer | Render sanitized Markdown locally |
-| `/html` | HTML Previewer | Render sanitized HTML in a sandboxed iframe |
+| Route       | Tool               | Purpose                                     |
+| ----------- | ------------------ | ------------------------------------------- |
+| `/markdown` | Markdown Previewer | Render sanitized Markdown locally           |
+| `/html`     | HTML Previewer     | Render sanitized HTML in a sandboxed iframe |
 
 ### Machine and Platform Routes
 
-| Route | Purpose | Notes |
-| --- | --- | --- |
-| `/health` | Operational health check | Plain text `OK` response |
-| `/robots.txt` | Crawl directives | Built dynamically from the resolved site origin |
-| `/sitemap.xml` | Public sitemap | Built dynamically from the tool registry |
+| Route          | Purpose                  | Notes                                           |
+| -------------- | ------------------------ | ----------------------------------------------- |
+| `/health`      | Operational health check | Plain text `OK` response                        |
+| `/robots.txt`  | Crawl directives         | Built dynamically from the resolved site origin |
+| `/sitemap.xml` | Public sitemap           | Built dynamically from the tool registry        |
 
 ### External Resources
 
@@ -185,41 +185,41 @@ This design supports:
 
 ### Stack
 
-| Concern | Implementation |
-| --- | --- |
-| Framework | SvelteKit 2 |
-| Component model | Svelte 5 |
-| Runtime adapter | `@sveltejs/adapter-node` |
-| Styling | Tailwind CSS v4 plus app-level CSS variables |
-| Language | TypeScript |
-| Package manager | pnpm |
-| Unit tests | Vitest |
-| E2E tests | Playwright |
-| Container deployment | Docker |
+| Concern              | Implementation                               |
+| -------------------- | -------------------------------------------- |
+| Framework            | SvelteKit 2                                  |
+| Component model      | Svelte 5                                     |
+| Runtime adapter      | `@sveltejs/adapter-node`                     |
+| Styling              | Tailwind CSS v4 plus app-level CSS variables |
+| Language             | TypeScript                                   |
+| Package manager      | pnpm                                         |
+| Unit tests           | Vitest                                       |
+| E2E tests            | Playwright                                   |
+| Container deployment | Docker                                       |
 
 Runtime dependencies stay intentionally small:
 
-| Package | Why it exists |
-| --- | --- |
-| `qrcode` | QR generation |
-| `diff` | Text diff generation |
+| Package  | Why it exists        |
+| -------- | -------------------- |
+| `qrcode` | QR generation        |
+| `diff`   | Text diff generation |
 
 Everything else is dev/build infrastructure.
 
 ### Architecture by Responsibility
 
-| Path | Responsibility |
-| --- | --- |
-| [`src/routes/+page.svelte`](./src/routes/+page.svelte) | Homepage, featured tools, search/filter UI, supporting sections |
-| [`src/routes/<tool>/+page.svelte`](./src/routes) | Dedicated route per tool |
-| [`src/routes/+layout.svelte`](./src/routes/+layout.svelte) | Global shell, theme initialization, search modal wiring, global background |
-| [`src/lib/constants/tools.ts`](./src/lib/constants/tools.ts) | Tool registry used for navigation, search, sitemap, and structured data |
-| [`src/lib/search/tools.ts`](./src/lib/search/tools.ts) | Search indexing/search behavior |
-| [`src/lib/tools/`](./src/lib/tools) | Pure logic for tool behavior plus colocated unit tests |
-| [`src/lib/components/`](./src/lib/components) | Shared layout, SEO, UI, and tool-shell components |
-| [`src/lib/utils/seo.ts`](./src/lib/utils/seo.ts) | JSON-LD and metadata helpers |
-| [`src/lib/utils/site-indexing.ts`](./src/lib/utils/site-indexing.ts) | Canonical origin, robots, and sitemap generation |
-| [`src/hooks.server.ts`](./src/hooks.server.ts) | Response security headers |
+| Path                                                                 | Responsibility                                                             |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`src/routes/+page.svelte`](./src/routes/+page.svelte)               | Homepage, featured tools, search/filter UI, supporting sections            |
+| [`src/routes/<tool>/+page.svelte`](./src/routes)                     | Dedicated route per tool                                                   |
+| [`src/routes/+layout.svelte`](./src/routes/+layout.svelte)           | Global shell, theme initialization, search modal wiring, global background |
+| [`src/lib/constants/tools.ts`](./src/lib/constants/tools.ts)         | Tool registry used for navigation, search, sitemap, and structured data    |
+| [`src/lib/search/tools.ts`](./src/lib/search/tools.ts)               | Search indexing/search behavior                                            |
+| [`src/lib/tools/`](./src/lib/tools)                                  | Pure logic for tool behavior plus colocated unit tests                     |
+| [`src/lib/components/`](./src/lib/components)                        | Shared layout, SEO, UI, and tool-shell components                          |
+| [`src/lib/utils/seo.ts`](./src/lib/utils/seo.ts)                     | JSON-LD and metadata helpers                                               |
+| [`src/lib/utils/site-indexing.ts`](./src/lib/utils/site-indexing.ts) | Canonical origin, robots, and sitemap generation                           |
+| [`src/hooks.server.ts`](./src/hooks.server.ts)                       | Response security headers                                                  |
 
 ### Why the Tool Registry Matters
 
@@ -412,10 +412,10 @@ node build
 
 Operational variables to care about:
 
-| Variable | Purpose |
-| --- | --- |
-| `PORT` | Server port |
-| `HOST` | Bind host when starting manually |
+| Variable          | Purpose                                                   |
+| ----------------- | --------------------------------------------------------- |
+| `PORT`            | Server port                                               |
+| `HOST`            | Bind host when starting manually                          |
 | `PUBLIC_SITE_URL` | Canonical public origin for metadata, robots, and sitemap |
 
 ### Docker deployment

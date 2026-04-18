@@ -20,6 +20,8 @@
 
 	let query = '';
 	let selectedCategories: string[] = [];
+	const homeDescription =
+		'Privacy-first browser tools for JSON formatting, QR code generation, regex testing, Base64 encoding, URL inspection, timestamps, hashing, SQL work, and more. Runs locally with no accounts or uploads.';
 
 	const featuredTools = tools.filter((tool) =>
 		featuredToolIds.includes(tool.id as (typeof featuredToolIds)[number])
@@ -45,15 +47,9 @@
 		: searchedTools;
 	$: canonicalOrigin = resolveSiteOrigin(env.PUBLIC_SITE_URL, $page.url);
 	$: schemas = [
-		buildWebsiteSchema(
-			canonicalOrigin,
-			'Essential browser tools for developers: QR codes, JSON formatter, Base64 encoder, URL tools, timestamps, hashing, and more. Privacy-first, no accounts, works offline.'
-		),
+		buildWebsiteSchema(canonicalOrigin, homeDescription),
 		buildOrganizationSchema(canonicalOrigin),
-		buildCollectionPageSchema(
-			canonicalOrigin,
-			'Essential browser tools for developers: QR codes, JSON formatter, Base64 encoder, URL tools, timestamps, hashing, and more. Privacy-first, no accounts, works offline.'
-		),
+		buildCollectionPageSchema(canonicalOrigin, homeDescription),
 		buildToolListSchema(canonicalOrigin, tools),
 		{
 			'@context': 'https://schema.org',
@@ -89,10 +85,20 @@
 </script>
 
 <SeoHead
-	title="Free Local Browser Tools for Developers and Everyday Tasks"
-	description="Essential browser tools for developers: QR codes, JSON formatter, Base64 encoder, URL tools, timestamps, hashing, and more. Privacy-first, no accounts, works offline."
+	title="Free Browser Tools for JSON, QR Codes, Regex, Base64, URLs, and More"
+	description={homeDescription}
+	keywords={[
+		'free developer tools',
+		'json formatter',
+		'qr code generator',
+		'regex tester',
+		'base64 encoder',
+		'url tools',
+		'timestamp converter',
+		'privacy-first browser tools'
+	]}
 	{schemas}
-	imageAlt="Recica Tools social card showing free local browser tools"
+	imageAlt="Recica Tools social card showing privacy-first browser tools"
 />
 
 <section class="space-y-14">
@@ -102,11 +108,12 @@
 			<h1
 				class="max-w-[12ch] text-5xl font-semibold tracking-[-0.06em] text-[var(--text)] sm:text-6xl"
 			>
-				Essential tools for developers and creators.
+				Free browser tools for developers and everyday technical work.
 			</h1>
 			<p class="prose-note max-w-2xl">
-				Powerful browser-based utilities for QR codes, JSON, Base64, URLs, timestamps, hashing, and
-				more. Privacy-first, no accounts required, no data leaves your device.
+				JSON formatting, QR code generation, Base64 encoding, URL inspection, timestamps, hashing,
+				regex testing, and more. Everything runs locally in your browser with no accounts, uploads,
+				or tracking.
 			</p>
 
 			<div class="surface-panel-elevated max-w-2xl p-4 sm:p-5">
@@ -155,8 +162,8 @@
 				</h2>
 			</div>
 			<p class="max-w-xl text-sm leading-6 text-[var(--text-secondary)]">
-				From JSON formatting and QR generation to SQL queries, regex testing, and file diffs—every
-				tool is designed for one job, works instantly, and respects your privacy.
+				From JSON formatting and QR generation to SQL queries, regex testing, hashes, timestamps,
+				and file diffs, every tool is built for one job, opens quickly, and stays local.
 			</p>
 		</div>
 

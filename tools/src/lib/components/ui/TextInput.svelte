@@ -3,6 +3,7 @@
 	export let label = '';
 	export let value = '';
 	export let type = 'text';
+	export let name = '';
 	export let placeholder = '';
 	export let help = '';
 	export let error: string | undefined = undefined;
@@ -31,6 +32,10 @@
 	export let spellcheck = false;
 	export let mono = false;
 	export let readonly = false;
+
+	$: helpId = help && !error ? `${id}-help` : undefined;
+	$: errorId = error ? `${id}-error` : undefined;
+	$: describedBy = [helpId, errorId].filter(Boolean).join(' ') || undefined;
 </script>
 
 <label class="field" for={id}>
@@ -39,6 +44,7 @@
 	{/if}
 	<input
 		{id}
+		name={name || id}
 		class={`input-base ${mono ? 'mono' : ''}`}
 		{type}
 		bind:value
@@ -49,10 +55,12 @@
 		{inputmode}
 		{spellcheck}
 		{readonly}
+		aria-describedby={describedBy}
+		aria-invalid={error ? 'true' : undefined}
 	/>
 	{#if error}
-		<span class="field__error">{error}</span>
+		<span class="field__error" id={errorId}>{error}</span>
 	{:else if help}
-		<span class="field__help">{help}</span>
+		<span class="field__help" id={helpId}>{help}</span>
 	{/if}
 </label>

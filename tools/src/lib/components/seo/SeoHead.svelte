@@ -10,6 +10,8 @@
 	export let type = 'website';
 	export let imagePath = defaultSocialImagePath;
 	export let imageAlt = `${siteName} social preview`;
+	export let keywords: string[] = [];
+	export let noindex = false;
 	export let robots = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
 	export let schemas: unknown[] = [];
 
@@ -18,14 +20,19 @@
 	$: imageUrl = imagePath ? new URL(imagePath, origin).toString() : '';
 	$: fullTitle = title ? `${title} • ${siteName}` : siteName;
 	$: socialTitle = title || siteName;
+	$: resolvedRobots = noindex ? 'noindex, nofollow, noarchive' : robots;
 	$: serializedSchemas = schemas.map((schema) => serializeJsonLd(schema));
 </script>
 
 <svelte:head>
 	<title>{fullTitle}</title>
 	<meta name="description" content={description} />
-	<meta name="robots" content={robots} />
+	<meta name="robots" content={resolvedRobots} />
+	<meta name="googlebot" content={resolvedRobots} />
 	<link rel="canonical" href={canonicalUrl} />
+	{#if keywords.length}
+		<meta name="keywords" content={keywords.join(', ')} />
+	{/if}
 
 	<meta property="og:site_name" content={siteName} />
 	<meta property="og:locale" content="en_US" />
@@ -46,6 +53,7 @@
 	<meta name="twitter:title" content={socialTitle} />
 	<meta name="twitter:description" content={description} />
 	<meta name="author" content="Drilon Recica" />
+	<meta name="creator" content="Drilon Recica" />
 	<meta name="theme-color" content="#1ec8a5" />
 	<meta name="color-scheme" content="light dark" />
 	<meta name="mobile-web-app-capable" content="yes" />
@@ -54,6 +62,7 @@
 
 	{#if imageUrl}
 		<meta name="twitter:image" content={imageUrl} />
+		<meta name="twitter:image:alt" content={imageAlt} />
 	{/if}
 
 	{#each serializedSchemas as json (json)}

@@ -1,6 +1,13 @@
 import { tools } from '$lib/constants/tools';
 
-export const publicPageRoutes = ['/', ...tools.map((tool) => tool.route)];
+export const publicPageRoutes = [
+	{ path: '/', changeFrequency: 'weekly', priority: '1.0' },
+	...tools.map((tool) => ({
+		path: tool.route,
+		changeFrequency: 'monthly',
+		priority: '0.8'
+	}))
+] as const;
 
 export function resolveSiteOrigin(configuredUrl: string | undefined, requestUrl: URL): string {
 	const candidate = configuredUrl?.trim();
@@ -23,25 +30,42 @@ export function resolveSiteOrigin(configuredUrl: string | undefined, requestUrl:
 
 export function buildRobotsTxt(origin: string): string {
 	const sitemapUrl = new URL('/sitemap.xml', origin).toString();
+	const host = new URL(origin).host;
 
-	return ['User-agent: *', 'Allow: /', '', `Sitemap: ${sitemapUrl}`].join('\n');
+	return ['User-agent: *', 'Allow: /', '', `Sitemap: ${sitemapUrl}`, `Host: ${host}`].join('\n');
 }
 
 export function buildSitemapXml(
 	origin: string,
-	routes: readonly string[] = publicPageRoutes
+	routes: ReadonlyArray<{
+		path: string;
+		changeFrequency?: string;
+		priority?: string;
+	}> = publicPageRoutes
 ): string {
-	const urls = [...new Set(routes)].map((route) => {
-		const url = new URL(route, origin).toString();
-		const priority = route === '/' ? '1.0' : '0.8';
-		const lastmod = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+	const lastmod = new Date().toISOString().split('T')[0] ?? '';
+	const seenPaths = new Set<string>();
+	const urls = routes
+		.filter((route) => {
+			if (seenPaths.has(route.path)) {
+				return false;
+			}
 
-		return `  <url>
+			seenPaths.add(route.path);
+			return true;
+		})
+		.map((route) => {
+			const url = new URL(route.path, origin).toString();
+			const priority = route.priority ?? (route.path === '/' ? '1.0' : '0.8');
+			const changeFrequency = route.changeFrequency;
+
+			return `  <url>
     <loc>${escapeXml(url)}</loc>
     <lastmod>${lastmod}</lastmod>
+    ${changeFrequency ? `<changefreq>${changeFrequency}</changefreq>` : ''}
     <priority>${priority}</priority>
   </url>`;
-	});
+		});
 
 	return [
 		'<?xml version="1.0" encoding="UTF-8"?>',

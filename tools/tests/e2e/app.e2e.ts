@@ -3,7 +3,9 @@ import { expect, test } from '@playwright/test';
 test('homepage search and quick-open work', async ({ page }) => {
 	await page.goto('/');
 	await expect(
-		page.getByRole('heading', { name: /free local tools for developers/i })
+		page.getByRole('heading', {
+			name: /free browser tools for developers and everyday technical work/i
+		})
 	).toBeVisible();
 
 	const featuredSection = page
@@ -20,7 +22,7 @@ test('homepage search and quick-open work', async ({ page }) => {
 	await page.getByLabel('Find a tool').fill('base64');
 	await expect(page.getByRole('link', { name: /base64 encoder/i }).first()).toBeVisible();
 
-	await page.keyboard.press('/');
+	await page.getByRole('button', { name: /^search/i }).click();
 	await expect(page.getByRole('dialog', { name: 'Tool search' })).toBeVisible();
 	await page.getByLabel('Search tools').fill('timestamp');
 	await page.keyboard.press('Enter');
@@ -29,18 +31,23 @@ test('homepage search and quick-open work', async ({ page }) => {
 
 test('homepage category pills filter the tool grid', async ({ page }) => {
 	await page.goto('/');
+	const toolIndexSection = page
+		.locator('section')
+		.filter({ has: page.getByRole('heading', { name: 'Browse all tools' }) })
+		.last();
+
 	await expect(page.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');
 
 	await page.getByRole('button', { name: 'Security' }).click();
-	await expect(page.getByRole('link', { name: /password generator/i }).first()).toBeVisible();
-	await expect(page.getByRole('link', { name: /hash generator/i }).first()).toBeVisible();
-	await expect(page.getByRole('link', { name: /jwt inspector/i }).first()).toBeVisible();
-	await expect(page.getByRole('link', { name: /json formatter \/ validator/i })).toHaveCount(0);
+	await expect(toolIndexSection.getByRole('link', { name: /password generator/i }).first()).toBeVisible();
+	await expect(toolIndexSection.getByRole('link', { name: /hash generator/i }).first()).toBeVisible();
+	await expect(toolIndexSection.getByRole('link', { name: /jwt inspector/i }).first()).toBeVisible();
+	await expect(toolIndexSection.getByRole('link', { name: /json formatter \/ validator/i })).toHaveCount(0);
 
 	await page.getByRole('button', { name: 'All' }).click();
 	await expect(page.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');
 	await expect(
-		page.getByRole('link', { name: /json formatter \/ validator/i }).first()
+		toolIndexSection.getByRole('link', { name: /json formatter \/ validator/i }).first()
 	).toBeVisible();
 });
 
@@ -69,7 +76,7 @@ test('qr route switches presets, renders output, and handles an oversized value'
 
 	await page.getByRole('button', { name: 'Text' }).click();
 	await page.getByLabel('Text').fill('x'.repeat(8000));
-	await expect(page.getByText(/too large for a qr code/i)).toBeVisible();
+	await expect(page.getByText(/too large for a qr code/i).first()).toBeVisible();
 });
 
 test('json route formats valid input and reports invalid input', async ({ page }) => {
@@ -81,12 +88,14 @@ test('json route formats valid input and reports invalid input', async ({ page }
 
 	await page.getByLabel('Raw JSON').fill('{"lab":}');
 	await page.getByRole('button', { name: 'Validate' }).click();
-	await expect(page.getByText(/unexpected token/i)).toBeVisible();
+	await expect(page.locator('.status-pill.status-error')).toContainText(
+		/(invalid json|unexpected token)/i
+	);
 });
 
 test('password route regenerates and blocks empty charset selection', async ({ page }) => {
 	await page.goto('/password');
-	await expect(page.getByText(/generated password/i)).toBeVisible();
+	await expect(page.getByText('Generated Password', { exact: true })).toBeVisible();
 
 	await page.getByRole('button', { name: /Uppercase/i }).click();
 	await page.getByRole('button', { name: /Lowercase/i }).click();
@@ -174,12 +183,12 @@ test('robots.txt and sitemap.xml expose crawlable public urls', async ({ request
 
 test('regex route previews matches and reports invalid patterns', async ({ page }) => {
 	await page.goto('/regex');
-	await page.getByLabel('Pattern').fill('(json)');
-	await page.getByLabel('Test text').fill('json\njson tools');
+	await page.locator('#regex-pattern').fill('(json)');
+	await page.locator('#regex-source').fill('json\njson tools');
 	await expect(page.getByText(/2 matches found/i)).toBeVisible();
 	await expect(page.getByText('Match 1 · 0-4')).toBeVisible();
 
-	await page.getByLabel('Pattern').fill('[');
+	await page.locator('#regex-pattern').fill('[');
 	await expect(page.getByText(/invalid regular expression/i)).toBeVisible();
 });
 
@@ -191,7 +200,7 @@ test('uuid route generates batches and validates count bounds', async ({ page })
 
 	await page.getByLabel('Count').fill('0');
 	await page.getByRole('button', { name: 'Generate' }).click();
-	await expect(page.getByText(/between 1 and 50/i)).toBeVisible();
+	await expect(page.locator('.status-pill.status-error')).toContainText('between 1 and 50');
 });
 
 test('hash route generates digests locally', async ({ page }) => {
@@ -217,8 +226,8 @@ test('query route parses values and reports malformed encoding', async ({ page }
 test('case route converts text and clears to empty outputs', async ({ page }) => {
 	await page.goto('/case');
 	await page.getByLabel('Source text').fill('Recica Tools');
-	await expect(page.getByText('recicaTools')).toBeVisible();
-	await expect(page.getByText('recica_tools')).toBeVisible();
+	await expect(page.locator('pre').getByText('recicaTools', { exact: true })).toBeVisible();
+	await expect(page.locator('pre').getByText('recica_tools', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Source text').fill('');
 	await expect(page.getByText(/enter text to convert it/i).first()).toBeVisible();
@@ -243,7 +252,7 @@ test('env route parses entries and flags malformed rows', async ({ page }) => {
 test('color route converts valid values and rejects invalid ones', async ({ page }) => {
 	await page.goto('/color');
 	await page.getByLabel('Color value').fill('#ffffff');
-	await expect(page.getByText('RGB')).toBeVisible();
+	await expect(page.getByText('RGB', { exact: true })).toBeVisible();
 	await expect(page.getByText('rgb(255, 255, 255)')).toBeVisible();
 
 	await page.getByLabel('Color value').fill('wat');
@@ -285,7 +294,7 @@ test('html route previews markup without executing scripts', async ({ page }) =>
 test('device route reports browser-side information', async ({ page }) => {
 	await page.goto('/device');
 	await expect(page.getByText('userAgent')).toBeVisible();
-	await expect(page.getByText('viewport')).toBeVisible();
+	await expect(page.getByText('viewport', { exact: true })).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Copy JSON' })).toBeEnabled();
 });
 

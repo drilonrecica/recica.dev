@@ -5,35 +5,50 @@ export interface Props {
     title: string;
     description: string;
     image?: string;
+    imageAlt?: string;
     type?: "website" | "article";
+    canonical?: string;
+    noindex?: boolean;
 }
 
 const {
     title,
     description,
     image = siteConfig.image,
+    imageAlt = siteConfig.imageAlt,
     type = "website",
+    canonical,
+    noindex = false,
 } = Astro.props;
 
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const origin = Astro.site ?? new URL(siteConfig.origin);
+const canonicalURL = new URL(canonical ?? Astro.url.pathname, origin);
+const socialImageUrl = new URL(image, origin).toString();
+const robotsContent = noindex
+    ? "noindex, nofollow, noarchive"
+    : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
+
+function serializeJsonLd(value: unknown) {
+    return JSON.stringify(value).replaceAll("<", "\\u003c");
+}
 
 const schema = {
     "@context": "https://schema.org",
     "@graph": [
         {
             "@type": "WebSite",
-            "@id": "https://recica.dev/#website",
-            url: "https://recica.dev",
+            "@id": `${siteConfig.origin}/#website`,
+            url: siteConfig.origin,
             name: siteConfig.name,
             description: siteConfig.description,
             inLanguage: "en-US",
         },
         {
             "@type": "Person",
-            "@id": "https://recica.dev/#drilon",
+            "@id": `${siteConfig.origin}/#drilon`,
             name: siteConfig.name,
-            url: "https://recica.dev",
-            image: new URL(image, Astro.url).toString(),
+            url: siteConfig.origin,
+            image: socialImageUrl,
             jobTitle: siteConfig.role,
             sameAs: siteConfig.socialLinks,
         },
@@ -60,27 +75,42 @@ const schema = {
 <meta name="apple-mobile-web-app-title" content="recica.dev" />
 <link rel="manifest" href="/site.webmanifest" />
 <meta name="generator" content={Astro.generator} />
+<meta name="theme-color" content="#0b1014" />
+<meta name="color-scheme" content="dark" />
+<meta name="format-detection" content="telephone=no" />
+<meta name="application-name" content={siteConfig.domain} />
+<meta name="apple-mobile-web-app-title" content={siteConfig.domain} />
 
 <!-- Canonical URL -->
-<link rel="canonical" href={canonicalURL} />
-<script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<link rel="canonical" href={canonicalURL.toString()} />
+<script type="application/ld+json" set:html={serializeJsonLd(schema)} />
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 <meta name="author" content={siteConfig.name} />
+<meta name="creator" content={siteConfig.name} />
+<meta name="robots" content={robotsContent} />
+<meta name="googlebot" content={robotsContent} />
 
 <!-- Open Graph / Facebook -->
+<meta property="og:site_name" content={siteConfig.domain} />
+<meta property="og:locale" content="en_US" />
 <meta property="og:type" content={type} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={canonicalURL.toString()} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
-<meta property="og:image" content={new URL(image, Astro.url)} />
+<meta property="og:image" content={socialImageUrl} />
+<meta property="og:image:secure_url" content={socialImageUrl} />
+<meta property="og:image:alt" content={imageAlt} />
 
 <!-- Twitter -->
-<meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={Astro.url} />
-<meta property="twitter:title" content={title} />
-<meta property="twitter:description" content={description} />
-<meta property="twitter:image" content={new URL(image, Astro.url)} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content={canonicalURL.toString()} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={socialImageUrl} />
+<meta name="twitter:image:alt" content={imageAlt} />
+<meta name="twitter:creator" content={siteConfig.twitterHandle} />
+<meta name="twitter:site" content={siteConfig.twitterHandle} />

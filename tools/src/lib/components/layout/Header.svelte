@@ -5,6 +5,7 @@
 
 	export let pathname = '/';
 	export let searchOpen = false;
+	export let searchButtonEl: HTMLButtonElement | null = null;
 
 	const dispatch = createEventDispatcher<{ search: void }>();
 
@@ -45,8 +46,12 @@
 
 		<div class="flex items-center gap-2">
 			<button
+				bind:this={searchButtonEl}
 				type="button"
 				class={`button-base ${searchOpen ? 'button-secondary' : 'button-ghost'} min-w-[8.5rem]`}
+				aria-controls="tool-search-dialog"
+				aria-expanded={searchOpen}
+				aria-haspopup="dialog"
 				on:click={() => dispatch('search')}
 			>
 				<span>Search</span>

@@ -30,7 +30,13 @@
 		: [];
 </script>
 
-<SeoHead title={seoTitle || title} {description} {schemas} />
+<SeoHead
+	title={seoTitle || title}
+	{description}
+	keywords={currentTool?.keywords ?? []}
+	imageAlt={`${seoTitle || title} preview card`}
+	{schemas}
+/>
 
 <section class="mx-auto w-full max-w-6xl space-y-6">
 	<header class="space-y-4">

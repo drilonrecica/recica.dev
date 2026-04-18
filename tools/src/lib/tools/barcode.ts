@@ -222,8 +222,8 @@ function encodeEan13(input: string): BarcodeResult {
 	const left = full
 		.slice(1, 7)
 		.split('')
-		.map((digit, index) =>
-			(parity[index] === 'L' ? EAN_L[Number(digit)] : EAN_G[Number(digit)]) ?? ''
+		.map(
+			(digit, index) => (parity[index] === 'L' ? EAN_L[Number(digit)] : EAN_G[Number(digit)]) ?? ''
 		)
 		.join('');
 	const right = full

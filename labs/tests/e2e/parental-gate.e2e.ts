@@ -27,7 +27,7 @@ test('loads the parental gate route with canonical metadata', async ({ page }) =
 	);
 	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 		'href',
-		'http://127.0.0.1:4173/parental-gate-lab'
+		'http://127.0.0.1:4175/parental-gate-lab'
 	);
 });
 
