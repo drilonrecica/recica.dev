@@ -148,6 +148,16 @@ Sorted by severity, importance, and priority.
 - `Recommendation`:
   - Add `Strict-Transport-Security` at the edge/proxy layer for all three domains.
   - Start with a conservative max-age, then move to `includeSubDomains` and `preload` only after validating the full hostname estate.
+- `Status`:
+  - Done by developer on 2026-04-19.
+  - Live verification confirms:
+    - `http://recica.dev/` returns `301` to `https://recica.dev/`
+    - `Strict-Transport-Security: max-age=2592000; includeSubDomains` is present on:
+      - `https://recica.dev/`
+      - `https://tools.recica.dev/`
+      - `https://labs.recica.dev/`
+  - Assessment: this is a valid conservative rollout and is sufficient to close the finding.
+  - `preload` is not enabled yet, which is acceptable at this stage.
 
 ### AUD-002
 
@@ -477,7 +487,7 @@ These are repo-local engineering tasks that can be implemented, tested, and veri
 
 These tasks are deployment, platform, or estate-level controls that cannot be fully or safely completed from repository code alone.
 
-- `AUD-001` edge-level HSTS rollout for:
+- [x] `AUD-001` edge-level HSTS rollout for:
   - `recica.dev`
   - `tools.recica.dev`
   - `labs.recica.dev`
