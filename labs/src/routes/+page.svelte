@@ -14,16 +14,37 @@
 	const description =
 		'Public product experiments by Drilon Reçica, including Parental Gate Lab, interactive UX references, and concept work around mobile products, product engineering, and privacy-first tools.';
 
-	const aboutPoints = [
-		'Labs sits between the flagship site and the stable tools layer: earlier than a finished product, but real enough to open and use.',
-		'Only the experiments that show product taste, interaction judgment, and engineering depth make it onto the homepage.'
-	];
+	const aboutCopy =
+		'Labs is where interaction studies and product concepts go public before they harden into products.';
 
 	const nextExperiments = [
 		'Privacy-first mobile analytics and crash reporting',
 		'Family-app UX references and interaction studies',
 		'Selected product engineering concept work'
 	];
+
+	const experimentPresentation: Record<
+		string,
+		{
+			metaTags: string[];
+			previewVariant: 'parental-gate' | 'analytics-concept';
+			detailPoints?: string[];
+		}
+	> = {
+		'parental-gate-lab': {
+			metaTags: ['UX / Mobile'],
+			previewVariant: 'parental-gate'
+		},
+		'mobile-analytics-crash-reporting': {
+			metaTags: ['Concept', 'Privacy / Mobile'],
+			previewVariant: 'analytics-concept',
+			detailPoints: [
+				'Anonymous-first event model',
+				'Crash grouping and release health',
+				'Mobile-first self-hosted deployment'
+			]
+		}
+	};
 
 	const primaryExperiment = featuredExperiments[0];
 	const secondaryExperiment = featuredExperiments[1];
@@ -63,12 +84,11 @@
 						class="font-display text-[clamp(3.4rem,8vw,7rem)] leading-[0.88] font-bold tracking-[-0.08em] text-[var(--ink)]"
 						data-testid="labs-home-hero"
 					>
-						Public product experiments.
+						Interesting experiments. Useful prototypes.
 					</h1>
 					<p class="max-w-3xl text-lg leading-8 text-[var(--ink-soft)] sm:text-xl">
-						The exploratory layer of the Recica ecosystem: interactive references, useful
-						prototypes, and product ideas that are still early enough to stay sharp, but real enough
-						to test, compare, and learn from in public.
+						A place for interaction studies, product references, and early tools that are far enough
+						along to open, test, compare, and learn from in public.
 					</p>
 				</div>
 
@@ -129,16 +149,17 @@
 						<p
 							class="font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--ink)] sm:text-5xl"
 						>
-							One strong experiment now. One strong concept close behind.
+							Start with a live product lab. Then scan the next concept.
 						</p>
 						<p class="max-w-xl text-base leading-8 text-[var(--ink-soft)] sm:text-lg">
-							The first public lab is already interactive. The next one explores privacy-first
-							mobile telemetry without dashboard bloat.
+							Parental Gate Lab is already interactive. The next concept explores privacy-first
+							mobile telemetry for teams that want useful signal without dashboard sprawl.
 						</p>
 					</div>
 
 					<p class="text-sm leading-7 text-[var(--ink-soft)]">
-						Ideas stay here while they are still sharp enough to teach something.
+						Useful for product, UX, and engineering teams who want concrete references instead of
+						abstract inspiration.
 					</p>
 				</div>
 			</div>
@@ -150,19 +171,30 @@
 	<div class="section-frame">
 		<div class="route-divider">Featured experiments</div>
 		<div class="mt-5 space-y-4">
-			<h2 class="section-title">A small front page, with the right experiments doing the work.</h2>
+			<h2 class="section-title">One live lab, one concept in motion.</h2>
 			<p class="section-copy">
-				One live interactive lab and one concept teaser are enough to show where the work is going.
+				Start with the interactive reference. Then scan the next concept taking shape.
 			</p>
 		</div>
 
 		<div class="lab-grid lab-grid--featured mt-6">
 			{#if primaryExperiment}
-				<ExperimentCard experiment={primaryExperiment} featured={true} />
+				<ExperimentCard
+					experiment={primaryExperiment}
+					featured={true}
+					metaTags={experimentPresentation[primaryExperiment.slug]?.metaTags ?? []}
+					previewVariant={experimentPresentation[primaryExperiment.slug]?.previewVariant ?? null}
+					detailPoints={experimentPresentation[primaryExperiment.slug]?.detailPoints ?? []}
+				/>
 			{/if}
 
 			{#if secondaryExperiment}
-				<ExperimentCard experiment={secondaryExperiment} />
+				<ExperimentCard
+					experiment={secondaryExperiment}
+					metaTags={experimentPresentation[secondaryExperiment.slug]?.metaTags ?? []}
+					previewVariant={experimentPresentation[secondaryExperiment.slug]?.previewVariant ?? null}
+					detailPoints={experimentPresentation[secondaryExperiment.slug]?.detailPoints ?? []}
+				/>
 			{/if}
 		</div>
 
@@ -177,21 +209,12 @@
 				<div class="space-y-4">
 					<p class="eyebrow">About Labs</p>
 					<h2 class="section-title text-[clamp(2.3rem,4vw,4rem)]">
-						Small by design. Useful from day one.
+						Concrete experiments with clear constraints and honest status.
 					</h2>
-					<p class="section-copy max-w-2xl">
-						Labs is where ideas get tested in public before they harden into stable tools or fade
-						out for good.
-					</p>
+					<p class="section-copy max-w-2xl">{aboutCopy}</p>
 				</div>
 
 				<div class="grid gap-5">
-					<div class="compact-list">
-						{#each aboutPoints as point (point)}
-							<p class="compact-list__item">{point}</p>
-						{/each}
-					</div>
-
 					<div class="home-bridge__next">
 						<p class="eyebrow">What’s next</p>
 						<ul class="summary-list mt-3">

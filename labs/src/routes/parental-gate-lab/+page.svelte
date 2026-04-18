@@ -31,10 +31,27 @@
 		'Compare parental gate UX patterns for kids and family apps. Try live demos, review tradeoffs, and get a practical recommendation for settings, purchases, subscriptions, and other adult-only flows.';
 
 	const patterns = parentalGatePatterns;
+	const quickStartLinks = [
+		{
+			label: 'Try patterns',
+			href: '#demos',
+			description: 'Open the six live demos and start with the pattern that feels closest.'
+		},
+		{
+			label: 'Compare tradeoffs',
+			href: '#compare',
+			description: 'Scan the matrix when the right pattern is not obvious at first glance.'
+		},
+		{
+			label: 'Get a recommendation',
+			href: '#recommendation',
+			description: 'Use the six-question helper for one primary fit and one backup.'
+		}
+	];
 	const whatItIsPoints = [
-		'Parental gates protect settings, purchases, subscriptions, and other adult-only surfaces.',
-		'The right gate depends on risk, frequency, literacy, and accessibility needs.',
-		'Good friction slows accidental child access without making adults resent the product.'
+		'Used for settings, purchases, subscriptions, and other adult-only surfaces.',
+		'Choose the pattern based on risk, frequency, literacy, and accessibility.',
+		'The best gate is clear for adults and resistant to accidental child access.'
 	];
 
 	const implementationThemes = [
@@ -81,6 +98,17 @@
 		'pattern-matching': 'General restricted flows'
 	};
 
+	const patternMotifs: Record<string, { label: string; className: string }> = {
+		'math-gate': { label: '1+1', className: 'pattern-motif--math' },
+		'hold-to-confirm': { label: 'Hold', className: 'pattern-motif--hold' },
+		'drag-and-drop': { label: 'Drag', className: 'pattern-motif--drag' },
+		'shape-color-recognition': { label: 'Shape', className: 'pattern-motif--shape' },
+		'text-challenge': { label: 'Type', className: 'pattern-motif--text' },
+		'pattern-matching': { label: 'Match', className: 'pattern-motif--pattern' }
+	};
+
+	const patternNameById = new Map(patterns.map((pattern) => [pattern.id, pattern.name]));
+
 	const compactPatternRows = patterns.map((pattern) => ({
 		id: pattern.id,
 		slug: pattern.slug,
@@ -88,12 +116,13 @@
 		bestFor: patternTags[pattern.id] ?? pattern.bestFor,
 		strength: pattern.strengths[0],
 		watchOut: pattern.weaknesses[0],
-		note: pattern.accessibilityNotes[0] ?? pattern.implementationNotes[0]
+		note: pattern.accessibilityNotes[0] ?? pattern.implementationNotes[0],
+		signals: buildPatternSignals(pattern)
 	}));
 
 	let activePatternId = patterns[0]?.id ?? 'math-gate';
 	let activeStatus: 'idle' | 'in-progress' | 'success' | 'failure' = 'idle';
-	let activeMessage = 'Select a pattern and try it in the shared demo panel.';
+	let activeMessage = buildIdleMessage(activePatternId);
 
 	let mathAnswer = '';
 	let holdProgress = 0;
@@ -111,7 +140,7 @@
 	$: activePattern = patterns.find((pattern) => pattern.id === activePatternId) ?? patterns[0];
 	$: sortedPatterns = sortPatternsByCriterion(patterns, compareCriterion);
 	$: compareMeta =
-		criteriaMeta.find((criterion) => criterion.key === compareCriterion) ?? criteriaMeta[0];
+		criteriaMeta.find((criterion) => criterion.key === compareCriterion) ?? criteriaMeta[0]!;
 
 	onDestroy(() => {
 		clearHoldTimer();
@@ -125,7 +154,6 @@
 	function resetActiveDemo() {
 		clearHoldTimer();
 		activeStatus = 'idle';
-		activeMessage = 'Ready to try the active pattern.';
 		mathAnswer = '';
 		holdProgress = 0;
 		holdComplete = false;
@@ -133,6 +161,7 @@
 		shapeSelection = '';
 		textAnswer = '';
 		patternSelection = '';
+		activeMessage = buildIdleMessage(activePatternId);
 	}
 
 	function setStatus(status: 'idle' | 'in-progress' | 'success' | 'failure', message: string) {
@@ -292,6 +321,43 @@
 
 		handleDrop(candidateId);
 	}
+
+	function buildIdleMessage(patternId: string) {
+		return `${patternNameById.get(patternId) ?? 'This pattern'} is active. Try the demo below or switch patterns.`;
+	}
+
+	function buildPatternSignals(pattern: (typeof patterns)[number]) {
+		const signals: string[] = [];
+
+		if (pattern.criteriaScores.accessibility >= 4) {
+			signals.push('Access');
+		}
+
+		if (pattern.criteriaScores.speed >= 4) {
+			signals.push('Fast');
+		}
+
+		if (pattern.recommendationTags.includes('low-literacy')) {
+			signals.push('Low literacy');
+		}
+
+		if (
+			pattern.interactionConstraints.includes('limited-precision') ||
+			pattern.interactionConstraints.includes('motor-sensitive')
+		) {
+			signals.push('Precision');
+		}
+
+		if (pattern.recommendationTags.includes('high-risk')) {
+			signals.push('High risk');
+		}
+
+		return [...new Set(signals)].slice(0, 3);
+	}
+
+	function buildScoreWidth(score: number) {
+		return `${Math.max(0, Math.min(score, 5)) * 20}%`;
+	}
 </script>
 
 <SeoHead
@@ -323,10 +389,9 @@
 	<div class="section-frame pt-6 sm:pt-10">
 		<div class="lab-grid lab-grid--hero">
 			<div class="hero-enter grid gap-7">
-				<div class="route-divider">Live prototype</div>
+				<div class="route-divider">Family app UX</div>
 
 				<div class="space-y-5">
-					<p class="eyebrow">{parentalGateCopy.hero.kicker}</p>
 					<h1
 						class="font-display text-[clamp(3rem,7vw,6rem)] leading-[0.9] font-bold tracking-[-0.08em] text-[var(--ink)]"
 					>
@@ -387,6 +452,16 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="quick-start-strip hero-enter mt-6">
+			{#each quickStartLinks as item (item.href)}
+				<a href={resolve(item.href)} class="quick-start-card">
+					<span class="eyebrow">{item.label}</span>
+					<strong>{item.label}</strong>
+					<span>{item.description}</span>
+				</a>
+			{/each}
+		</div>
 	</div>
 </section>
 
@@ -420,13 +495,32 @@
 
 		<div class="lab-grid lab-grid--three mt-6" data-testid="demo-grid">
 			{#each patterns as pattern (pattern.id)}
-				<article class={`demo-card ${pattern.id === activePatternId ? 'demo-card--active' : ''}`}>
+				<article
+					class={`demo-card ${pattern.id === activePatternId ? 'demo-card--active' : ''}`}
+					aria-current={pattern.id === activePatternId ? 'true' : undefined}
+				>
 					<div class="space-y-3">
-						<div class="flex flex-wrap items-center gap-3">
-							<h3 class="font-display text-2xl font-semibold tracking-[-0.05em] text-[var(--ink)]">
-								{pattern.name}
-							</h3>
-							<span class="tag-pill">{patternTags[pattern.id] ?? pattern.bestFor}</span>
+						<div class="demo-card__header">
+							<div
+								class={`pattern-motif ${patternMotifs[pattern.id]?.className ?? ''}`}
+								aria-hidden="true"
+							>
+								{patternMotifs[pattern.id]?.label ?? 'Lab'}
+							</div>
+
+							<div class="space-y-2">
+								<div class="flex flex-wrap items-center gap-3">
+									<h3
+										class="font-display text-2xl font-semibold tracking-[-0.05em] text-[var(--ink)]"
+									>
+										{pattern.name}
+									</h3>
+									{#if pattern.id === activePatternId}
+										<span class="status-pill status-pill--live">Active pattern</span>
+									{/if}
+								</div>
+								<span class="tag-pill">{patternTags[pattern.id] ?? pattern.bestFor}</span>
+							</div>
 						</div>
 
 						<p class="text-sm leading-7 text-[var(--ink-soft)]">{pattern.summary}</p>
@@ -436,6 +530,11 @@
 						<span class="score-pill">Resistance {pattern.criteriaScores.childResistance}/5</span>
 						<span class="score-pill">Speed {pattern.criteriaScores.speed}/5</span>
 					</div>
+
+					<p class="demo-card__watch-out">
+						<strong>Watch-out:</strong>
+						{pattern.weaknesses[0]}
+					</p>
 
 					<button
 						type="button"
@@ -453,7 +552,7 @@
 			{#if activePattern}
 				<div class="flex flex-wrap items-center justify-between gap-4">
 					<div class="space-y-2">
-						<p class="eyebrow">Shared demo panel</p>
+						<p class="eyebrow">Active demo</p>
 						<h3 class="font-display text-3xl font-semibold tracking-[-0.05em] text-[var(--ink)]">
 							{activePattern.name}
 						</h3>
@@ -688,7 +787,8 @@
 				<div>
 					<p class="eyebrow">Compare</p>
 					<p class="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
-						Sort the matrix by one criterion to see where each pattern leads or falls off.
+						Sort one criterion, scan the tradeoffs, then use the helper if two options still feel
+						close.
 					</p>
 				</div>
 
@@ -702,11 +802,19 @@
 				</label>
 			</div>
 
-			<div class="mt-6 overflow-x-auto">
+			<div class="compare-context mt-5">
+				<p class="compare-context__label">
+					{compareMeta.label}
+					<span>{compareMeta.highIsBetter ? 'Higher is better' : 'Lower is better'}</span>
+				</p>
+				<p class="text-sm leading-7 text-[var(--ink-soft)]">{compareMeta.description}</p>
+			</div>
+
+			<div class="mt-6 hidden overflow-x-auto md:block">
 				<table class="compare-table" data-testid="compare-table">
 					<thead>
 						<tr>
-							<th>Pattern</th>
+							<th class="compare-table__sticky-column">Pattern</th>
 							<th>Best for</th>
 							{#each criteriaMeta as criterion (criterion.key)}
 								<th class:compare-highlight={criterion.key === compareCriterion}>
@@ -718,7 +826,7 @@
 					<tbody>
 						{#each sortedPatterns as pattern (pattern.id)}
 							<tr data-testid={`compare-row-${pattern.slug}`}>
-								<td>
+								<td class="compare-table__sticky-column">
 									<div class="compare-highlight font-display text-lg tracking-[-0.04em]">
 										{pattern.name}
 									</div>
@@ -726,13 +834,55 @@
 								<td>{pattern.bestFor}</td>
 								{#each criteriaMeta as criterion (criterion.key)}
 									<td class:compare-highlight={criterion.key === compareCriterion}>
-										<span class="score-meter">{pattern.criteriaScores[criterion.key]}</span>
+										<div class="score-cell">
+											<span class="score-meter">{pattern.criteriaScores[criterion.key]}</span>
+											<div class="score-bar" aria-hidden="true">
+												<div
+													class="score-bar__fill"
+													style={`width: ${buildScoreWidth(pattern.criteriaScores[criterion.key])}`}
+												></div>
+											</div>
+										</div>
 									</td>
 								{/each}
 							</tr>
 						{/each}
 					</tbody>
 				</table>
+			</div>
+
+			<div class="compare-card-grid mt-6 grid gap-4 md:hidden">
+				{#each sortedPatterns as pattern (pattern.id)}
+					<article class="compare-card" data-testid={`compare-card-${pattern.slug}`}>
+						<div class="space-y-2">
+							<div class="flex flex-wrap items-center justify-between gap-3">
+								<h3
+									class="font-display text-2xl font-semibold tracking-[-0.05em] text-[var(--ink)]"
+								>
+									{pattern.name}
+								</h3>
+								<span class="tag-pill">{pattern.bestFor}</span>
+							</div>
+						</div>
+
+						<div class="compare-card__scores">
+							{#each criteriaMeta as criterion (criterion.key)}
+								<div class="compare-card__score">
+									<div class="flex items-center justify-between gap-3">
+										<span>{criterion.shortLabel}</span>
+										<strong>{pattern.criteriaScores[criterion.key]}/5</strong>
+									</div>
+									<div class="score-bar" aria-hidden="true">
+										<div
+											class="score-bar__fill"
+											style={`width: ${buildScoreWidth(pattern.criteriaScores[criterion.key])}`}
+										></div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</article>
+				{/each}
 			</div>
 		</div>
 
@@ -796,13 +946,18 @@
 							</p>
 						</div>
 
-						<div class="rounded-[24px] border border-[var(--line)] bg-[var(--surface)] p-5">
-							<p class="eyebrow">Backup option</p>
-							<p
-								class="font-display mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--ink)]"
-							>
-								{recommendation.backup.name}
-							</p>
+						<div class="result-card">
+							<div class="result-card__section">
+								<p class="eyebrow">Backup option</p>
+								<p
+									class="font-display mt-2 text-2xl font-semibold tracking-[-0.04em] text-[var(--ink)]"
+								>
+									{recommendation.backup.name}
+								</p>
+								<p class="mt-2 text-sm leading-7 text-[var(--ink-soft)]">
+									Safer fallback if the primary feels too heavy in practice.
+								</p>
+							</div>
 						</div>
 
 						<div>
@@ -821,6 +976,42 @@
 									<li>{item}</li>
 								{/each}
 							</ul>
+						</div>
+
+						<div class="result-card">
+							<div class="result-card__section">
+								<p class="eyebrow">Reference notes</p>
+								<div class="result-note-grid mt-3">
+									<div class="result-note">
+										<strong>Accessibility note</strong>
+										<p>{recommendation.primary.accessibilityNotes[0]}</p>
+									</div>
+									<div class="result-note">
+										<strong>Implementation note</strong>
+										<p>{recommendation.primary.implementationNotes[0]}</p>
+									</div>
+								</div>
+							</div>
+
+							<div class="result-card__section result-card__section--breakdown">
+								<p class="eyebrow">Score breakdown</p>
+								<div class="score-breakdown mt-3">
+									{#each recommendation.scoreBreakdown.slice(0, 3) as item (item.patternId)}
+										<div class="score-breakdown__row">
+											<div class="flex items-center justify-between gap-3">
+												<span>{patternNameById.get(item.patternId) ?? item.patternId}</span>
+												<strong>{item.score}</strong>
+											</div>
+											<div class="score-bar" aria-hidden="true">
+												<div
+													class="score-bar__fill"
+													style={`width: ${Math.min(Math.max(item.score, 0), 20) * 5}%`}
+												></div>
+											</div>
+										</div>
+									{/each}
+								</div>
+							</div>
 						</div>
 					</div>
 				{:else}
@@ -862,6 +1053,11 @@
 							{row.name}
 						</h3>
 						<p class="pattern-row__tag">{row.bestFor}</p>
+						<div class="pattern-signal-row">
+							{#each row.signals as signal (signal)}
+								<span class="pattern-signal">{signal}</span>
+							{/each}
+						</div>
 					</div>
 
 					<div class="pattern-row__detail">
@@ -896,11 +1092,14 @@
 
 					<div class="guidance-divider pt-5">
 						<p class="eyebrow">Accessibility + anti-patterns</p>
-						<ul class="summary-list summary-list--warning mt-3">
+						<div class="warning-band mt-3">
 							{#each antiPatterns as item (item)}
-								<li>{item}</li>
+								<article class="warning-band__item">
+									<strong>Avoid this</strong>
+									<p>{item}</p>
+								</article>
 							{/each}
-						</ul>
+						</div>
 					</div>
 				</div>
 			</div>

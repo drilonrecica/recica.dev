@@ -15,11 +15,6 @@ export const parentalGateFaq = [
 			'No. They are also useful for settings, profile changes, adult dashboards, subscription management, and any surface where accidental child interaction creates real consequences.'
 	},
 	{
-		question: 'Should a parental gate be hard to solve?',
-		answer:
-			'It should be intentionally resistant to accidental child interaction, but not punishing for adults. Excessive friction damages the product just as much as weak gating.'
-	},
-	{
 		question: 'Do parental gates need accessibility support?',
 		answer:
 			'Yes. A gate that blocks adults with accessibility needs is not a good gate. Accessible fallback paths and clear semantics are part of the design, not optional extras.'

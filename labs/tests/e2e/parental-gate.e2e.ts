@@ -8,6 +8,15 @@ test('loads the parental gate route with canonical metadata', async ({ page }) =
 	await expect(page.getByTestId('guidance-section')).toBeVisible();
 	await expect(page.getByTestId('pattern-rows')).toBeVisible();
 	await expect(page.locator('[data-testid^="pattern-row-"]')).toHaveCount(6);
+	await expect(page.getByText('Live prototype')).toHaveCount(0);
+	await expect(page.getByRole('link', { name: 'Try patterns' })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Compare tradeoffs' })).toBeVisible();
+	await expect(page.getByRole('link', { name: 'Get a recommendation' })).toBeVisible();
+	await expect(page.locator('[data-testid="demo-grid"] article').first()).toContainText(
+		'Active pattern'
+	);
+	await expect(page.getByTestId('demo-panel')).toContainText('Math Gate is active.');
+	await expect(page.locator('.compact-faq__item')).toHaveCount(4);
 	await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 		'content',
 		'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
@@ -110,6 +119,9 @@ test('recommendation helper returns a deterministic result', async ({ page }) =>
 
 	await expect(page.getByTestId('recommendation-panel')).toContainText('Text Challenge Gate');
 	await expect(page.getByTestId('recommendation-panel')).toContainText('Math Gate');
+	await expect(page.getByTestId('recommendation-panel')).toContainText('Accessibility note');
+	await expect(page.getByTestId('recommendation-panel')).toContainText('Implementation note');
+	await expect(page.getByTestId('recommendation-panel')).toContainText('Score breakdown');
 });
 
 test.describe('mobile behavior', () => {
@@ -131,5 +143,12 @@ test.describe('mobile behavior', () => {
 		}
 
 		expect(panelBox.y).toBeGreaterThan(gridBox.y + gridBox.height - 1);
+	});
+
+	test('uses stacked comparison cards on mobile', async ({ page }) => {
+		await page.goto('/parental-gate-lab');
+
+		await expect(page.locator('[data-testid^="compare-card-"]')).toHaveCount(6);
+		await expect(page.getByTestId('compare-table')).toBeHidden();
 	});
 });

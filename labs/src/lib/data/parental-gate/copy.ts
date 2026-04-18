@@ -1,17 +1,16 @@
 export const parentalGateCopy = {
 	hero: {
-		kicker: 'Live prototype',
 		title: 'Parental Gate Lab',
 		subtitle: 'Compare UX patterns for kids and family apps.',
 		description:
-			'Try six parental gate patterns, compare the tradeoffs, and get a practical recommendation based on risk, frequency, literacy, and accessibility needs.',
-		status: 'Interactive reference · local recommendation helper'
+			'Try six parental gate patterns, compare the tradeoffs, and get a practical recommendation for adult-only flows in kids and family apps.',
+		status: 'Compare patterns, use the fit finder, and review implementation guidance.'
 	},
 	intro: {
 		eyebrow: 'Overview',
 		title: 'A parental gate is intentional friction, not a magic wall.',
 		description:
-			'The goal is simple: enough resistance to slow accidental child access without making adults resent the product.'
+			'A parental gate adds deliberate friction to adult-only actions. The right one blocks accidental child access without making adults fight the product.'
 	},
 	demos: {
 		eyebrow: 'Demos',
@@ -34,7 +33,7 @@ export const parentalGateCopy = {
 		eyebrow: 'Guidance',
 		title: 'Guidance for shipping, not just choosing.',
 		description:
-			'The demos are the fast path. These notes cover the implementation and accessibility details that usually settle the final decision.'
+			'Use the patterns for the fast read. Use these notes when implementation and accessibility decide the final choice.'
 	},
 	about: {
 		eyebrow: 'About this lab',

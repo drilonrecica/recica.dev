@@ -11,6 +11,10 @@ test('renders the Labs homepage hero and featured experiments', async ({ page })
 	await expect(page.getByTestId('experiment-card-mobile-analytics-crash-reporting')).toBeVisible();
 	await expect(page.getByText('How Labs works')).toHaveCount(0);
 	await expect(page.getByText('What Labs is')).toHaveCount(0);
+	await expect(page.getByText('2026')).toHaveCount(0);
+	await expect(page.getByText('Anonymous-first event model')).toBeVisible();
+	await expect(page.getByText('Crash grouping and release health')).toBeVisible();
+	await expect(page.getByText('Mobile-first self-hosted deployment')).toBeVisible();
 	await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 		'content',
 		'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
