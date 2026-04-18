@@ -7,7 +7,8 @@ const contentSecurityPolicy = [
 	"frame-ancestors 'none'",
 	"img-src 'self' data: blob:",
 	"font-src 'self' data:",
-	"style-src 'self' 'unsafe-inline'",
+	"style-src 'self'",
+	"style-src-attr 'unsafe-inline'",
 	"script-src 'self' 'unsafe-inline'",
 	"connect-src 'self'",
 	"object-src 'none'"

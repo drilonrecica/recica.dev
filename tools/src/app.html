@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark" data-theme="dark">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,16 +9,6 @@
 		<link rel="apple-touch-icon" href="/favicons/apple-touch-icon.png" />
 		<link rel="icon" href="/favicons/favicon-96x96.png" sizes="96x96" />
 		<link rel="manifest" href="/manifest.json" />
-		<script>
-			(() => {
-				const storageKey = 'recica-theme';
-				const root = document.documentElement;
-				const stored = localStorage.getItem(storageKey);
-				const theme = stored === 'light' ? 'light' : 'dark';
-				root.classList.toggle('dark', theme === 'dark');
-				root.dataset.theme = theme;
-			})();
-		</script>
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

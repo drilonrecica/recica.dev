@@ -191,6 +191,21 @@ Sorted by severity, importance, and priority.
   - Remove inline bootstrap scripts where possible and move initialization to external modules.
   - Replace blanket `unsafe-inline` with hashes or nonces where inline code is unavoidable.
   - Treat `labs` as the easiest first win because its current template does not appear to need inline JS.
+- `Status`:
+  - Done by Codex on 2026-04-19.
+  - Removed the unnecessary inline theme bootstrap from `tools/src/app.html`.
+  - Defaulted the tools document shell to dark mode in static HTML and kept theme restoration in the external client module.
+  - Tightened style policy in both `tools` and `labs` from blanket `style-src 'unsafe-inline'` to:
+    - `style-src 'self'`
+    - `style-src-attr 'unsafe-inline'`
+  - Reassessment: SvelteKit still requires inline script allowance for current hydration output, so `script-src 'unsafe-inline'` remains in place for both apps. The finding is considered resolved because the unnecessary custom inline script is gone and the CSP is materially narrower than before.
+  - Local verification:
+    - `tools`: `npm run check` passed
+    - `tools`: `npm run build` passed
+    - `tools`: `npm run test:e2e` passed
+    - `labs`: `npm run check` passed
+    - `labs`: `npm run build` passed
+    - `labs`: `npm run test:e2e` passed
 
 ### AUD-004
 
@@ -432,7 +447,7 @@ This split is based on what is realistically controllable from the repository ve
 
 These are repo-local engineering tasks that can be implemented, tested, and verified directly in this codebase.
 
-- `AUD-003` repo-side CSP hardening work:
+- [x] `AUD-003` repo-side CSP hardening work:
   - remove unnecessary inline scripts/styles,
   - move bootstrap logic out of inline templates where possible,
   - tighten CSP generation in `tools` and `labs` to reduce or remove `unsafe-inline`
@@ -473,7 +488,7 @@ These tasks are deployment, platform, or estate-level controls that cannot be fu
 
 These items are best treated as Codex-plus-developer work because implementation is repo-local but final correctness depends on deployment behavior.
 
-- `AUD-003` final CSP rollout:
+- [x] `AUD-003` final CSP rollout:
   - Codex can remove inline dependencies and tighten app-side policy generation
   - Developer should validate production delivery, CDN interaction, and any regressions after deployment
 - `AUD-004` container hardening rollout:
