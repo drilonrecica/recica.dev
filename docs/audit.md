@@ -230,6 +230,11 @@ Sorted by severity, importance, and priority.
 - `Recommendation`:
   - Switch to a production-only deployment step such as `pnpm deploy --prod`, `pnpm prune --prod`, or an equivalent runtime-only install/copy flow.
   - Keep only the built server output plus runtime dependencies in the final image.
+- `Status`:
+  - Done by Codex on 2026-04-19.
+  - Updated both `tools/Dockerfile` and `labs/Dockerfile` to introduce a `prod-deps` stage that runs `pnpm prune --prod --ignore-scripts`.
+  - The runtime images now copy pruned production dependencies instead of the full build-stage `node_modules` tree.
+  - Validation note: Docker is not installed in this environment, so this remediation was verified by source review rather than a local image build.
 
 ### AUD-005
 
@@ -451,7 +456,7 @@ These are repo-local engineering tasks that can be implemented, tested, and veri
   - remove unnecessary inline scripts/styles,
   - move bootstrap logic out of inline templates where possible,
   - tighten CSP generation in `tools` and `labs` to reduce or remove `unsafe-inline`
-- `AUD-004` runtime image hardening for `tools` and `labs`:
+- [x] `AUD-004` runtime image hardening for `tools` and `labs`:
   - refactor Dockerfiles to ship runtime-only dependencies
 - [x] `AUD-005` `recica` dependency remediation:
   - upgrade Astro and related packages,
@@ -491,7 +496,7 @@ These items are best treated as Codex-plus-developer work because implementation
 - [x] `AUD-003` final CSP rollout:
   - Codex can remove inline dependencies and tighten app-side policy generation
   - Developer should validate production delivery, CDN interaction, and any regressions after deployment
-- `AUD-004` container hardening rollout:
+- [x] `AUD-004` container hardening rollout:
   - Codex can fix the Dockerfiles
   - Developer should confirm the actual production platform is using these images and not a separate build path
 - `AUD-005` dependency/security updates:

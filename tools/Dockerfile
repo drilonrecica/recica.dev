@@ -12,6 +12,9 @@ FROM deps AS build
 COPY . .
 RUN pnpm run build
 
+FROM build AS prod-deps
+RUN pnpm prune --prod --ignore-scripts
+
 FROM node:20-alpine AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
@@ -22,7 +25,7 @@ RUN apk add --no-cache curl
 
 COPY --from=build /app/build ./build
 COPY --from=build /app/package.json ./package.json
-COPY --from=build /app/node_modules ./node_modules
+COPY --from=prod-deps /app/node_modules ./node_modules
 
 USER app
 EXPOSE 3000
