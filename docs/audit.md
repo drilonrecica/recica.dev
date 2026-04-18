@@ -355,6 +355,11 @@ Sorted by severity, importance, and priority.
   - Normalize error metadata strategy:
     - either omit canonicals on error routes,
     - or canonicalize them consistently to the app root or a dedicated non-indexable error endpoint.
+- `Status`:
+  - Done by Codex on 2026-04-19.
+  - Added `omitCanonical` support to the shared Svelte SEO components and applied it to `tools` and `labs` error surfaces.
+  - `tools` and `labs` no longer intentionally emit canonical links for error pages.
+  - Local verification: `tools` build and check passed; `labs` build and check passed.
 
 ## Remediation Roadmap
 
@@ -405,7 +410,7 @@ These are repo-local engineering tasks that can be implemented, tested, and veri
 - [x] `AUD-008` local hygiene fix in `tools`:
   - format the two failing files and return the lint gate to green
 - [x] `AUD-009` replace the remaining Svelte favicon artifact in `tools`
-- `AUD-010` normalize error-route canonical strategy in `tools` and `labs`
+- [x] `AUD-010` normalize error-route canonical strategy in `tools` and `labs`
 
 ### Should be done by the developer
 

@@ -14,6 +14,7 @@
 	export let noindex = false;
 	export let robots = 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1';
 	export let schemas: unknown[] = [];
+	export let omitCanonical = false;
 
 	$: origin = resolveSiteOrigin(env.PUBLIC_SITE_URL, $page.url);
 	$: canonicalUrl = new URL(path || $page.url.pathname, origin).toString();
@@ -29,7 +30,9 @@
 	<meta name="description" content={description} />
 	<meta name="robots" content={resolvedRobots} />
 	<meta name="googlebot" content={resolvedRobots} />
-	<link rel="canonical" href={canonicalUrl} />
+	{#if !omitCanonical}
+		<link rel="canonical" href={canonicalUrl} />
+	{/if}
 	{#if keywords.length}
 		<meta name="keywords" content={keywords.join(', ')} />
 	{/if}
@@ -39,7 +42,9 @@
 	<meta property="og:type" content={type} />
 	<meta property="og:title" content={socialTitle} />
 	<meta property="og:description" content={description} />
-	<meta property="og:url" content={canonicalUrl} />
+	{#if !omitCanonical}
+		<meta property="og:url" content={canonicalUrl} />
+	{/if}
 
 	{#if imageUrl}
 		<meta property="og:image" content={imageUrl} />

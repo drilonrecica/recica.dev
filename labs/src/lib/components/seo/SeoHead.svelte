@@ -18,6 +18,7 @@
 	export let keywords: string[] = [];
 	export let type: 'website' | 'article' = 'website';
 	export let noindex = false;
+	export let omitCanonical = false;
 	export let schema: unknown[] = [];
 	export let schemaBuilder: ((origin: string, canonicalUrl: string) => unknown[]) | null = null;
 
@@ -47,7 +48,9 @@
 	<meta property="og:title" content={fullTitle} />
 	<meta property="og:description" content={description} />
 	<meta property="og:type" content={type} />
-	<meta property="og:url" content={canonicalUrl} />
+	{#if !omitCanonical}
+		<meta property="og:url" content={canonicalUrl} />
+	{/if}
 	<meta property="og:image" content={socialImageUrl} />
 	<meta property="og:image:secure_url" content={socialImageUrl} />
 	<meta property="og:image:alt" content={resolvedSocialImageAlt} />
@@ -59,7 +62,9 @@
 	<meta name="twitter:creator" content="@drilonrecica" />
 	<meta name="twitter:site" content="@drilonrecica" />
 	<meta name="generator" content={siteTagline} />
-	<link rel="canonical" href={canonicalUrl} />
+	{#if !omitCanonical}
+		<link rel="canonical" href={canonicalUrl} />
+	{/if}
 	{#if keywords.length}
 		<meta name="keywords" content={keywords.join(', ')} />
 	{/if}

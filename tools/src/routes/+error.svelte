@@ -14,7 +14,7 @@
 	const details = error?.message ? String(error.message) : '';
 </script>
 
-<SeoHead {title} {description} noindex={true} />
+<SeoHead {title} {description} noindex={true} omitCanonical={true} />
 
 <section class="min-h-[calc(100vh-6rem)] px-4 py-12 sm:px-6 lg:px-8">
 	<div class="mx-auto flex max-w-5xl flex-col gap-8">
