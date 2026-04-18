@@ -13,10 +13,7 @@
 
 	function isJsonErrorDetails(error: unknown): error is JsonErrorDetails {
 		return Boolean(
-			error &&
-				typeof error === 'object' &&
-				'message' in error &&
-				typeof error.message === 'string'
+			error && typeof error === 'object' && 'message' in error && typeof error.message === 'string'
 		);
 	}
 

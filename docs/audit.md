@@ -308,6 +308,10 @@ Sorted by severity, importance, and priority.
   - This is low risk functionally, but it weakens confidence in the local hygiene baseline.
 - `Recommendation`:
   - Format the two files and keep the lint gate green before the next release or merge.
+- `Status`:
+  - Done by Codex on 2026-04-19.
+  - `tools/src/routes/json/+page.svelte` and `tools/tests/e2e/app.e2e.ts` were formatted.
+  - Local verification: `tools` lint now passes.
 
 ### AUD-009
 
@@ -393,7 +397,7 @@ These are repo-local engineering tasks that can be implemented, tested, and veri
   - add `astro check`,
   - add linting,
   - align root documentation with the real verification posture
-- `AUD-008` local hygiene fix in `tools`:
+- [x] `AUD-008` local hygiene fix in `tools`:
   - format the two failing files and return the lint gate to green
 - `AUD-009` replace the remaining Svelte favicon artifact in `tools`
 - `AUD-010` normalize error-route canonical strategy in `tools` and `labs`

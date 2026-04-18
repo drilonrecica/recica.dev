@@ -39,10 +39,18 @@ test('homepage category pills filter the tool grid', async ({ page }) => {
 	await expect(page.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');
 
 	await page.getByRole('button', { name: 'Security' }).click();
-	await expect(toolIndexSection.getByRole('link', { name: /password generator/i }).first()).toBeVisible();
-	await expect(toolIndexSection.getByRole('link', { name: /hash generator/i }).first()).toBeVisible();
-	await expect(toolIndexSection.getByRole('link', { name: /jwt inspector/i }).first()).toBeVisible();
-	await expect(toolIndexSection.getByRole('link', { name: /json formatter \/ validator/i })).toHaveCount(0);
+	await expect(
+		toolIndexSection.getByRole('link', { name: /password generator/i }).first()
+	).toBeVisible();
+	await expect(
+		toolIndexSection.getByRole('link', { name: /hash generator/i }).first()
+	).toBeVisible();
+	await expect(
+		toolIndexSection.getByRole('link', { name: /jwt inspector/i }).first()
+	).toBeVisible();
+	await expect(
+		toolIndexSection.getByRole('link', { name: /json formatter \/ validator/i })
+	).toHaveCount(0);
 
 	await page.getByRole('button', { name: 'All' }).click();
 	await expect(page.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');
