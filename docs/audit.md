@@ -369,6 +369,65 @@ Sorted by severity, importance, and priority.
 1. Replace the remaining Svelte favicon artifact in `tools`.
 2. Normalize canonical handling on error routes.
 
+## Execution Ownership
+
+This split is based on what is realistically controllable from the repository versus what must be changed in deployment or platform configuration.
+
+### Should be done by Codex
+
+These are repo-local engineering tasks that can be implemented, tested, and verified directly in this codebase.
+
+- `AUD-003` repo-side CSP hardening work:
+  - remove unnecessary inline scripts/styles,
+  - move bootstrap logic out of inline templates where possible,
+  - tighten CSP generation in `tools` and `labs` to reduce or remove `unsafe-inline`
+- `AUD-004` runtime image hardening for `tools` and `labs`:
+  - refactor Dockerfiles to ship runtime-only dependencies
+- `AUD-005` `recica` dependency remediation:
+  - upgrade Astro and related packages,
+  - refresh lockfile,
+  - re-run build and audit checks
+- `AUD-006` root verification orchestration:
+  - add a minimal root-level task runner, script wrapper, or Makefile for install/build/test/audit
+- `AUD-007` `recica` quality-gate improvements:
+  - add `astro check`,
+  - add linting,
+  - align root documentation with the real verification posture
+- `AUD-008` local hygiene fix in `tools`:
+  - format the two failing files and return the lint gate to green
+- `AUD-009` replace the remaining Svelte favicon artifact in `tools`
+- `AUD-010` normalize error-route canonical strategy in `tools` and `labs`
+
+### Should be done by the developer
+
+These tasks are deployment, platform, or estate-level controls that cannot be fully or safely completed from repository code alone.
+
+- `AUD-001` edge-level HSTS rollout for:
+  - `recica.dev`
+  - `tools.recica.dev`
+  - `labs.recica.dev`
+- `AUD-002` `recica.dev` response-header hardening at the CDN, reverse proxy, or hosting layer:
+  - `Content-Security-Policy`
+  - `Referrer-Policy`
+  - `X-Content-Type-Options`
+  - `X-Frame-Options` or equivalent `frame-ancestors` policy
+  - `Permissions-Policy`
+- final rollout approval for any production header changes that could affect caching, embedding, or browser compatibility
+
+### Shared / coordinated
+
+These items are best treated as Codex-plus-developer work because implementation is repo-local but final correctness depends on deployment behavior.
+
+- `AUD-003` final CSP rollout:
+  - Codex can remove inline dependencies and tighten app-side policy generation
+  - Developer should validate production delivery, CDN interaction, and any regressions after deployment
+- `AUD-004` container hardening rollout:
+  - Codex can fix the Dockerfiles
+  - Developer should confirm the actual production platform is using these images and not a separate build path
+- `AUD-005` dependency/security updates:
+  - Codex can implement and verify the package updates
+  - Developer should control deployment timing and monitor post-release behavior
+
 ## Residual Risks and Limitations
 
 - Infrastructure findings are based on black-box behavior and repo-visible config only. Cloudflare and deployment platform settings were not directly inspected.
