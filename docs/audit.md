@@ -275,6 +275,21 @@ Sorted by severity, importance, and priority.
     - build
     - test
     - audit
+- `Status`:
+  - Done by Codex on 2026-04-19.
+  - Added a root `Makefile` with standardized cross-app targets for:
+    - `install`
+    - `check`
+    - `build`
+    - `test`
+    - `audit`
+  - Added `scripts/run-pnpm.sh` so the root orchestration can resolve `pnpm` consistently without forcing a workspace rewrite.
+  - Updated the root README to document the new top-level verification entrypoints.
+  - Hardened `recica/playwright.config.ts` and the root `recica-test` target so the flagship Playwright suite runs correctly from the root orchestrator instead of only from the app directory.
+  - Local verification:
+    - `make check` passed
+    - `make build` passed
+    - `make test` passed
 
 ### AUD-007
 
@@ -427,7 +442,7 @@ These are repo-local engineering tasks that can be implemented, tested, and veri
   - upgrade Astro and related packages,
   - refresh lockfile,
   - re-run build and audit checks
-- `AUD-006` root verification orchestration:
+- [x] `AUD-006` root verification orchestration:
   - add a minimal root-level task runner, script wrapper, or Makefile for install/build/test/audit
 - [x] `AUD-007` `recica` quality-gate improvements:
   - add `astro check`,

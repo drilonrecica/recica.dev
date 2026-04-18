@@ -1,4 +1,8 @@
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "@playwright/test";
+
+const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
 export default defineConfig({
   testDir: "tests/e2e",
@@ -10,6 +14,7 @@ export default defineConfig({
   webServer: {
     command:
       "./node_modules/.bin/astro build && ./node_modules/.bin/astro preview --host 127.0.0.1 --port 4173",
+    cwd: projectRoot,
     port: 4173,
     reuseExistingServer: !process.env.CI,
   },

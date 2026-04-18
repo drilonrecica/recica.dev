@@ -8,7 +8,9 @@ It is intentionally split into 3 independent apps:
 - `tools/` for the standalone browser toolbox at `https://tools.recica.dev`
 - `labs/` for the experimental product layer at `https://labs.recica.dev`
 
-There is no root workspace runner, no shared root package manager flow, and no single monorepo build command. Each app is built, tested, and deployed independently because each one has a different product role and a different runtime profile.
+There is now a minimal root orchestration layer via [`Makefile`](./Makefile) for cross-app install, check, build, test, and audit commands.
+
+There is still no shared root package manager flow. Each app keeps its own package manager and lockfile because each one has a different product role and a different runtime profile.
 
 ## Domain Model
 
@@ -150,7 +152,24 @@ Trying to force all 3 concerns into one runtime would create unnecessary couplin
 
 ## Local Development
 
-There is no root install command. Work inside the app you are changing.
+There is now a root install command for convenience:
+
+```bash
+make install
+```
+
+For day-to-day development, it is still usually better to work inside the app you are changing.
+
+## Root Verification Commands
+
+The root orchestration layer is intentionally thin. It standardizes cross-app verification without pretending the apps share one runtime or one package manager.
+
+```bash
+make check
+make build
+make test
+make audit
+```
 
 ### `recica/`
 
