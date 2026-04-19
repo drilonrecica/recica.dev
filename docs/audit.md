@@ -438,29 +438,31 @@ Sorted by severity, importance, and priority.
 
 ## Remediation Roadmap
 
+Current state: all originally recommended remediation items have now either been completed or explicitly accepted as risk. This section is retained as a closure summary, not as an open backlog.
+
 ### Immediate (`P1`)
 
-1. Add HSTS on all three public domains.
-2. Bring `recica.dev` up to the same hardening baseline as `tools` and `labs`.
-3. Remove or minimize CSP `unsafe-inline` allowances, starting with `labs`, then `tools`.
-4. Upgrade `recica` to at least Astro `5.18.1` and re-audit the dependency graph.
-5. Prune production Docker images for `tools` and `labs` down to runtime-only dependencies.
+1. [x] `AUD-001` Add HSTS on all three public domains.
+2. [x] `AUD-002` `recica.dev` hardening-header gap recorded as `WONT DO` / accepted risk.
+3. [x] `AUD-003` Remove or minimize CSP `unsafe-inline` allowances to the current practical limit.
+4. [x] `AUD-005` Upgrade `recica` to at least Astro `5.18.1` and re-audit the dependency graph.
+5. [x] `AUD-004` Prune production Docker images for `tools` and `labs` down to runtime-only dependencies.
 
 ### Near-term (`P2`)
 
-1. Add a root orchestration layer for build/test/audit so the repo can be verified end to end.
-2. Add `astro check` and linting to `recica`.
-3. Update the root docs so the actual verification posture is accurate.
-4. Clear the current `tools` lint failure before treating the snapshot as release-ready.
+1. [x] `AUD-006` Add a root orchestration layer for build/test/audit so the repo can be verified end to end.
+2. [x] `AUD-007` Add `astro check` and linting to `recica`.
+3. [x] `AUD-007` Update the root docs so the actual verification posture is accurate.
+4. [x] `AUD-008` Clear the current `tools` lint failure before treating the snapshot as release-ready.
 
 ### Backlog (`P3`)
 
-1. Replace the remaining Svelte favicon artifact in `tools`.
-2. Normalize canonical handling on error routes.
+1. [x] `AUD-009` Replace the remaining Svelte favicon artifact in `tools`.
+2. [x] `AUD-010` Normalize canonical handling on error routes.
 
 ## Execution Ownership
 
-This split is based on what is realistically controllable from the repository versus what must be changed in deployment or platform configuration.
+This split now records closure ownership. There are no remaining unresolved implementation findings in this audit; one item is explicitly accepted risk (`AUD-002`).
 
 ### Should be done by Codex
 
@@ -495,17 +497,19 @@ These tasks are deployment, platform, or estate-level controls that cannot be fu
   - `recica.dev`
   - `tools.recica.dev`
   - `labs.recica.dev`
-- `AUD-002` `recica.dev` response-header hardening at the CDN, reverse proxy, or hosting layer: WONT DO / accepted risk
+- [x] `AUD-002` `recica.dev` response-header hardening at the CDN, reverse proxy, or hosting layer: WONT DO / accepted risk
   - `Content-Security-Policy`
   - `Referrer-Policy`
   - `X-Content-Type-Options`
   - `X-Frame-Options` or equivalent `frame-ancestors` policy
   - `Permissions-Policy`
-- final rollout approval for any production header changes that could affect caching, embedding, or browser compatibility
+- [x] Header rollout decision closed for current scope:
+  - `AUD-001` is live and verified
+  - no additional `recica` response-header rollout is planned under `AUD-002`
 
 ### Shared / coordinated
 
-These items are best treated as Codex-plus-developer work because implementation is repo-local but final correctness depends on deployment behavior.
+These items were best treated as Codex-plus-developer work because implementation was repo-local but final correctness depended on deployment behavior.
 
 - [x] `AUD-003` final CSP rollout:
   - Codex can remove inline dependencies and tighten app-side policy generation
@@ -513,9 +517,9 @@ These items are best treated as Codex-plus-developer work because implementation
 - [x] `AUD-004` container hardening rollout:
   - Codex can fix the Dockerfiles
   - Developer should confirm the actual production platform is using these images and not a separate build path
-- `AUD-005` dependency/security updates:
+- [x] `AUD-005` dependency/security updates:
   - Codex can implement and verify the package updates
-  - Developer should control deployment timing and monitor post-release behavior
+  - Developer-owned deployment timing and post-release monitoring remain normal operational follow-through, not an open audit finding
 
 ## Residual Risks and Limitations
 
