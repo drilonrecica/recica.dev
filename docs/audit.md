@@ -177,6 +177,10 @@ Sorted by severity, importance, and priority.
 - `Recommendation`:
   - Add the same baseline security headers to the `recica` deployment path at the CDN/proxy layer or host configuration.
   - This is infrastructure work, not Astro component work.
+- `Status`:
+  - WONT DO by developer decision on 2026-04-19.
+  - Rationale: `recica` remains an intentionally simple Astro flagship, and the team does not want to change the current deployment model or add separate app-level/server-side header management for this site.
+  - Residual risk accepted: `recica.dev` remains less hardened at the response-header layer than `tools` and `labs`.
 
 ### AUD-003
 
@@ -491,7 +495,7 @@ These tasks are deployment, platform, or estate-level controls that cannot be fu
   - `recica.dev`
   - `tools.recica.dev`
   - `labs.recica.dev`
-- `AUD-002` `recica.dev` response-header hardening at the CDN, reverse proxy, or hosting layer:
+- `AUD-002` `recica.dev` response-header hardening at the CDN, reverse proxy, or hosting layer: WONT DO / accepted risk
   - `Content-Security-Policy`
   - `Referrer-Policy`
   - `X-Content-Type-Options`
