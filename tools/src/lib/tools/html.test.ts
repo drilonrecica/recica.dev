@@ -9,9 +9,23 @@ describe('html tools', () => {
 		expect(html).toBe('<button>x</button>');
 	});
 
-	it('neutralizes javascript urls in preview documents', () => {
-		expect(createHtmlPreviewDocument('<a href="javascript:alert(1)">bad</a>')).toContain(
-			'href="#"'
+	it('removes URL-bearing attributes and active metadata', () => {
+		const document = createHtmlPreviewDocument(
+			'<a href="javascript:alert(1)">bad</a><img src="/private"><link rel="stylesheet" href="/private.css">'
 		);
+		expect(document).not.toContain('javascript:');
+		expect(document).not.toContain('/private');
+		expect(document).not.toContain('<link');
+	});
+
+	it('blocks preview documents from making network requests', () => {
+		const document = createHtmlPreviewDocument(
+			'<style>@import "/private.css"; p { background: url(/private.png) }</style>'
+		);
+		expect(document).toContain(
+			`Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'"`
+		);
+		expect(document).not.toContain('@import');
+		expect(document).not.toContain('url(');
 	});
 });

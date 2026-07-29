@@ -368,13 +368,26 @@ test('markdown route renders safe preview output', async ({ page }) => {
 test('html route previews markup without executing scripts', async ({ page }) => {
 	await page.goto('/html');
 	const preview = page.frameLocator('iframe[title="HTML preview"]');
+	const previewRequests: string[] = [];
+	page.on('request', (request) => {
+		if (request.url().includes('private-preview-marker')) previewRequests.push(request.url());
+	});
 	await expect(preview.getByRole('heading', { name: 'Recica Preview' })).toBeVisible();
 
 	await page
 		.getByLabel('HTML')
-		.fill('<button onclick="alert(1)">Safe</button><script>document.body.append("owned")</script>');
+		.fill(
+			'<button onclick="alert(1)">Safe</button>' +
+				'<script>document.body.append("owned")</script>' +
+				'<img src="/private-preview-marker-image">' +
+				'<link rel="stylesheet" href="/private-preview-marker-style">' +
+				'<iframe src="/private-preview-marker-frame"></iframe>' +
+				'<video src="/private-preview-marker-media"></video>'
+		);
 	await expect(preview.getByRole('button', { name: 'Safe' })).toBeVisible();
 	await expect(preview.locator('body')).not.toContainText('owned');
+	await page.waitForTimeout(250);
+	expect(previewRequests).toEqual([]);
 });
 
 test('device route reports browser-side information', async ({ page }) => {
