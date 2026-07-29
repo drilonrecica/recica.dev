@@ -1,7 +1,7 @@
 {
 	"ci": {
 		"collect": {
-			"startServerCommand": "pnpm --dir labs preview --host 127.0.0.1 --port 4175",
+			"startServerCommand": "env --chdir=labs ./node_modules/.bin/vite preview --host 127.0.0.1 --port 4175",
 			"startServerReadyPattern": "Local",
 			"url": ["http://127.0.0.1:4175/", "http://127.0.0.1:4175/parental-gate-lab"],
 			"numberOfRuns": 1,
