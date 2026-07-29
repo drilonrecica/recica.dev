@@ -1,20 +1,23 @@
 ---
 import { heroActions, sectionCopy, siteConfig } from '@/lib/site-content';
 
-const posterLines = [
-	'Android delivery',
-	'Systems modernization',
-	'Product judgment',
-	'Independent tools'
+const capabilities = [
+	['01', 'Android product engineering'],
+	['02', 'Legacy modernization'],
+	['03', 'Accessible delivery'],
+	['04', '0-to-1 product systems']
 ];
 ---
 
-<section class="hero-stage">
-	<div class="hero-stage__wash" aria-hidden="true"></div>
+<section class="hero-stage" aria-labelledby="hero-title">
 	<div class="hero-stage__shell">
 		<div class="hero-copy">
-			<h1 class="hero-title">{siteConfig.name}</h1>
-			<p class="hero-role">{siteConfig.role}</p>
+			<div class="hero-copy__meta">
+				<p class="dossier-index">DOSSIER 001 / 2026</p>
+				<p>Static · Independent</p>
+			</div>
+			<h1 id="hero-title" class="hero-title">{siteConfig.name}</h1>
+			<p class="hero-role">Senior mobile &amp;<br />product engineer.</p>
 			<p class="hero-support">{siteConfig.supportingLine}</p>
 			<p class="hero-intro">{sectionCopy.hero.intro}</p>
 
@@ -34,33 +37,20 @@ const posterLines = [
 			</div>
 		</div>
 
-		<div class="hero-poster" aria-hidden="true">
-			<div class="hero-poster__frame">
-				<div class="hero-poster__mesh"></div>
-				<div class="hero-poster__route hero-poster__route--primary"></div>
-				<div class="hero-poster__route hero-poster__route--secondary"></div>
-				<div class="hero-poster__route hero-poster__route--tertiary"></div>
-				<div class="hero-poster__route hero-poster__route--quaternary"></div>
-				<div class="hero-poster__node hero-poster__node--origin"></div>
-				<div class="hero-poster__node hero-poster__node--switch"></div>
-				<div class="hero-poster__node hero-poster__node--target"></div>
-				<div class="hero-poster__signal hero-poster__signal--north">Production Android</div>
-				<div class="hero-poster__signal hero-poster__signal--east">Systems work</div>
-				<div class="hero-poster__signal hero-poster__signal--south">Product delivery</div>
-				<div class="hero-poster__kicker">Mobile / Product / Systems</div>
-				<div class="hero-poster__stack">
-					{
-						posterLines.map((line) => (
-							<p>{line}</p>
-						))
-					}
-				</div>
-				<div class="hero-poster__footer">
-					<span>Selected work</span>
-					<span>Independent tools</span>
-					<span>Clear contact</span>
-				</div>
+		<div class="capability-plate" aria-label="Core capabilities">
+			<div class="capability-plate__head">
+				<span>Operating range</span>
+				<span>12+ years</span>
 			</div>
+			<ol>
+				{capabilities.map(([number, label]) => (
+					<li><span>{number}</span><strong>{label}</strong></li>
+				))}
+			</ol>
+			<div class="capability-plate__signal" aria-hidden="true">
+				<span></span><span></span><span></span><span></span>
+			</div>
+			<p class="capability-plate__foot">Architecture / Delivery / Product judgment</p>
 		</div>
 	</div>
 </section>

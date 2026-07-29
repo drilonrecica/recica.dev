@@ -15,7 +15,7 @@ runtimes with strict prerendering and an unprivileged Nginx static runtime.
 Product UI remains independent; only repository policy, validation, CI, and
 operational standards are aligned.
 
-**Tech Stack:** Node.js 24 LTS, `pnpm@11.18.0`, Astro 5, SvelteKit 2, Svelte 5,
+**Tech Stack:** Node.js 24 LTS, `pnpm@11.18.0`, Astro 7, SvelteKit 2, Svelte 5,
 TypeScript, Tailwind CSS 4, Vitest, Playwright, axe-core, Nginx unprivileged,
 Coolify, and Cloudflare.
 

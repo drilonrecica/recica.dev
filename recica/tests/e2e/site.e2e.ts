@@ -12,12 +12,16 @@ async function expectNoViolations(page: Page) {
   ).toEqual([]);
 }
 
-test("flagship homepage exposes canonical SEO metadata and passes axe", async ({
+test("technical dossier homepage preserves public anchors without presentation scripts", async ({
   page,
 }) => {
   await page.goto("/");
 
   await expect(page).toHaveTitle(/Drilon Reçica/);
+  await expect(page.locator("body")).toHaveAttribute(
+    "data-publication",
+    "technical-dossier",
+  );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
     "https://recica.dev/",
@@ -30,24 +34,78 @@ test("flagship homepage exposes canonical SEO metadata and passes axe", async ({
     "content",
     "recica.dev",
   );
+  await expect(page.getByRole("heading", { level: 1 })).toContainText(
+    "Drilon Reçica",
+  );
   await expect(page.getByRole("link", { name: "Explore Labs" })).toBeVisible();
 
+  for (const anchor of ["work", "experience", "about", "contact", "tools"]) {
+    await expect(page.locator(`#${anchor}`)).toHaveCount(1);
+  }
+
+  await expect(
+    page.locator('script:not([type="application/ld+json"])'),
+  ).toHaveCount(0);
   await expectNoViolations(page);
 });
 
-test("about compatibility page stays noindex and canonical-safe", async ({
-  request,
-}) => {
-  const response = await request.get("/about/");
-  expect(response.ok()).toBeTruthy();
+test("about is a canonical, crawlable dossier page", async ({ page }) => {
+  await page.goto("/about");
 
-  const html = await response.text();
-  expect(html).toContain("noindex, nofollow, noarchive");
-  expect(html).toContain("https://recica.dev/#about");
-  expect(html).toContain('meta http-equiv="refresh" content="0;url=/#about"');
+  await expect(
+    page.getByRole("heading", { level: 1, name: "About Drilon Reçica" }),
+  ).toBeVisible();
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://recica.dev/about",
+  );
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1",
+  );
+  await expect(page.locator('meta[http-equiv="refresh"]')).toHaveCount(0);
+  await expectNoViolations(page);
 });
 
-test("robots and sitemap index stay aligned with the flagship origin", async ({
+for (const caseStudy of [
+  {
+    path: "/work/wohin-du-willst",
+    title: "Deutsche Bahn – Wohin Du Willst",
+  },
+  { path: "/work/qisara", title: "Qisara" },
+  { path: "/work/edeka-scan-and-go", title: "EDEKA – Scan & Go" },
+]) {
+  test(`${caseStudy.title} has a canonical case-study page`, async ({
+    page,
+  }) => {
+    await page.goto(caseStudy.path);
+
+    await expect(
+      page.getByRole("heading", { level: 1, name: caseStudy.title }),
+    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Outcome" })).toBeVisible();
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      `https://recica.dev${caseStudy.path}`,
+    );
+    await expectNoViolations(page);
+  });
+}
+
+test("branded 404 is generated and unknown routes retain 404 status", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/404");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Dossier entry not found" }),
+  ).toBeVisible();
+
+  const missing = await request.get("/this-route-does-not-exist");
+  expect(missing.status()).toBe(404);
+});
+
+test("robots and sitemap index stay aligned with every flagship route", async ({
   request,
 }) => {
   const robots = await request.get("/robots.txt");
@@ -56,9 +114,12 @@ test("robots and sitemap index stay aligned with the flagship origin", async ({
     "Sitemap: https://recica.dev/sitemap-index.xml",
   );
 
-  const sitemap = await request.get("/sitemap-index.xml");
+  const sitemap = await request.get("/sitemap-0.xml");
   expect(sitemap.ok()).toBeTruthy();
   const sitemapXml = await sitemap.text();
-  expect(sitemapXml).toContain("https://recica.dev/sitemap-0.xml");
-  expect(sitemapXml).not.toContain("/about");
+  expect(sitemapXml).toContain("https://recica.dev/about");
+  expect(sitemapXml).toContain("https://recica.dev/work/wohin-du-willst");
+  expect(sitemapXml).toContain("https://recica.dev/work/qisara");
+  expect(sitemapXml).toContain("https://recica.dev/work/edeka-scan-and-go");
+  expect(sitemapXml).not.toContain("https://recica.dev/404");
 });

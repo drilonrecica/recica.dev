@@ -2,36 +2,29 @@
 import { featuredTools, sectionCopy } from '@/lib/site-content';
 ---
 
-<section id="tools" class="tools-band anchor-target">
-	<div class="tools-band__shell">
-		<div class="section-heading-block section-heading-block--on-dark">
-			<p class="kicker kicker--on-dark">{sectionCopy.tools.kicker}</p>
-			<h2 class="section-title section-title--on-dark">{sectionCopy.tools.title}</h2>
-			<p class="section-copy section-copy--on-dark">{sectionCopy.tools.description}</p>
-		</div>
+<section id="tools" class="dossier-section anchor-target">
+	<header class="dossier-section__header">
+		<p class="dossier-index">03 / INDEPENDENT PUBLICATIONS</p>
+		<h2>{sectionCopy.tools.title}</h2>
+		<p>{sectionCopy.tools.description}</p>
+	</header>
 
-		<div class="tool-highlight-list">
+	<div class="publication-index">
 			{
-				featuredTools.map((tool) => (
-					<a href={tool.href} target="_blank" rel="noreferrer" class="tool-highlight">
-						<div>
-							<p class="tool-highlight__category">{tool.category}</p>
-							<h3>{tool.name}</h3>
-						</div>
-						<p>{tool.description}</p>
+				featuredTools.map((tool, index) => (
+					<a href={tool.href} target="_blank" rel="noreferrer" class="publication-entry">
+						<span>TL-{String(index + 1).padStart(2, '0')}</span>
+						<div><p>{tool.category}</p><h3>{tool.name}</h3></div>
+						<p class="publication-entry__copy">{tool.description}</p>
+						<span aria-hidden="true">↗</span>
 					</a>
 				))
 			}
-		</div>
+	</div>
 
-		<div class="tools-band__footer">
-			<p>{sectionCopy.tools.footer}</p>
-			<a href="https://tools.recica.dev" target="_blank" rel="noreferrer" class="action-link action-link--secondary-on-dark">
-				Explore Recica Tools
-			</a>
-			<a href="https://labs.recica.dev" target="_blank" rel="noreferrer" class="action-link action-link--secondary-on-dark">
-				Explore Labs
-			</a>
-		</div>
+	<div class="publication-links">
+		<p>{sectionCopy.tools.footer}</p>
+		<a href="https://tools.recica.dev" target="_blank" rel="noreferrer">Explore Recica Tools</a>
+		<a href="https://labs.recica.dev" target="_blank" rel="noreferrer">Explore Labs</a>
 	</div>
 </section>

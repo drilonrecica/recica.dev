@@ -18,6 +18,7 @@ export type ProofItem = {
 export type CaseStudyTone = "cobalt" | "gold" | "forest";
 
 export type CaseStudy = {
+  slug: string;
   title: string;
   role: string;
   period: string;
@@ -25,8 +26,8 @@ export type CaseStudy = {
   bullets: string[];
   outcome: string;
   stack: string[];
-  href: string;
-  linkLabel: string;
+  externalHref: string;
+  externalLabel: string;
   tone: CaseStudyTone;
 };
 
@@ -218,6 +219,7 @@ export const proofItems: ProofItem[] = [
 
 export const caseStudies: CaseStudy[] = [
   {
+    slug: "wohin-du-willst",
     title: "Deutsche Bahn – Wohin Du Willst",
     role: "Senior Android Developer",
     period: "Nov 2023 — Present",
@@ -230,11 +232,13 @@ export const caseStudies: CaseStudy[] = [
     outcome:
       "Made ongoing delivery safer in a large public mobility app without relying on a disruptive rewrite.",
     stack: ["Kotlin", "Jetpack Compose", "Coroutines", "Flow", "Accessibility"],
-    href: "https://play.google.com/store/apps/details?id=de.dbregio.wohinduwillst",
-    linkLabel: "Open on Play Store",
+    externalHref:
+      "https://play.google.com/store/apps/details?id=de.dbregio.wohinduwillst",
+    externalLabel: "Open on Play Store",
     tone: "cobalt",
   },
   {
+    slug: "qisara",
     title: "Qisara",
     role: "Tech Lead & Senior Software Engineer",
     period: "2023 — 2024",
@@ -247,11 +251,12 @@ export const caseStudies: CaseStudy[] = [
     outcome:
       "Took a 0-to-1 product from concept to a launch-ready foundation across product, app, backend, and deployment.",
     stack: ["Flutter", "Deno", "TypeScript", "Coolify", "VPS Infrastructure"],
-    href: "https://qisara.com/",
-    linkLabel: "Visit product",
+    externalHref: "https://qisara.com/",
+    externalLabel: "Visit product",
     tone: "forest",
   },
   {
+    slug: "edeka-scan-and-go",
     title: "EDEKA – Scan & Go",
     role: "Senior Android Developer",
     period: "Aug 2022 — Nov 2023",
@@ -264,8 +269,9 @@ export const caseStudies: CaseStudy[] = [
     outcome:
       "Improved in-store reliability and UX clarity in a product where shopper confidence depends on speed and low friction.",
     stack: ["Android", "Kotlin", "Jetpack Compose", "Retail UX"],
-    href: "https://play.google.com/store/apps/details?id=de.edeka.genuss",
-    linkLabel: "Open on Play Store",
+    externalHref:
+      "https://play.google.com/store/apps/details?id=de.edeka.genuss",
+    externalLabel: "Open on Play Store",
     tone: "gold",
   },
 ];

@@ -11,9 +11,11 @@ export interface Props {
     description: string;
     image?: string;
     type?: "website" | "article";
+    canonical?: string;
+    noindex?: boolean;
 }
 
-const { title, description, image, type } = Astro.props;
+const { title, description, image, type, canonical, noindex } = Astro.props;
 ---
 
 <!doctype html>
@@ -24,10 +26,11 @@ const { title, description, image, type } = Astro.props;
             description={description}
             image={image}
             type={type}
+            canonical={canonical}
+            noindex={noindex}
         />
     </head>
-    <body class="min-h-screen font-sans antialiased">
-        <!-- Accessibility Skip Link -->
+    <body data-publication="technical-dossier">
         <a
             href="#main-content"
             class="skip-link"
@@ -42,8 +45,5 @@ const { title, description, image, type } = Astro.props;
         </main>
 
         <Footer />
-        <script>
-            import "@/scripts/BlueprintLabel";
-        </script>
     </body>
 </html>

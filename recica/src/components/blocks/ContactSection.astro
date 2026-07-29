@@ -2,19 +2,18 @@
 import { contactLinks, sectionCopy, siteConfig } from '@/lib/site-content';
 ---
 
-<section id="contact" class="section-shell anchor-target">
-	<div class="section-grid">
-		<div class="section-heading-block">
-			<p class="kicker">{sectionCopy.contact.kicker}</p>
-			<h2 class="section-title">{sectionCopy.contact.title}</h2>
-			<p class="section-copy">{sectionCopy.contact.description}</p>
+<section id="contact" class="dossier-section anchor-target">
+	<header class="dossier-section__header">
+			<p class="dossier-index">07 / CONTACT CHANNELS</p>
+			<h2>{sectionCopy.contact.title}</h2>
+			<p>{sectionCopy.contact.description}</p>
 			<p class="contact-address">
 				{sectionCopy.contact.emailLabel}:
 				<a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
 			</p>
-		</div>
+	</header>
 
-		<div class="contact-list">
+	<div class="contact-list">
 			{
 				contactLinks.map((link) => (
 					<a
@@ -23,12 +22,11 @@ import { contactLinks, sectionCopy, siteConfig } from '@/lib/site-content';
 						target={link.href.startsWith('http') ? '_blank' : undefined}
 						rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
 					>
-						<p class="contact-item__eyebrow">{link.eyebrow}</p>
+						<p class="contact-item__eyebrow">{link.eyebrow} / channel</p>
 						<h3>{link.label}</h3>
 						<p>{link.description}</p>
 					</a>
 				))
 			}
-		</div>
 	</div>
 </section>

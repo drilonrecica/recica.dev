@@ -2,49 +2,32 @@
 import { caseStudies, sectionCopy } from '@/lib/site-content';
 ---
 
-<section id="work" class="section-shell anchor-target">
-	<div class="section-heading-block">
-		<p class="kicker">{sectionCopy.work.kicker}</p>
-		<h2 class="section-title">{sectionCopy.work.title}</h2>
-		<p class="section-copy">{sectionCopy.work.description}</p>
-	</div>
+<section id="work" class="dossier-section anchor-target">
+	<header class="dossier-section__header">
+		<p class="dossier-index">02 / SELECTED WORK</p>
+		<h2>{sectionCopy.work.title}</h2>
+		<p>{sectionCopy.work.description}</p>
+	</header>
 
-	<div class="story-list">
+	<div class="case-index">
 		{
-			caseStudies.map((study) => (
-				<article class={`story-row story-row--${study.tone}`}>
-					<div class="story-row__meta">
-						<div>
-							<p class="story-row__eyebrow">{study.period}</p>
-							<h3 class="story-row__title">{study.title}</h3>
-							<p class="story-row__role">{study.role}</p>
-						</div>
-						<a href={study.href} target="_blank" rel="noreferrer" class="story-row__link">
-							{study.linkLabel}
-						</a>
+			caseStudies.map((study, index) => (
+				<article class="case-entry">
+					<p class="case-entry__number">CS-{String(index + 1).padStart(2, '0')}</p>
+					<div class="case-entry__identity">
+						<p class="case-entry__period">{study.period}</p>
+						<h3>{study.title}</h3>
+						<p>{study.role}</p>
 					</div>
-
-					<div class="story-row__body">
-						<p class="story-row__summary">{study.summary}</p>
-						<ul class="story-row__bullets">
-							{
-								study.bullets.map((bullet) => (
-									<li>{bullet}</li>
-								))
-							}
+					<div class="case-entry__brief">
+						<p>{study.summary}</p>
+						<ul class="tag-row" aria-label="Technologies and disciplines">
+							{study.stack.map((tag) => <li>{tag}</li>)}
 						</ul>
-						<p class="story-row__outcome">
-							<span>Outcome</span>
-							{study.outcome}
-						</p>
-						<div class="tag-row">
-							{
-								study.stack.map((tag) => (
-									<span>{tag}</span>
-								))
-							}
-						</div>
 					</div>
+					<a href={`/work/${study.slug}`} class="case-entry__link">
+						Read case study <span aria-hidden="true">↗</span>
+					</a>
 				</article>
 			))
 		}

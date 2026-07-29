@@ -2,23 +2,23 @@
 import { principles, sectionCopy } from '@/lib/site-content';
 ---
 
-<section id="about" class="section-shell anchor-target">
-	<div class="section-grid">
-		<div class="section-heading-block">
-			<p class="kicker">{sectionCopy.about.kicker}</p>
-			<h2 class="section-title">{sectionCopy.about.title}</h2>
-			<p class="section-copy">{sectionCopy.about.description}</p>
-		</div>
+<section id="about" class="dossier-section anchor-target">
+	<header class="dossier-section__header">
+		<p class="dossier-index">05 / WORKING METHOD</p>
+		<h2>{sectionCopy.about.title}</h2>
+		<p>{sectionCopy.about.description}</p>
+		<a href="/about" class="text-link">Read the full profile ↗</a>
+	</header>
 
-		<div class="principle-list">
+	<div class="principle-list">
 			{
-				principles.map((principle) => (
+				principles.map((principle, index) => (
 					<article class="principle-item">
+						<span>{String(index + 1).padStart(2, '0')}</span>
 						<h3>{principle.title}</h3>
 						<p>{principle.description}</p>
 					</article>
 				))
 			}
-		</div>
 	</div>
 </section>
