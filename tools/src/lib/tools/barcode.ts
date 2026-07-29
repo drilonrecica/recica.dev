@@ -198,7 +198,7 @@ function renderSvg(sequence: string, text: string, height = 80) {
 function calculateModulo10CheckDigit(digits: string) {
 	const values = digits.split('').map(Number);
 	const sum = values.reduce(
-		(total, digit, index) => total + digit * ((digits.length - index) % 2 === 0 ? 3 : 1),
+		(total, digit, index) => total + digit * ((digits.length - index) % 2 === 1 ? 3 : 1),
 		0
 	);
 	return (10 - (sum % 10)) % 10;

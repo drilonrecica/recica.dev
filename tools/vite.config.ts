@@ -10,13 +10,28 @@ export default defineConfig({
 		coverage: {
 			provider: 'v8',
 			reporter: ['text', 'json', 'html'],
+			include: [
+				'src/lib/constants/**/*.ts',
+				'src/lib/offline/**/*.ts',
+				'src/lib/search/**/*.ts',
+				'src/lib/tools/**/*.ts',
+				'src/lib/utils/**/*.ts'
+			],
 			exclude: [
 				'build/',
+				'src/lib/constants/resources.ts',
+				'src/lib/utils/clipboard.ts',
 				'src/**/*.d.ts',
 				'src/**/*.config.*',
 				'src/**/*.test.*',
 				'src/**/*.spec.*'
-			]
+			],
+			thresholds: {
+				statements: 80,
+				lines: 80,
+				functions: 80,
+				branches: 70
+			}
 		},
 		projects: [
 			{

@@ -22,4 +22,40 @@ describe('barcode tools', () => {
 			error: 'UPC-A accepts 11 digits plus an optional check digit.'
 		});
 	});
+
+	it('generates UPC-A check digits and accepts valid complete values', () => {
+		const generated = generateBarcode('upca', '03600029145');
+		expect(generated.ok).toBe(true);
+		if (!generated.ok) return;
+		expect(generated.text).toBe('036000291452');
+
+		expect(generateBarcode('upca', generated.text).ok).toBe(true);
+	});
+
+	it('rejects incorrect check digits', () => {
+		expect(generateBarcode('ean13', '5901234123450')).toEqual({
+			ok: false,
+			error: 'EAN-13 check digit is invalid.'
+		});
+		expect(generateBarcode('upca', '036000291453')).toEqual({
+			ok: false,
+			error: 'UPC-A check digit is invalid.'
+		});
+	});
+
+	it('rejects empty and non-printable Code 128 input while escaping labels', () => {
+		expect(generateBarcode('code128', '')).toEqual({
+			ok: false,
+			error: 'Enter text to generate a barcode.'
+		});
+		expect(generateBarcode('code128', 'line\nbreak')).toEqual({
+			ok: false,
+			error: 'Code 128 supports printable ASCII characters in this version.'
+		});
+
+		const escaped = generateBarcode('code128', '<&">');
+		expect(escaped.ok).toBe(true);
+		if (!escaped.ok) return;
+		expect(escaped.svg).toContain('&lt;&amp;&quot;&gt;');
+	});
 });

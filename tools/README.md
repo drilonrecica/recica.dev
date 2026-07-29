@@ -355,8 +355,12 @@ Unit tests live next to tool logic and utility logic:
 
 - `src/lib/tools/*.test.ts`
 - `src/lib/utils/*.test.ts`
+- `src/lib/offline/*.test.ts`
 
-These cover parser behavior, transformations, validation paths, and edge cases for the core utilities.
+These cover parser behavior, transformations, validation paths, cache policy,
+and edge cases for the core utilities. CI enforces global minimums of 80%
+statements, 80% lines, 80% functions, and 70% branches across the covered
+pure-library surface.
 
 ### End-to-end tests
 
@@ -374,6 +378,8 @@ It covers:
 - privacy disclosures and canonical metadata
 - local operations producing no network requests
 - explicit oversized-input rejection without truncation
+- representative routes operating with the network disabled
+- Cache Storage excluding input, output, query variants, and third-party data
 - route-level behavior for multiple tools
 - `robots.txt`
 - `sitemap.xml`
@@ -416,6 +422,12 @@ pnpm lint
 
 ```bash
 pnpm test:unit:run
+```
+
+### Unit tests with enforced coverage
+
+```bash
+pnpm test:coverage
 ```
 
 ### Install Playwright browser

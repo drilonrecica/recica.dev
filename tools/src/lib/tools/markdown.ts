@@ -14,7 +14,7 @@ function sanitizeUrl(url: string) {
 function renderInline(input: string) {
 	const codeSpans: string[] = [];
 	let value = escapeHtml(input).replace(/`([^`]+)`/g, (_, code: string) => {
-		codeSpans.push(`<code>${escapeHtml(code)}</code>`);
+		codeSpans.push(`<code>${code}</code>`);
 		return `__CODE_${codeSpans.length - 1}__`;
 	});
 
