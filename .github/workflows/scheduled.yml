@@ -1,0 +1,82 @@
+name: Scheduled maintenance
+
+on:
+  schedule:
+    - cron: "43 3 15 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cross-browser:
+    name: ${{ matrix.app }} ${{ matrix.browser }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [recica, tools, labs]
+        browser: [chromium, firefox, webkit]
+    env:
+      PUBLIC_INDEXING_ENABLED: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.18.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: ${{ matrix.app }}/pnpm-lock.yaml
+      - run: pnpm --dir ${{ matrix.app }} install --frozen-lockfile
+      - run: pnpm --dir ${{ matrix.app }} exec playwright install --with-deps ${{ matrix.browser }}
+      - run: pnpm --dir ${{ matrix.app }} exec playwright test --browser=${{ matrix.browser }}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: failure()
+        with:
+          name: ${{ matrix.app }}-${{ matrix.browser }}-failure
+          path: |
+            ${{ matrix.app }}/playwright-report
+            ${{ matrix.app }}/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+  performance:
+    name: Bundle and Lighthouse budgets
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_INDEXING_ENABLED: true
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.18.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - run: |
+          for app in recica tools labs; do
+            pnpm --dir "$app" install --frozen-lockfile
+            pnpm --dir "$app" build
+          done
+      - run: node --test scripts/check-bundle-budgets.test.mjs
+      - run: node scripts/check-bundle-budgets.mjs
+      - run: pnpm dlx @lhci/cli@0.15.1 autorun --config=recica/lighthouserc.json
+      - run: pnpm dlx @lhci/cli@0.15.1 autorun --config=tools/lighthouserc.json
+      - run: pnpm dlx @lhci/cli@0.15.1 autorun --config=labs/lighthouserc.json
+
+  production-smoke:
+    name: Production status and headers
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify public origins
+        run: |
+          for origin in https://recica.dev https://tools.recica.dev https://labs.recica.dev; do
+            headers=$(curl --fail --silent --show-error --location --retry 3 \
+              --dump-header - --output /dev/null "$origin")
+            grep -iq '^x-content-type-options: nosniff' <<<"$headers"
+            grep -iq '^referrer-policy:' <<<"$headers"
+          done
+          curl --fail --silent --show-error --retry 3 https://tools.recica.dev/health
+          curl --fail --silent --show-error --retry 3 https://labs.recica.dev/health

@@ -318,6 +318,57 @@ Preview requirements:
 - `noindex, nofollow`
 - robots disallow
 - production canonical URL
+
+---
+
+## 12. Implemented repository automation
+
+The repository now defines:
+
+- `quality.yml` for path-aware app checks and production builds
+- `e2e.yml` for Chromium behavior and accessibility tests
+- `security.yml` for dependency, secret, CodeQL, static-artifact, and container checks
+- `scheduled.yml` for cross-browser, Lighthouse, bundle-budget, and production smoke checks
+- `dependabot.yml` for monthly app and GitHub Actions updates
+
+The first local high-severity audit found advisories in Astro 5 and its inherited
+Sharp release. Recica therefore tracks Astro 7, whose supported Sharp range
+includes the patched `0.35.x` line. This does not change the architectural
+decision: Recica remains a static Astro publication with no application server.
+
+All actions are pinned to immutable commit SHAs. GitHub Actions validates only;
+it does not deploy. Coolify remains responsible for deployments after merges to
+`master`.
+
+### Required branch-protection checks
+
+The repository owner must enable branch protection for `master` in GitHub. Use
+these stable checks:
+
+- `Detect affected apps`
+- `Recica quality`
+- `Tools quality`
+- `Labs quality`
+- `recica Chromium E2E`
+- `tools Chromium E2E`
+- `labs Chromium E2E`
+- `CodeQL`
+- `Secret scan`
+- `Static artifact policy`
+- `tools container`
+- `labs container`
+
+Also block force pushes and branch deletion. Requiring a second reviewer remains
+optional for this solo-maintained repository. Changing the GitHub settings is a
+manual infrastructure action and is not performed by repository code.
+
+### Performance budgets
+
+`scripts/check-bundle-budgets.mjs` reads
+`docs/modernization/bundle-budgets.json`, rejects public source maps, and checks
+the aggregate gzip size of generated JavaScript and CSS. Budget changes require
+an explicit documented review; CI must not silently raise them.
+
 - no production secrets
 - no public permanent caching
 - same static runtime as production

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: install check build test audit verify \
+.PHONY: install check build test audit verify bundle-budgets \
 	recica-install tools-install labs-install \
 	recica-check tools-check labs-check \
 	recica-build tools-build labs-build \
@@ -17,7 +17,11 @@ test: recica-test tools-test labs-test
 
 audit: recica-audit tools-audit labs-audit
 
-verify: check build test
+verify: check build bundle-budgets test
+
+bundle-budgets:
+	node --test scripts/check-bundle-budgets.test.mjs
+	node scripts/check-bundle-budgets.mjs
 
 recica-install:
 	./scripts/run-pnpm.sh --dir recica install --frozen-lockfile
