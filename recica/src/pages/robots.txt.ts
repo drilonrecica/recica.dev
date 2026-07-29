@@ -1,13 +1,16 @@
 import type { APIRoute } from "astro";
 
-export const GET: APIRoute = ({ site, url }) => {
-  const origin = import.meta.env.SITE ?? site?.origin ?? url.origin;
+import { siteConfig } from "@/lib/site-content";
+
+export const GET: APIRoute = () => {
+  const indexingEnabled = import.meta.env.PUBLIC_INDEXING_ENABLED === "true";
+  const policy = indexingEnabled ? "Allow: /" : "Disallow: /";
   const body = [
     "User-agent: *",
-    "Allow: /",
+    policy,
     "",
-    `Sitemap: ${new URL("/sitemap-index.xml", origin).toString()}`,
-    `Host: ${new URL(origin).host}`,
+    `Sitemap: ${new URL("/sitemap-index.xml", siteConfig.origin).toString()}`,
+    `Host: ${new URL(siteConfig.origin).host}`,
   ].join("\n");
 
   return new Response(body, {

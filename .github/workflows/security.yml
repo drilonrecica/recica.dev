@@ -90,6 +90,12 @@ jobs:
             echo 'Unexpected remote stylesheet or preload found in generated output.'
             exit 1
           fi
+      - name: Verify preview indexing policy
+        run: |
+          for output in recica/dist tools/build labs/build; do
+            rg -q 'noindex, nofollow' "$output/index.html"
+            rg -q 'Disallow: /' "$output/robots.txt"
+          done
 
   container:
     name: ${{ matrix.app }} container
@@ -97,13 +103,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        app: [tools, labs]
+        include:
+          - app: tools
+            origin: https://tools.recica.dev
+          - app: labs
+            origin: https://labs.recica.dev
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
       - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: ${{ matrix.app }}
+          build-args: |
+            PUBLIC_INDEXING_ENABLED=true
+            PUBLIC_SITE_URL=${{ matrix.origin }}
           load: true
           push: false
           tags: recica-${{ matrix.app }}:ci
@@ -115,10 +128,13 @@ jobs:
           docker inspect recica-${{ matrix.app }}:ci \
             --format '{{json .Config.ExposedPorts}}' | grep -q '8080/tcp'
           docker run --rm --entrypoint sh recica-${{ matrix.app }}:ci \
-            -c 'test ! -d /app/node_modules && test -f /usr/share/nginx/html/index.html'
+            -c "test ! -d /app/node_modules &&
+              test -f /usr/share/nginx/html/index.html &&
+              grep -q '${{ matrix.origin }}' /usr/share/nginx/html/index.html &&
+              grep -Eq 'index, ?follow' /usr/share/nginx/html/index.html &&
+              grep -q 'Allow: /' /usr/share/nginx/html/robots.txt"
       - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
         with:
           image-ref: recica-${{ matrix.app }}:ci
           severity: HIGH,CRITICAL
-          ignore-unfixed: true
           exit-code: "1"

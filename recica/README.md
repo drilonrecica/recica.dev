@@ -40,7 +40,9 @@ The homepage retains the stable public anchors:
 | `/cv.pdf`                 | Existing downloadable CV contract          |
 
 The canonical origin is fixed in `astro.config.mjs` as
-`https://recica.dev`. Public routes are indexable; the 404 document is noindex.
+`https://recica.dev`. Builds default to `noindex, nofollow`; the production
+resource must set `PUBLIC_INDEXING_ENABLED=true`. The 404 document remains
+noindex in every environment.
 
 ## Architecture
 
