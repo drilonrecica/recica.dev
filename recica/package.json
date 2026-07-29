@@ -4,6 +4,11 @@
   "version": "1.0.0",
   "author": "Drilon Recica",
   "license": "UNLICENSED",
+  "packageManager": "pnpm@11.18.0",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": ">=11 <12"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",

@@ -130,7 +130,7 @@ That order is part of the product design. It puts identity and proof ahead of ch
 | Fonts              | `@fontsource/inter` and `@fontsource/jetbrains-mono`   |
 | Type safety        | `astro/tsconfigs/strict`                               |
 | Sitemap generation | `@astrojs/sitemap`                                     |
-| Package manager    | npm                                                    |
+| Package manager    | `pnpm@11.18.0`                                         |
 
 There is no React, no server runtime, no API layer, and no CMS dependency. That is intentional. The site does not need dynamic infrastructure.
 
@@ -266,58 +266,58 @@ recica/
 
 ### Requirements
 
-- Node.js 20 or newer
-- npm
+- Node.js 24 LTS
+- pnpm 11.18.0
 
 ### Install
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Start the local dev server
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ### Build for production
 
 ```bash
-npm run build
+pnpm build
 ```
 
 ### Run Astro/type checks
 
 ```bash
-npm run check
+pnpm check
 ```
 
 ### Run formatting lint
 
 ```bash
-npm run lint
+pnpm lint
 ```
 
 ### Run end-to-end tests
 
 ```bash
-npm run test:e2e
+pnpm test:e2e
 ```
 
 ### Preview the production build
 
 ```bash
-npm run preview
+pnpm preview
 ```
 
 ## Operational Notes
 
 - `recica` now has 3 routine automated quality gates:
-  - `npm run check` for Astro/type diagnostics
-  - `npm run lint` for Prettier formatting consistency
-  - `npm run test:e2e` for browser-level regression coverage
-- `npm run build` remains the final static-output verification step.
+  - `pnpm check` for Astro/type diagnostics
+  - `pnpm lint` for Prettier formatting consistency
+  - `pnpm test:e2e` for browser-level regression coverage
+- `pnpm build` remains the final static-output verification step.
 - Content changes usually belong in `site-content.ts`.
 - Layout or presentation changes usually belong in block components or `global.css`.
 - SEO changes usually belong in `Meta.astro` and `astro.config.mjs`.
@@ -327,7 +327,7 @@ npm run preview
 This app is suitable for static hosting. The expected deployment model is:
 
 1. install dependencies
-2. run `npm run build`
+2. run `pnpm build`
 3. deploy the generated `dist/` directory
 
 Because this is a static Astro site:

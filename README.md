@@ -118,7 +118,7 @@ Shared branding is fine. Shared product responsibility is not.
 
 | App       | Framework              | Styling                                | Language   | Package Manager | Build Output              | Automated Tests              |
 | --------- | ---------------------- | -------------------------------------- | ---------- | --------------- | ------------------------- | ---------------------------- |
-| `recica/` | Astro 5                | Tailwind CSS v4 + custom CSS           | TypeScript | npm             | Static `dist/`            | Astro check + Prettier + Playwright |
+| `recica/` | Astro 5                | Tailwind CSS v4 + custom CSS           | TypeScript | pnpm            | Static `dist/`            | Astro check + Prettier + Playwright |
 | `tools/`  | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
 | `labs/`   | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
 
@@ -162,21 +162,22 @@ For day-to-day development, it is still usually better to work inside the app yo
 
 ## Root Verification Commands
 
-The root orchestration layer is intentionally thin. It standardizes cross-app verification without pretending the apps share one runtime or one package manager.
+The root orchestration layer is intentionally thin. It standardizes cross-app verification without pretending the apps share one runtime or lockfile.
 
 ```bash
 make check
 make build
 make test
 make audit
+make verify
 ```
 
 ### `recica/`
 
 ```bash
 cd recica
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 ### `tools/`
@@ -201,11 +202,11 @@ pnpm dev
 
 ```bash
 cd recica
-npm run check
-npm run lint
-npm run build
-npm run test:e2e
-npm run preview
+pnpm check
+pnpm lint
+pnpm build
+pnpm test:e2e
+pnpm preview
 ```
 
 ### `tools/`

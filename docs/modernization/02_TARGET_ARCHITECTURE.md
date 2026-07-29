@@ -480,7 +480,7 @@ Each app's `package.json` should include:
 
 ```json
 {
-  "packageManager": "pnpm@11.17.0",
+  "packageManager": "pnpm@11.18.0",
   "engines": {
     "node": ">=24 <25",
     "pnpm": ">=11 <12"

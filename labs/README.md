@@ -316,6 +316,11 @@ Because this is an interactive public app, keeping this file current matters mor
 
 Install and run the app from the `labs/` directory.
 
+Requirements:
+
+- Node.js 24 LTS
+- pnpm 11.18.0
+
 ```bash
 cd labs
 pnpm install
