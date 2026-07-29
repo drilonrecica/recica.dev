@@ -445,3 +445,26 @@ select:focus-visible {
 		transition-duration: 0.01ms !important;
 	}
 }
+
+@media (forced-colors: active) {
+	button,
+	a,
+	input,
+	textarea,
+	select,
+	.surface-panel,
+	.surface-panel-elevated,
+	.surface-panel-strong {
+		border-color: CanvasText;
+	}
+
+	button:focus-visible,
+	a:focus-visible,
+	input:focus-visible,
+	textarea:focus-visible,
+	select:focus-visible {
+		outline: 2px solid Highlight;
+		outline-offset: 3px;
+		box-shadow: none;
+	}
+}

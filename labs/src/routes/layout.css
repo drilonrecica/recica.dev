@@ -1165,3 +1165,53 @@ select:focus-visible {
 		grid-template-columns: 1fr;
 	}
 }
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+@media (forced-colors: active) {
+	.button-base,
+	.nav-chip,
+	.footer-link,
+	.demo-action,
+	.answer-option,
+	.icon-pick,
+	.pattern-option,
+	.fallback-chip,
+	.drag-item,
+	input,
+	textarea,
+	select,
+	.surface-card {
+		border-color: CanvasText;
+	}
+
+	.button-base:focus-visible,
+	.nav-chip:focus-visible,
+	.footer-link:focus-visible,
+	.demo-action:focus-visible,
+	.answer-option:focus-visible,
+	.icon-pick:focus-visible,
+	.pattern-option:focus-visible,
+	.fallback-chip:focus-visible,
+	.drag-item:focus-visible,
+	input:focus-visible,
+	textarea:focus-visible,
+	select:focus-visible {
+		outline: 2px solid Highlight;
+		outline-offset: 3px;
+		box-shadow: none;
+	}
+}
