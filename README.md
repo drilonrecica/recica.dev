@@ -118,7 +118,7 @@ Shared branding is fine. Shared product responsibility is not.
 
 | App       | Framework              | Styling                                | Language   | Package Manager | Build Output        | Automated Tests                     |
 | --------- | ---------------------- | -------------------------------------- | ---------- | --------------- | ------------------- | ----------------------------------- |
-| `recica/` | Astro 5                | Tailwind CSS v4 + custom CSS           | TypeScript | pnpm            | Static `dist/`      | Astro check + Prettier + Playwright |
+| `recica/` | Astro 7                | Tailwind CSS v4 + custom CSS           | TypeScript | pnpm            | Static `dist/`      | Astro check + Prettier + Playwright |
 | `tools/`  | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Strict static build | Vitest + Playwright                 |
 | `labs/`   | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Strict static build | Vitest + Playwright                 |
 

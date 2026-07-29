@@ -124,7 +124,7 @@ That order is part of the product design. It puts identity and proof ahead of ch
 
 | Concern            | Implementation                                         |
 | ------------------ | ------------------------------------------------------ |
-| Framework          | Astro 5                                                |
+| Framework          | Astro 7                                                |
 | Build output       | Static `dist/` output                                  |
 | Styling            | Tailwind CSS v4 via Vite plugin plus custom global CSS |
 | Fonts              | `@fontsource/inter` and `@fontsource/jetbrains-mono`   |
