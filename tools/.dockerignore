@@ -6,3 +6,7 @@ playwright-report
 test-results
 coverage
 docs
+.env
+.env.*
+*.log
+blob-report

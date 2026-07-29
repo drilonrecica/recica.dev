@@ -1,35 +1,22 @@
-FROM node:20-alpine AS base
+FROM node:24-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd AS build
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 WORKDIR /app
 
-FROM base AS deps
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN corepack enable && corepack prepare pnpm@11.18.0 --activate
 
-FROM deps AS build
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
+
 COPY . .
 RUN pnpm run build
 
-FROM build AS prod-deps
-RUN pnpm prune --prod --ignore-scripts
+FROM ghcr.io/nginx/nginx-unprivileged:1.30.2-alpine3.23@sha256:de3e40ec8b7debd7194fc798d4bbfb102c7f8b012b2c73032816b5f72393acdd AS runtime
 
-FROM node:20-alpine AS runtime
-WORKDIR /app
-ENV NODE_ENV=production
-ENV PORT=3000
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx/security-headers.conf /etc/nginx/security-headers.conf
+COPY --from=build /app/build /usr/share/nginx/html
 
-RUN addgroup -S app && adduser -S app -G app
-RUN apk add --no-cache curl
-
-COPY --from=build /app/build ./build
-COPY --from=build /app/package.json ./package.json
-COPY --from=prod-deps /app/node_modules ./node_modules
-
-USER app
-EXPOSE 3000
+EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
-
-CMD ["node", "build"]
+	CMD wget -q -O - http://127.0.0.1:8080/health | grep -qx OK

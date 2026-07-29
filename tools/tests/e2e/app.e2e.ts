@@ -177,7 +177,7 @@ test('robots.txt and sitemap.xml expose crawlable public urls', async ({ request
 	expect(robots.ok()).toBeTruthy();
 	const robotsText = await robots.text();
 	expect(robotsText).toContain('User-agent: *');
-	expect(robotsText).toContain('Allow: /');
+	expect(robotsText).toContain('Disallow: /');
 	expect(robotsText).toMatch(/Sitemap: https?:\/\/[^\n]+\/sitemap\.xml/);
 
 	const sitemap = await request.get('/sitemap.xml');

@@ -74,7 +74,7 @@ If legacy hostnames still exist at infrastructure level, they should be treated 
 | Path                  | Responsibility                                      | Runtime Model                           |
 | --------------------- | --------------------------------------------------- | --------------------------------------- |
 | [`recica/`](./recica) | Flagship personal site                              | Static Astro build                      |
-| [`tools/`](./tools)   | Stable browser tools product                        | SvelteKit server build via adapter-node |
+| [`tools/`](./tools)   | Stable browser tools product                        | Strict static SvelteKit build           |
 | [`labs/`](./labs)     | Experiments, prototypes, and interactive references | SvelteKit server build via adapter-node |
 | [`docs/`](./docs)     | Repo-level documentation area                       | No runtime role currently               |
 
@@ -116,11 +116,11 @@ Shared branding is fine. Shared product responsibility is not.
 
 ## Technology Summary
 
-| App       | Framework              | Styling                                | Language   | Package Manager | Build Output              | Automated Tests              |
-| --------- | ---------------------- | -------------------------------------- | ---------- | --------------- | ------------------------- | ---------------------------- |
+| App       | Framework              | Styling                                | Language   | Package Manager | Build Output              | Automated Tests                     |
+| --------- | ---------------------- | -------------------------------------- | ---------- | --------------- | ------------------------- | ----------------------------------- |
 | `recica/` | Astro 5                | Tailwind CSS v4 + custom CSS           | TypeScript | pnpm            | Static `dist/`            | Astro check + Prettier + Playwright |
-| `tools/`  | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
-| `labs/`   | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
+| `tools/`  | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright                 |
+| `labs/`   | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright                 |
 
 ## Why the Apps Are Separate
 
@@ -244,10 +244,11 @@ pnpm preview
 
 ### `tools/`
 
-- SvelteKit app built with `@sveltejs/adapter-node`
-- runs as a Node server with `node build`
-- exposes `/health` for uptime probes
-- canonical origin is environment-aware via `PUBLIC_SITE_URL`
+- SvelteKit app built with strict `@sveltejs/adapter-static`
+- generated output is served by an unprivileged Nginx container
+- exposes a prerendered `/health` response for uptime probes
+- uses the fixed production canonical origin
+- preview builds default to `noindex, nofollow`
 
 ### `labs/`
 
@@ -270,12 +271,9 @@ pnpm preview
 
 ### Tools domain
 
-`tools/` resolves public origin like this:
-
-1. use `PUBLIC_SITE_URL` if set to a valid `http` or `https` URL
-2. otherwise fall back to the current request origin
-
-That supports production, previews, and self-hosted environments.
+`tools/` uses `https://tools.recica.dev` for public canonical URLs. Preview
+builds keep production canonicals and default to `noindex, nofollow`. A
+loopback-only origin override exists for non-indexable local tests.
 
 ### Labs domain
 
@@ -310,7 +308,7 @@ The tools app is interactive, so it needs stronger runtime hardening.
 - no account model
 - no analytics or tracking flow in the implemented app
 - no remote uploads for the built-in utilities
-- security headers in `src/hooks.server.ts`
+- security headers in the static Nginx configuration
 
 ### `labs/`
 

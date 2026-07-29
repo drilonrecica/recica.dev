@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { page } from '$app/stores';
-	import { env } from '$env/dynamic/public';
 	import { resolve } from '$app/paths';
 	import SeoHead from '$lib/components/seo/SeoHead.svelte';
 	import ToolCard from '$lib/components/tools/ToolCard.svelte';
@@ -10,7 +8,7 @@
 	import { resources } from '$lib/constants/resources';
 	import { featuredToolIds, tools } from '$lib/constants/tools';
 	import { searchTools } from '$lib/search/tools';
-	import { resolveSiteOrigin } from '$lib/utils/site-indexing';
+	import { SITE_ORIGIN } from '$lib/utils/site-indexing';
 	import {
 		buildCollectionPageSchema,
 		buildOrganizationSchema,
@@ -45,12 +43,11 @@
 	$: filteredTools = selectedCategories.length
 		? searchedTools.filter((tool) => selectedCategories.includes(tool.category))
 		: searchedTools;
-	$: canonicalOrigin = resolveSiteOrigin(env.PUBLIC_SITE_URL, $page.url);
-	$: schemas = [
-		buildWebsiteSchema(canonicalOrigin, homeDescription),
-		buildOrganizationSchema(canonicalOrigin),
-		buildCollectionPageSchema(canonicalOrigin, homeDescription),
-		buildToolListSchema(canonicalOrigin, tools),
+	const schemas = [
+		buildWebsiteSchema(SITE_ORIGIN, homeDescription),
+		buildOrganizationSchema(SITE_ORIGIN),
+		buildCollectionPageSchema(SITE_ORIGIN, homeDescription),
+		buildToolListSchema(SITE_ORIGIN, tools),
 		{
 			'@context': 'https://schema.org',
 			'@type': 'FAQPage',

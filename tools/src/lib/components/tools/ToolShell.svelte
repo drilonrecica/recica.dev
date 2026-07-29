@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { env } from '$env/dynamic/public';
 	import SeoHead from '$lib/components/seo/SeoHead.svelte';
 	import { tools } from '$lib/constants/tools';
-	import { resolveSiteOrigin } from '$lib/utils/site-indexing';
+	import { SITE_ORIGIN } from '$lib/utils/site-indexing';
 	import { buildBreadcrumbSchema, buildToolSchema } from '$lib/utils/seo';
 
 	export let title = '';
@@ -15,14 +14,13 @@
 	export let tips: string[] = [];
 
 	$: currentTool = tools.find((tool) => tool.route === $page.url.pathname);
-	$: canonicalOrigin = resolveSiteOrigin(env.PUBLIC_SITE_URL, $page.url);
 	$: layoutClass = split
 		? `grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.95fr)] ${contentClass}`
 		: `mx-auto max-w-3xl ${contentClass}`;
 	$: schemas = currentTool
 		? [
-				buildToolSchema(canonicalOrigin, currentTool, description, seoTitle || title),
-				buildBreadcrumbSchema(canonicalOrigin, [
+				buildToolSchema(SITE_ORIGIN, currentTool, description, seoTitle || title),
+				buildBreadcrumbSchema(SITE_ORIGIN, [
 					{ name: 'Home', path: '/' },
 					{ name: title, path: currentTool.route }
 				])

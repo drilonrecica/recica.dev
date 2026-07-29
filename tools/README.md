@@ -15,7 +15,7 @@ It is responsible for:
 - tool-specific metadata and structured data
 - local-first interaction patterns
 - crawler-facing machine endpoints
-- operational deployment for a Node runtime
+- static generation and container deployment
 
 It is related to the flagship personal site, but it is not a subpage of the flagship. It is its own product with its own public behavior and SEO surface.
 
@@ -135,11 +135,11 @@ The current app ships 24 tool pages.
 
 ### Machine and Platform Routes
 
-| Route          | Purpose                  | Notes                                           |
-| -------------- | ------------------------ | ----------------------------------------------- |
-| `/health`      | Operational health check | Plain text `OK` response                        |
-| `/robots.txt`  | Crawl directives         | Built dynamically from the resolved site origin |
-| `/sitemap.xml` | Public sitemap           | Built dynamically from the tool registry        |
+| Route          | Purpose                  | Notes                                        |
+| -------------- | ------------------------ | -------------------------------------------- |
+| `/health`      | Operational health check | Prerendered plain text `OK` response         |
+| `/robots.txt`  | Crawl directives         | Prerendered from the fixed production origin |
+| `/sitemap.xml` | Public sitemap           | Prerendered from the tool registry           |
 
 ### External Resources
 
@@ -151,16 +151,18 @@ That link is intentionally treated as an external recommendation, not as a built
 
 ## Canonical URL and Origin Strategy
 
-This app is more deployment-flexible than the flagship site.
-
 The intended public production origin is:
 
 - `https://tools.recica.dev`
 
-However, the app does not hardcode that origin in every route. Instead, SEO and indexing infrastructure resolve the origin like this:
+SEO and indexing infrastructure uses that fixed production origin. A loopback
+`PUBLIC_SITE_URL` override is accepted only for non-indexable local tests. Preview
+builds remain on production canonical URLs and default to `noindex, nofollow`;
+production indexing requires:
 
-1. use `PUBLIC_SITE_URL` if it is present and valid
-2. otherwise fall back to the current request origin
+```bash
+PUBLIC_INDEXING_ENABLED=true pnpm build
+```
 
 That logic lives in:
 
@@ -189,7 +191,7 @@ This design supports:
 | -------------------- | -------------------------------------------- |
 | Framework            | SvelteKit 2                                  |
 | Component model      | Svelte 5                                     |
-| Runtime adapter      | `@sveltejs/adapter-node`                     |
+| Build adapter        | `@sveltejs/adapter-static`                   |
 | Styling              | Tailwind CSS v4 plus app-level CSS variables |
 | Language             | TypeScript                                   |
 | Package manager      | pnpm                                         |
@@ -219,7 +221,7 @@ Everything else is dev/build infrastructure.
 | [`src/lib/components/`](./src/lib/components)                        | Shared layout, SEO, UI, and tool-shell components                          |
 | [`src/lib/utils/seo.ts`](./src/lib/utils/seo.ts)                     | JSON-LD and metadata helpers                                               |
 | [`src/lib/utils/site-indexing.ts`](./src/lib/utils/site-indexing.ts) | Canonical origin, robots, and sitemap generation                           |
-| [`src/hooks.server.ts`](./src/hooks.server.ts)                       | Response security headers                                                  |
+| [`nginx/`](./nginx)                                                  | Static routing, cache policy, and response security headers                |
 
 ### Why the Tool Registry Matters
 
@@ -282,7 +284,8 @@ That reinforces the relationship between the tools product and the flagship doma
 
 ## Security Posture
 
-This app is interactive, so the server layer sets security headers centrally in [`src/hooks.server.ts`](./src/hooks.server.ts).
+The unprivileged static server applies response headers from
+[`nginx/security-headers.conf`](./nginx/security-headers.conf).
 
 Current response headers include:
 
@@ -331,19 +334,20 @@ It covers:
 - `robots.txt`
 - `sitemap.xml`
 
-Playwright runs against a built server started from:
+Playwright runs against the generated static output using Vite preview:
 
-- `vite build`
-- `HOST=127.0.0.1 PORT=4173 node build`
+- `pnpm build`
+- `pnpm preview --host 127.0.0.1 --port 4174`
 
-That means the E2E tests validate the production-style adapter-node output, not only dev-mode behavior.
+This validates prerendered routes and hydrated interactions, not only dev-mode
+behavior.
 
 ## Development
 
 ### Requirements
 
-- Node.js 20 or newer
-- pnpm 10 or newer
+- Node.js 24 LTS
+- pnpm 11.18.0
 
 ### Install
 
@@ -402,33 +406,24 @@ pnpm preview
 
 ## Deployment
 
-### Direct Node deployment
+### Indexing build variables
 
-The adapter-node build is started with:
-
-```bash
-node build
-```
-
-Operational variables to care about:
-
-| Variable          | Purpose                                                   |
-| ----------------- | --------------------------------------------------------- |
-| `PORT`            | Server port                                               |
-| `HOST`            | Bind host when starting manually                          |
-| `PUBLIC_SITE_URL` | Canonical public origin for metadata, robots, and sitemap |
+| Variable                  | Purpose                                                           |
+| ------------------------- | ----------------------------------------------------------------- |
+| `PUBLIC_INDEXING_ENABLED` | Exact `true` enables production crawling; all other values do not |
+| `PUBLIC_SITE_URL`         | Loopback-only override for non-indexable local tests              |
 
 ### Docker deployment
 
-The provided [`Dockerfile`](./Dockerfile) uses a multi-stage Node 20 Alpine build:
+The provided [`Dockerfile`](./Dockerfile) uses a Node 24 build stage and an
+unprivileged Nginx runtime:
 
-1. enable corepack
+1. activate the pinned pnpm release
 2. install with `pnpm --frozen-lockfile`
-3. build the app
-4. copy the built server and production dependencies into a runtime image
-5. expose port `3000`
-6. healthcheck `http://localhost:3000/health`
-7. start with `node build`
+3. generate the strict static site
+4. copy only `build/` and the Nginx configuration into the runtime image
+5. expose unprivileged port `8080`
+6. healthcheck `http://127.0.0.1:8080/health`
 
 Build image:
 
@@ -439,7 +434,7 @@ docker build -t recica-tools .
 Run image:
 
 ```bash
-docker run --rm -p 3000:3000 -e PORT=3000 recica-tools
+docker run --rm -p 8080:8080 recica-tools
 ```
 
 ## File Layout
@@ -447,6 +442,7 @@ docker run --rm -p 3000:3000 -e PORT=3000 recica-tools
 ```text
 tools/
   Dockerfile
+  nginx/
   package.json
   playwright.config.ts
   pnpm-lock.yaml
@@ -458,7 +454,6 @@ tools/
     manifest.json
     og-default.svg
   src/
-    hooks.server.ts
     lib/
       assets/
       components/
@@ -470,7 +465,9 @@ tools/
       utils/
     routes/
       +layout.svelte
+      +layout.ts
       +page.svelte
+      404/
       health/
       robots.txt/
       sitemap.xml/

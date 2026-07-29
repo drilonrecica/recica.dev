@@ -1,49 +1,78 @@
 import { tools } from '$lib/constants/tools';
 
+export const PRODUCTION_ORIGIN = 'https://tools.recica.dev';
+
 export const publicPageRoutes = [
-	{ path: '/', changeFrequency: 'weekly', priority: '1.0' },
-	...tools.map((tool) => ({
-		path: tool.route,
-		changeFrequency: 'monthly',
-		priority: '0.8'
-	}))
+	{ path: '/' },
+	...tools.map((tool) => ({ path: tool.route }))
 ] as const;
 
-export function resolveSiteOrigin(configuredUrl: string | undefined, requestUrl: URL): string {
-	const candidate = configuredUrl?.trim();
-
-	if (candidate) {
-		try {
-			const url = new URL(candidate);
-			// Basic validation - ensure it's http or https
-			if (!['http:', 'https:'].includes(url.protocol)) {
-				throw new Error('Invalid protocol');
-			}
-			return url.origin;
-		} catch {
-			// Fall back to the current request origin when configuration is invalid.
-		}
-	}
-
-	return requestUrl.origin;
+export function parseIndexingEnabled(value: string | undefined): boolean {
+	return value === 'true';
 }
 
-export function buildRobotsTxt(origin: string): string {
+function isLoopbackHostname(hostname: string): boolean {
+	return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+}
+
+export function resolveSiteOrigin(
+	configuredUrl: string | undefined,
+	indexingEnabled: boolean
+): string {
+	const candidate = configuredUrl?.trim();
+
+	if (!candidate) {
+		return PRODUCTION_ORIGIN;
+	}
+
+	let url: URL;
+	try {
+		url = new URL(candidate);
+	} catch {
+		throw new Error('PUBLIC_SITE_URL must be a valid absolute URL.');
+	}
+
+	if (!['http:', 'https:'].includes(url.protocol)) {
+		throw new Error('PUBLIC_SITE_URL must use http or https.');
+	}
+
+	if (url.origin === PRODUCTION_ORIGIN) {
+		return PRODUCTION_ORIGIN;
+	}
+
+	if (indexingEnabled) {
+		throw new Error('PUBLIC_SITE_URL cannot override the production origin for indexable builds.');
+	}
+
+	if (!isLoopbackHostname(url.hostname)) {
+		throw new Error(
+			'PUBLIC_SITE_URL may override the canonical origin only for loopback test builds.'
+		);
+	}
+
+	return url.origin;
+}
+
+export const INDEXING_ENABLED = parseIndexingEnabled(import.meta.env.PUBLIC_INDEXING_ENABLED);
+export const SITE_ORIGIN = resolveSiteOrigin(import.meta.env.PUBLIC_SITE_URL, INDEXING_ENABLED);
+
+export function buildRobotsTxt(origin: string, indexingEnabled: boolean): string {
 	const sitemapUrl = new URL('/sitemap.xml', origin).toString();
 	const host = new URL(origin).host;
+	const accessDirective = indexingEnabled ? 'Allow: /' : 'Disallow: /';
 
-	return ['User-agent: *', 'Allow: /', '', `Sitemap: ${sitemapUrl}`, `Host: ${host}`].join('\n');
+	return ['User-agent: *', accessDirective, '', `Sitemap: ${sitemapUrl}`, `Host: ${host}`].join(
+		'\n'
+	);
 }
 
 export function buildSitemapXml(
 	origin: string,
 	routes: ReadonlyArray<{
 		path: string;
-		changeFrequency?: string;
-		priority?: string;
+		lastModified?: string;
 	}> = publicPageRoutes
 ): string {
-	const lastmod = new Date().toISOString().split('T')[0] ?? '';
 	const seenPaths = new Set<string>();
 	const urls = routes
 		.filter((route) => {
@@ -56,14 +85,12 @@ export function buildSitemapXml(
 		})
 		.map((route) => {
 			const url = new URL(route.path, origin).toString();
-			const priority = route.priority ?? (route.path === '/' ? '1.0' : '0.8');
-			const changeFrequency = route.changeFrequency;
+			const lastModified = route.lastModified
+				? `\n    <lastmod>${escapeXml(route.lastModified)}</lastmod>`
+				: '';
 
 			return `  <url>
-    <loc>${escapeXml(url)}</loc>
-    <lastmod>${lastmod}</lastmod>
-    ${changeFrequency ? `<changefreq>${changeFrequency}</changefreq>` : ''}
-    <priority>${priority}</priority>
+    <loc>${escapeXml(url)}</loc>${lastModified}
   </url>`;
 		});
 
