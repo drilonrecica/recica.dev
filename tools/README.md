@@ -448,6 +448,23 @@ pnpm build
 pnpm preview
 ```
 
+## Offline behavior
+
+Tools uses SvelteKit's native service worker after the static site has been
+generated. Each build creates versioned asset and document caches:
+
+- generated application assets and public static files are cache-first
+- public HTML routes are network-first, with the installed version as the
+  offline fallback
+- activation removes older `recica-tools-*` caches before claiming clients
+- a new worker waits for the previous version's clients to close, avoiding a
+  forced mid-session update
+
+Only same-origin, query-free `GET` requests for known assets and public routes
+are eligible. POST requests, third-party requests, arbitrary query variants,
+health/error documents, tool input, and generated output are never cached.
+There is no forced install prompt.
+
 ## Deployment
 
 ### Indexing build variables
@@ -498,10 +515,12 @@ tools/
     manifest.json
     og-default.svg
   src/
+    service-worker.ts
     lib/
       assets/
       components/
       constants/
+      offline/
       search/
       theme/
       tools/
