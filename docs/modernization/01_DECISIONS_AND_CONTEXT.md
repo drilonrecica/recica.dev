@@ -398,17 +398,17 @@ This modernization will not:
 
 The intended end state is approximately:
 
-| Area | Target confidence |
-|---|---:|
-| Architecture | 9.5+/10 |
-| Resource usage | 9.7+/10 |
-| Performance | 9.4+/10 |
-| Security | 9.2+/10 |
-| Maintainability | 9.3+/10 |
-| Testing | 9.2+/10 |
-| SEO | 9.3+/10 |
-| AI discoverability | 9.0+/10 |
-| Accessibility | 8.9 automated-only; 9.3 with manual checks |
+| Area               |                          Target confidence |
+| ------------------ | -----------------------------------------: |
+| Architecture       |                                    9.5+/10 |
+| Resource usage     |                                    9.7+/10 |
+| Performance        |                                    9.4+/10 |
+| Security           |                                    9.2+/10 |
+| Maintainability    |                                    9.3+/10 |
+| Testing            |                                    9.2+/10 |
+| SEO                |                                    9.3+/10 |
+| AI discoverability |                                    9.0+/10 |
+| Accessibility      | 8.9 automated-only; 9.3 with manual checks |
 
 These are directional quality targets, not marketing claims.
 
