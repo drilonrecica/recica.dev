@@ -7,8 +7,7 @@ export type RegexMatch = {
 };
 
 export type RegexResult =
-	| { ok: true; matches: RegexMatch[]; replaced: string }
-	| { ok: false; error: string };
+	{ ok: true; matches: RegexMatch[]; replaced: string } | { ok: false; error: string };
 
 function toRegexMatch(match: RegExpExecArray): RegexMatch {
 	return {

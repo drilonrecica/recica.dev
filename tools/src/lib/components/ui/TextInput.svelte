@@ -20,15 +20,8 @@
 		| 'url'
 		| undefined = 'off';
 	export let inputmode:
-		| 'none'
-		| 'text'
-		| 'tel'
-		| 'url'
-		| 'email'
-		| 'numeric'
-		| 'decimal'
-		| 'search'
-		| undefined = undefined;
+		'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search' | undefined =
+		undefined;
 	export let spellcheck = false;
 	export let mono = false;
 	export let readonly = false;

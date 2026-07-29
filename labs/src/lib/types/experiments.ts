@@ -14,12 +14,7 @@ export type ExperimentType = 'interactive-lab' | 'concept';
 export type ExperimentVisualTheme = 'editorial-light' | 'product-dark';
 export type HomeVisibility = 'featured' | 'teaser' | 'hidden';
 export type LabsRoutePath =
-	| '/'
-	| '/404'
-	| '/health'
-	| '/parental-gate-lab'
-	| '/robots.txt'
-	| '/sitemap.xml';
+	'/' | '/404' | '/health' | '/parental-gate-lab' | '/robots.txt' | '/sitemap.xml';
 
 export interface ExperimentDefinition {
 	slug: string;
