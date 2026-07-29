@@ -191,7 +191,7 @@ See [`final/2026-07-29.md`](./final/2026-07-29.md) for evidence and handoff.
 - [x] Search/filter/theme E2E passes.
 - [x] Robots/sitemap E2E passes.
 - [x] 404 E2E passes.
-- [x] No console errors occur.
+- [x] No unexpected console or page errors occur.
 - [x] Unexpected network requests fail tests.
 - [x] Chromium PR suite passes.
 - [ ] Scheduled Firefox/WebKit suite passes.
@@ -211,7 +211,7 @@ See [`final/2026-07-29.md`](./final/2026-07-29.md) for evidence and handoff.
 - [x] Errors are associated with fields.
 - [x] Dynamic statuses are announced.
 - [x] Reduced motion is respected.
-- [x] Forced-colors mode is usable.
+- [ ] Forced-colors mode is usable.
 - [ ] 200% zoom/reflow smoke test passes.
 - [x] Mobile touch targets are adequate.
 - [x] No keyboard trap exists.
