@@ -17,10 +17,10 @@
 					<span class="brand-mark" aria-hidden="true"></span>
 					<span class="min-w-0">
 						<span class="font-display block text-lg font-semibold tracking-[-0.03em]">
-							Labs by Drilon Recica
+							Recica Labs
 						</span>
 						<span class="block text-xs text-[var(--ink-soft)]">
-							{isProject ? 'Interactive product lab' : 'Experiments, prototypes, and concept work'}
+							{isProject ? 'Published study / Research Notebook' : 'Research Notebook'}
 						</span>
 					</span>
 				</a>
@@ -43,8 +43,8 @@
 						class="nav-chip shrink-0"
 						aria-current={isHome ? 'page' : undefined}>Home</a
 					>
-					<a href={resolve('/#experiments')} class="nav-chip shrink-0">Experiments</a>
-					<a href={resolve('/#about')} class="nav-chip shrink-0">About</a>
+					<a href={resolve('/#experiments')} class="nav-chip shrink-0">Notebook</a>
+					<a href={resolve('/#about')} class="nav-chip shrink-0">Policy</a>
 				{/if}
 			</nav>
 

@@ -309,16 +309,22 @@ That is a deliberate design choice. The helper should be inspectable and stable.
 
 Not all presentation content is stored directly in the data files.
 
-The route derives some compact view models in [`+page.svelte`](./+page.svelte):
+The presentation is split into:
 
-- `patternTags` for shorter demo-card labels
-- `compactPatternRows` for condensed guidance rows
+- [`ParentalGateIntro.svelte`](../../lib/components/parental-gate/ParentalGateIntro.svelte)
+  for the study record, question, method, scope, and overview
+- [`+page.svelte`](./+page.svelte) for the six interactive demos, comparison,
+  and recommendation state
+- [`ParentalGateGuidance.svelte`](../../lib/components/parental-gate/ParentalGateGuidance.svelte)
+  for condensed pattern guidance, implementation notes, and FAQ
 
-That is intentional. The data files stay rich enough for future expansion, while the route is free to compress the presentation layer.
+The data files stay rich enough for future expansion while each component owns
+one coherent part of the published study.
 
 ## Demo Implementations
 
-All 6 demos are implemented directly in the route component today.
+All 6 demos remain in the route component because they share one active panel
+and one local state model.
 
 Current handlers include:
 
@@ -329,14 +335,16 @@ Current handlers include:
 - `submitTextGate()`
 - `choosePattern()`
 
-This is acceptable for the current scope because:
+This remains appropriate for the current scope because:
 
 - the route is still one feature
 - all state is local
 - the demos share one panel and one state model
 - the logic remains readable
 
-If the route grows substantially or a second lab copies this pattern, then extraction into dedicated components becomes worth considering.
+If the interactive workbench itself grows substantially, its demo controls and
+recommendation panel can be split without moving feature state into the global
+layout.
 
 ## Accessibility Rules
 

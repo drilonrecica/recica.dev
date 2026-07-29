@@ -72,11 +72,13 @@ The public route source of truth for indexing lives in [`src/lib/utils/site-inde
 
 ## Visual and UX Model
 
-The current app uses a shared dark visual system across both the landing page and the shipped Parental Gate lab.
+The current app uses a light-only Research Notebook system across the landing
+page and the shipped Parental Gate study. There is no theme toggle or dark
+variant.
 
 The homepage should read as:
 
-- experimental
+- notebook-like
 - editorial
 - selective
 - ecosystem-aware
@@ -93,7 +95,9 @@ The shared tokens and shell live in:
 - [`src/routes/+layout.svelte`](./src/routes/+layout.svelte)
 - [`src/routes/layout.css`](./src/routes/layout.css)
 
-The implementation uses one visual system with route-aware emphasis rather than separate codebases or a user-facing theme toggle.
+The implementation uses one restrained visual system with route-aware density.
+Decorative route animations were removed, and the global font surface is kept
+to three self-hosted files.
 
 ## Technology Stack
 
@@ -165,7 +169,6 @@ It is responsible for:
 
 - loading the global stylesheet
 - applying the app shell class
-- deciding whether the current route is the homepage
 - rendering the shared Labs header and footer
 
 The shell stays thin on purpose. Route-specific behavior remains in the page routes instead of getting pushed into layout-level abstractions.
@@ -195,7 +198,7 @@ It has 3 main content blocks:
 
 1. hero
 2. featured experiments
-3. short about / what is next
+3. notebook publication policy
 
 That simplification is intentional. The homepage is not supposed to explain the philosophy of experimentation in five different ways.
 
@@ -205,13 +208,15 @@ That simplification is intentional. The homepage is not supposed to explain the 
 
 It renders:
 
-- live or coming-soon state
-- year
+- stable study/note number
+- published or in-progress state
 - title
 - one-liner
 - summary
-- one supporting note
-- CTA
+- research question or working hypothesis
+- CTA only when the entry has a real public route
+
+The in-progress analytics note deliberately has no placeholder route.
 
 It is intentionally restrained. The card is there to route attention, not to carry the full experiment.
 

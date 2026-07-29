@@ -37,10 +37,10 @@
 	<meta name="author" content="Drilon Reçica" />
 	<meta name="creator" content="Drilon Reçica" />
 	<meta name="format-detection" content="telephone=no" />
-	<meta name="theme-color" content="#0c1014" />
+	<meta name="theme-color" content="#f6f0e6" />
 	<meta name="application-name" content={siteName} />
 	<meta name="apple-mobile-web-app-title" content={siteName} />
-	<meta name="color-scheme" content="dark" />
+	<meta name="color-scheme" content="light" />
 	<meta property="og:site_name" content={siteName} />
 	<meta property="og:locale" content="en_US" />
 	<meta property="og:title" content={fullTitle} />
