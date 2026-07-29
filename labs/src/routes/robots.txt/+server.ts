@@ -1,10 +1,10 @@
-import { env } from '$env/dynamic/public';
 import type { RequestHandler } from './$types';
-import { buildRobotsTxt, resolveSiteOrigin } from '$lib/utils/site-indexing';
+import { buildRobotsTxt, INDEXING_ENABLED, SITE_ORIGIN } from '$lib/utils/site-indexing';
 
-export const GET: RequestHandler = ({ url }) => {
-	const origin = resolveSiteOrigin(env.PUBLIC_SITE_URL, url);
-	const body = buildRobotsTxt(origin);
+export const prerender = true;
+
+export const GET: RequestHandler = () => {
+	const body = buildRobotsTxt(SITE_ORIGIN, INDEXING_ENABLED);
 
 	return new Response(body, {
 		headers: {

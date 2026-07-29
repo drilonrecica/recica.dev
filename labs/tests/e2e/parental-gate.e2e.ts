@@ -19,7 +19,7 @@ test('loads the parental gate route with canonical metadata', async ({ page }) =
 	await expect(page.locator('.compact-faq__item')).toHaveCount(4);
 	await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 		'content',
-		'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+		'noindex, nofollow, noarchive'
 	);
 	await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
 		'content',
@@ -27,7 +27,7 @@ test('loads the parental gate route with canonical metadata', async ({ page }) =
 	);
 	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 		'href',
-		'http://127.0.0.1:4175/parental-gate-lab'
+		'https://labs.recica.dev/parental-gate-lab'
 	);
 });
 

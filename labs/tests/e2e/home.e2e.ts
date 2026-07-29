@@ -17,7 +17,7 @@ test('renders the Labs homepage hero and featured experiments', async ({ page })
 	await expect(page.getByText('Mobile-first self-hosted deployment')).toBeVisible();
 	await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 		'content',
-		'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+		'noindex, nofollow, noarchive'
 	);
 	await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
 		'content',
@@ -25,18 +25,18 @@ test('renders the Labs homepage hero and featured experiments', async ({ page })
 	);
 	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 		'href',
-		'http://127.0.0.1:4175/'
+		'https://labs.recica.dev/'
 	);
 });
 
 test('serves robots and sitemap endpoints', async ({ page }) => {
 	await page.goto('/robots.txt');
-	await expect(page.locator('body')).toContainText('Sitemap: http://127.0.0.1:4175/sitemap.xml');
-	await expect(page.locator('body')).toContainText('Disallow: /404');
-	await expect(page.locator('body')).toContainText('Host: 127.0.0.1:4175');
+	await expect(page.locator('body')).toContainText('Sitemap: https://labs.recica.dev/sitemap.xml');
+	await expect(page.locator('body')).toContainText('Disallow: /');
+	await expect(page.locator('body')).toContainText('Host: labs.recica.dev');
 
 	await page.goto('/sitemap.xml');
-	await expect(page.locator('body')).toContainText('http://127.0.0.1:4175/');
-	await expect(page.locator('body')).toContainText('http://127.0.0.1:4175/parental-gate-lab');
-	await expect(page.locator('body')).toContainText('<changefreq>weekly</changefreq>');
+	await expect(page.locator('body')).toContainText('https://labs.recica.dev/');
+	await expect(page.locator('body')).toContainText('https://labs.recica.dev/parental-gate-lab');
+	await expect(page.locator('body')).not.toContainText('<changefreq>');
 });

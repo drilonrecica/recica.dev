@@ -103,7 +103,7 @@ The implementation uses one visual system with route-aware emphasis rather than 
 | Component model    | Svelte 5                                      |
 | Language           | TypeScript                                    |
 | Styling            | Tailwind CSS v4 plus shared custom CSS tokens |
-| Build runtime      | `@sveltejs/adapter-node`                      |
+| Build adapter      | `@sveltejs/adapter-static`                    |
 | Package manager    | `pnpm`                                        |
 | Unit testing       | Vitest                                        |
 | End-to-end testing | Playwright                                    |
@@ -263,18 +263,19 @@ Its data and logic are split cleanly:
 
 ## SEO, Canonical, and Indexing
 
-Canonical origin is environment-aware.
+Canonical URLs use the fixed production origin:
 
-In production, set:
+- `https://labs.recica.dev`
+
+Preview builds keep production canonicals and default to `noindex, nofollow`.
+Production indexing requires an explicit build flag:
 
 ```bash
-PUBLIC_SITE_URL=https://labs.recica.dev
+PUBLIC_INDEXING_ENABLED=true pnpm build
 ```
 
-At runtime the app resolves origin like this:
-
-1. use `PUBLIC_SITE_URL` if it is a valid `http` or `https` URL
-2. otherwise fall back to the current request origin
+A loopback `PUBLIC_SITE_URL` override is accepted only for non-indexable local
+tests.
 
 That logic lives in [`src/lib/utils/site-indexing.ts`](./src/lib/utils/site-indexing.ts).
 
@@ -302,7 +303,8 @@ The app is intentionally low-risk by architecture:
 - no remote uploads
 - no persistence in the Parental Gate helper flows
 
-Security headers are set centrally in [`src/hooks.server.ts`](./src/hooks.server.ts):
+Security headers are set by the static runtime configuration in
+[`nginx/security-headers.conf`](./nginx/security-headers.conf):
 
 - Content-Security-Policy
 - Referrer-Policy
@@ -310,7 +312,8 @@ Security headers are set centrally in [`src/hooks.server.ts`](./src/hooks.server
 - X-Frame-Options
 - Permissions-Policy
 
-Because this is an interactive public app, keeping this file current matters more than styling polish.
+The browser remains responsible for all experiment interactions; the production
+container does not run a Node application server.
 
 ## Local Development
 
@@ -395,11 +398,12 @@ Playwright coverage currently verifies:
 
 The Playwright config lives in [`playwright.config.ts`](./playwright.config.ts).
 
-It starts a local built server on `127.0.0.1:4173` before running the browser tests.
+It builds the strict static output and starts Vite preview on `127.0.0.1:4175`
+before running the browser tests.
 
 ## Build and Deployment
 
-The app uses `@sveltejs/adapter-node`.
+The app uses strict `@sveltejs/adapter-static` without an SPA fallback.
 
 Build output is generated with:
 
@@ -407,17 +411,12 @@ Build output is generated with:
 pnpm run build
 ```
 
-Production runtime is the generated Node server:
-
-```bash
-node build
-```
-
 Operational assumptions:
 
-- canonical origin should be provided with `PUBLIC_SITE_URL`
-- a reverse proxy or platform should handle external TLS and host routing
-- `/health` can be used for basic uptime checks
+- only generated files from `build/` are copied into an unprivileged Nginx image
+- the container listens on port `8080`
+- a reverse proxy or platform handles external TLS and host routing
+- the prerendered `/health` response can be used for uptime checks
 
 ## Editing Guidance
 
