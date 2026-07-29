@@ -45,7 +45,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${parsed.ok ? 'status-neutral' : 'status-error'}`}>
+		<div
+			class={`status-pill ${parsed.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{parsed.ok ? 'Color parsed successfully.' : parsed.error}
 		</div>
 

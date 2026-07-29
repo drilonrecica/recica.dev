@@ -148,6 +148,7 @@ export function createMarkdownPreviewDocument(markdown: string) {
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'" />
 		<style>
 			body {
 				margin: 0;

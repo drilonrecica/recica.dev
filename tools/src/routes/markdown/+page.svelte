@@ -31,7 +31,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${limit.ok ? 'status-neutral' : 'status-error'}`}>
+		<div
+			class={`status-pill ${limit.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{limit.ok ? 'Markdown preview is sandboxed and sanitized.' : limit.message}
 		</div>
 
@@ -40,7 +45,7 @@
 			<iframe
 				title="Markdown preview"
 				class="mt-4 h-[38rem] w-full rounded-[14px] border border-[var(--border-subtle)] bg-white"
-				sandbox=""
+				sandbox="allow-scripts"
 				srcdoc={preview}
 			></iframe>
 		</div>

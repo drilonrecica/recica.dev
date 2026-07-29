@@ -71,7 +71,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}>
+		<div
+			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{error || status}
 		</div>
 

@@ -60,7 +60,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}>
+		<div
+			class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{#if result.ok}
 				{result.matches.length} match{result.matches.length === 1 ? '' : 'es'} found.
 			{:else}

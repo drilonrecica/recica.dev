@@ -94,6 +94,7 @@
 			rows={18}
 			mono
 			help="Input is treated as strict JSON only."
+			error={tone === 'error' ? status : undefined}
 			bind:value={input}
 		/>
 
@@ -107,6 +108,9 @@
 	<div class="space-y-4">
 		<div
 			class={`status-pill ${tone === 'success' ? 'status-success' : tone === 'error' ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
 		>
 			{status}
 		</div>

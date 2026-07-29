@@ -111,7 +111,9 @@
 			</div>
 
 			{#if error}
-				<div class="status-pill status-error mt-5">{error}</div>
+				<div class="status-pill status-error mt-5" role="alert" aria-live="assertive">
+					{error}
+				</div>
 			{:else}
 				<div class="mono-surface mt-5 overflow-x-auto p-5 text-base">{password}</div>
 			{/if}

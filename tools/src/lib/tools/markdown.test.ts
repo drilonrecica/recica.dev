@@ -13,6 +13,7 @@ describe('markdown tools', () => {
 		const doc = createMarkdownPreviewDocument('<script>alert(1)</script>');
 		expect(doc).not.toContain('<script>alert(1)</script>');
 		expect(doc).toContain('&lt;script&gt;alert(1)&lt;/script&gt;');
+		expect(doc).toContain(`default-src 'none'; style-src 'unsafe-inline'`);
 	});
 
 	it('renders inline code and blocks unsafe link schemes', () => {

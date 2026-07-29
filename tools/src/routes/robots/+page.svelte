@@ -33,6 +33,9 @@
 	<div class="space-y-4">
 		<div
 			class={`status-pill ${!limit.ok || parsed.errorCount ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
 		>
 			{limit.ok
 				? `${parsed.directiveCount} directives · ${parsed.errorCount} errors`

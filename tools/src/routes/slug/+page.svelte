@@ -57,7 +57,9 @@
 			</div>
 
 			{#if !limit.ok}
-				<div class="status-pill status-error mt-5">{limit.message}</div>
+				<div class="status-pill status-error mt-5" role="alert" aria-live="assertive">
+					{limit.message}
+				</div>
 			{:else if debouncedInput && output}
 				<div class="mono-surface mt-5 overflow-x-auto p-5">{output}</div>
 			{:else}

@@ -31,7 +31,9 @@
 		</div>
 
 		{#if !limit.ok}
-			<div class="status-pill status-error">{limit.message}</div>
+			<div class="status-pill status-error" role="alert" aria-live="assertive">
+				{limit.message}
+			</div>
 		{/if}
 
 		<div class="grid gap-4 md:grid-cols-2">

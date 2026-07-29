@@ -31,7 +31,9 @@
 
 	<div class="space-y-4">
 		{#if !limit.ok}
-			<div class="status-pill status-error">{limit.message}</div>
+			<div class="status-pill status-error" role="alert" aria-live="assertive">
+				{limit.message}
+			</div>
 		{/if}
 		<div class="grid gap-4 sm:grid-cols-2">
 			{#each [['Characters', counts.characters], ['No spaces', counts.charactersNoSpaces], ['Words', counts.words], ['Lines', counts.lines], ['Paragraphs', counts.paragraphs], ['Reading time', counts.readingMinutes ? `${counts.readingMinutes} min` : '0 min']] as metric (metric[0])}

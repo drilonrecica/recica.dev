@@ -35,7 +35,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}>
+		<div
+			class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{result.ok ? `${result.kind} with ${result.urls.length} URLs.` : result.error}
 		</div>
 

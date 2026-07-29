@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
-import { expect, test, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 async function expectNoViolations(page: Page) {
 	const results = await new AxeBuilder({ page })
@@ -38,4 +39,17 @@ test('search dialog traps focus and passes axe while open', async ({ page }) => 
 
 	await page.keyboard.press('Escape');
 	await expect(page.getByRole('button', { name: /^search/i })).toBeFocused();
+});
+
+test('JSON errors are announced and associated with the input', async ({ page }) => {
+	await page.goto('/json');
+	const input = page.getByLabel('Raw JSON');
+	await input.fill('{invalid');
+	await page.getByRole('button', { name: 'Validate' }).click();
+
+	await expect(input).toHaveAttribute('aria-invalid', 'true');
+	const errorId = await input.getAttribute('aria-describedby');
+	expect(errorId).toBeTruthy();
+	await expect(page.locator(`#${errorId}`)).toHaveAttribute('role', 'alert');
+	await expect(page.getByRole('status')).toContainText(/expected|property|json/i);
 });

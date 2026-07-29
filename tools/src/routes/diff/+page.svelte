@@ -73,6 +73,9 @@
 
 		<div
 			class={`status-pill ${limitError ? 'status-error' : changedCount ? 'status-success' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
 		>
 			{#if limitError}
 				{limitError}

@@ -52,6 +52,9 @@
 	<div class="space-y-4">
 		<div
 			class={`status-pill ${status.includes('local processing limit') ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
 		>
 			{status}
 		</div>

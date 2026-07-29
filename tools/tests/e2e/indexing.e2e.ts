@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
 
 test('default preview output is noindex with production canonicals', async ({ page, request }) => {
 	await page.goto('/json');
