@@ -16,6 +16,19 @@ test('core experiment content is available before hydration', async ({ browser }
 	await context.close();
 });
 
+test('generated pages use a hash-based script policy', async ({ page }) => {
+	await page.goto('/');
+
+	await expect(page.locator('meta[http-equiv="content-security-policy"]')).toHaveAttribute(
+		'content',
+		/script-src 'self' 'sha256-/
+	);
+	await expect(page.locator('meta[http-equiv="content-security-policy"]')).not.toHaveAttribute(
+		'content',
+		/unsafe-eval/
+	);
+});
+
 test('a generated branded document is available for real 404 responses', async ({ page }) => {
 	await page.goto('/404');
 	await expect(

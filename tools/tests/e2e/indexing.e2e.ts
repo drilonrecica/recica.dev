@@ -11,6 +11,14 @@ test('default preview output is noindex with production canonicals', async ({ pa
 		'content',
 		'noindex, nofollow, noarchive'
 	);
+	await expect(page.locator('meta[http-equiv="content-security-policy"]')).toHaveAttribute(
+		'content',
+		/script-src 'self' 'sha256-/
+	);
+	await expect(page.locator('meta[http-equiv="content-security-policy"]')).not.toHaveAttribute(
+		'content',
+		/unsafe-eval/
+	);
 
 	const robots = await request.get('/robots.txt');
 	expect(await robots.text()).toContain('Disallow: /');

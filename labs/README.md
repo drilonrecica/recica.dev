@@ -303,7 +303,8 @@ The app is intentionally low-risk by architecture:
 - no remote uploads
 - no persistence in the Parental Gate helper flows
 
-Security headers are set by the static runtime configuration in
+SvelteKit generates a hash-based CSP meta policy for executable content. The
+static runtime adds `frame-ancestors 'none'` and defense-in-depth headers from
 [`nginx/security-headers.conf`](./nginx/security-headers.conf):
 
 - Content-Security-Policy

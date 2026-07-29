@@ -284,7 +284,9 @@ That reinforces the relationship between the tools product and the flagship doma
 
 ## Security Posture
 
-The unprivileged static server applies response headers from
+SvelteKit generates a hash-based CSP meta policy for executable content. The
+unprivileged static server adds `frame-ancestors 'none'` and defense-in-depth
+response headers from
 [`nginx/security-headers.conf`](./nginx/security-headers.conf).
 
 Current response headers include:
