@@ -247,6 +247,7 @@ pnpm preview
 - SvelteKit app built with strict `@sveltejs/adapter-static`
 - generated output is served by an unprivileged Nginx container
 - exposes a prerendered `/health` response for uptime probes
+- provides privacy-safe offline reuse through a native service worker
 - uses the fixed production canonical origin
 - preview builds default to `noindex, nofollow`
 
