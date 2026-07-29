@@ -8,7 +8,8 @@ export default defineConfig({
 		trace: 'retain-on-failure'
 	},
 	webServer: {
-		command: 'pnpm build && pnpm preview --host 127.0.0.1 --port 4174',
+		command:
+			'./node_modules/.bin/vite build && ./node_modules/.bin/vite preview --host 127.0.0.1 --port 4174',
 		port: 4174,
 		reuseExistingServer: !process.env.CI
 	}
