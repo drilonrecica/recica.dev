@@ -100,6 +100,7 @@
 			<TextInput
 				id="barcode-input"
 				label="Value"
+				error={error || undefined}
 				mono
 				help="Input requirements depend on the selected barcode format."
 				bind:value={input}

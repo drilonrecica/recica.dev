@@ -27,6 +27,7 @@
 		<TextArea
 			id="html-input"
 			label="HTML"
+			error={limit.ok ? undefined : limit.message}
 			rows={22}
 			mono
 			help="Preview updates automatically as you edit."

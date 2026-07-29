@@ -1,8 +1,39 @@
 import { expect, test as base } from '@playwright/test';
+import { tools } from '../../src/lib/constants/tools';
 
-export const test = base.extend<{ qualityGuards: void }>({
+const allowedDocumentPaths = new Set(['/', '/404', '/privacy', ...tools.map((tool) => tool.route)]);
+const allowedStaticPaths = new Set([
+	'/favicon.svg',
+	'/manifest.json',
+	'/og-default.svg',
+	'/recica-tools-logo.jpg',
+	'/service-worker.js'
+]);
+
+export function isAllowedBrowserRequest(url: string, expectedOrigin: string) {
+	const parsed = new URL(url);
+	if (parsed.origin !== expectedOrigin || parsed.search || parsed.hash) return false;
+
+	return (
+		allowedDocumentPaths.has(parsed.pathname) ||
+		allowedStaticPaths.has(parsed.pathname) ||
+		parsed.pathname.startsWith('/_app/')
+	);
+}
+
+export const test = base.extend<{
+	expectedBrowserRequests: Set<string>;
+	qualityGuards: void;
+}>({
+	expectedBrowserRequests: async ({ page }, use) => {
+		const requests = new Set<string>();
+		const clearRequests = () => requests.clear();
+		page.once('close', clearRequests);
+		await use(requests);
+		page.off('close', clearRequests);
+	},
 	qualityGuards: [
-		async ({ baseURL, page }, use) => {
+		async ({ baseURL, expectedBrowserRequests, page }, use) => {
 			const consoleErrors: string[] = [];
 			const pageErrors: string[] = [];
 			const unexpectedRequests: string[] = [];
@@ -15,7 +46,11 @@ export const test = base.extend<{ qualityGuards: void }>({
 			page.on('request', (request) => {
 				const url = request.url();
 				if (!url.startsWith('http:') && !url.startsWith('https:')) return;
-				if (expectedOrigin && new URL(url).origin !== expectedOrigin) {
+				if (
+					expectedOrigin &&
+					!expectedBrowserRequests.has(url) &&
+					!isAllowedBrowserRequest(url, expectedOrigin)
+				) {
 					unexpectedRequests.push(`${request.method()} ${url}`);
 				}
 			});
@@ -24,7 +59,7 @@ export const test = base.extend<{ qualityGuards: void }>({
 
 			expect(consoleErrors, 'browser console errors').toEqual([]);
 			expect(pageErrors, 'uncaught browser errors').toEqual([]);
-			expect(unexpectedRequests, 'unexpected cross-origin requests').toEqual([]);
+			expect(unexpectedRequests, 'unexpected browser network requests').toEqual([]);
 		},
 		{ auto: true }
 	]

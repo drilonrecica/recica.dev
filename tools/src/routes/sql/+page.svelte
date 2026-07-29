@@ -37,6 +37,7 @@
 		<TextArea
 			id="sql-input"
 			label="SQL source"
+			error={status.includes('local processing limit') ? status : undefined}
 			rows={18}
 			mono
 			help="Paste any SQL text block."

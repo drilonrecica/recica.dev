@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { expect, test } from './fixtures';
 
 async function expectNoViolations(page: Page) {
@@ -8,6 +8,13 @@ async function expectNoViolations(page: Page) {
 		.analyze();
 
 	expect(results.violations, JSON.stringify(results.violations, null, 2)).toEqual([]);
+}
+
+async function expectLinkedFieldError(input: Locator, page: Page) {
+	await expect(input).toHaveAttribute('aria-invalid', 'true');
+	const errorId = await input.getAttribute('aria-describedby');
+	expect(errorId).toBeTruthy();
+	await expect(page.locator(`#${errorId}`)).toHaveAttribute('role', 'alert');
 }
 
 test('homepage and representative tool routes pass axe', async ({ page }) => {
@@ -41,15 +48,32 @@ test('search dialog traps focus and passes axe while open', async ({ page }) => 
 	await expect(page.getByRole('button', { name: /^search/i })).toBeFocused();
 });
 
-test('JSON errors are announced and associated with the input', async ({ page }) => {
+test('tool errors are announced and associated with representative input types', async ({
+	page
+}) => {
 	await page.goto('/json');
-	const input = page.getByLabel('Raw JSON');
-	await input.fill('{invalid');
+	const jsonInput = page.getByLabel('Raw JSON');
+	await jsonInput.fill('{invalid');
 	await page.getByRole('button', { name: 'Validate' }).click();
-
-	await expect(input).toHaveAttribute('aria-invalid', 'true');
-	const errorId = await input.getAttribute('aria-describedby');
-	expect(errorId).toBeTruthy();
-	await expect(page.locator(`#${errorId}`)).toHaveAttribute('role', 'alert');
+	await expectLinkedFieldError(jsonInput, page);
 	await expect(page.getByRole('status')).toContainText(/expected|property|json/i);
+
+	await page.goto('/url');
+	const urlInput = page.getByLabel('Source');
+	await urlInput.fill('%E0%A4%A');
+	await page.getByRole('button', { name: 'Decode' }).click();
+	await expectLinkedFieldError(urlInput, page);
+
+	await page.goto('/base64');
+	const base64Input = page.getByLabel('Source');
+	await base64Input.fill('%%%');
+	await page.getByRole('button', { name: 'Decode' }).click();
+	await expectLinkedFieldError(base64Input, page);
+
+	await page.goto('/barcode');
+	const barcodeInput = page.getByLabel('Value');
+	await page.getByRole('button', { name: 'EAN-13' }).click();
+	await barcodeInput.fill('123');
+	await page.getByRole('button', { name: 'Generate' }).click();
+	await expectLinkedFieldError(barcodeInput, page);
 });

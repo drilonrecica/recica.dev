@@ -23,8 +23,15 @@ test('a representative tool remains available and functional offline', async ({
 	await expect(page.getByText('b2ZmbGluZQ==', { exact: true })).toBeVisible();
 });
 
-test('cache storage excludes input, query variants, and unrelated caches', async ({ page }) => {
+test('cache storage excludes input, query variants, and unrelated caches', async ({
+	baseURL,
+	expectedBrowserRequests,
+	page
+}) => {
 	const privateMarker = `private-${crypto.randomUUID()}`;
+	expectedBrowserRequests.add(
+		new URL(`/json?input=${encodeURIComponent(privateMarker)}`, baseURL).toString()
+	);
 	await page.goto('/json');
 	await page.evaluate(() => navigator.serviceWorker.ready);
 

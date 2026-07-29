@@ -1,4 +1,12 @@
-import { expect, test } from './fixtures';
+import { expect, isAllowedBrowserRequest, test } from './fixtures';
+
+test('browser request policy rejects arbitrary same-origin and cross-origin URLs', () => {
+	expect(isAllowedBrowserRequest('http://127.0.0.1:4174/json', 'http://127.0.0.1:4174')).toBe(true);
+	expect(
+		isAllowedBrowserRequest('http://127.0.0.1:4174/private-input-marker', 'http://127.0.0.1:4174')
+	).toBe(false);
+	expect(isAllowedBrowserRequest('https://example.com/', 'http://127.0.0.1:4174')).toBe(false);
+});
 
 test('homepage search and quick-open work', async ({ page }) => {
 	await page.goto('/');
@@ -198,7 +206,7 @@ test('url route encodes values and shows malformed decode errors', async ({ page
 
 	await page.getByLabel('Source').fill('%E0%A4%A');
 	await page.getByRole('button', { name: 'Decode' }).click();
-	await expect(page.getByText(/could not decode this value/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/could not decode this value/i);
 });
 
 test('base64 route encodes text and rejects malformed decode input', async ({ page }) => {
@@ -209,7 +217,7 @@ test('base64 route encodes text and rejects malformed decode input', async ({ pa
 
 	await page.getByLabel('Source').fill('abc_def');
 	await page.getByRole('button', { name: 'Decode' }).click();
-	await expect(page.getByText(/use standard base64 text only/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/use standard base64 text only/i);
 });
 
 test('slug route generates output and clears to empty state', async ({ page }) => {
@@ -229,7 +237,7 @@ test('timestamp route converts values and reports invalid input', async ({ page 
 
 	await page.getByLabel('Unix timestamp').fill('abc');
 	await page.getByRole('button', { name: 'Convert' }).click();
-	await expect(page.getByText(/enter a whole unix timestamp/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/enter a whole unix timestamp/i);
 });
 
 test('diff route highlights changed lines', async ({ page }) => {
@@ -275,7 +283,7 @@ test('regex route previews matches and reports invalid patterns', async ({ page 
 	await expect(page.getByText('Match 1 · 0-4')).toBeVisible();
 
 	await page.locator('#regex-pattern').fill('[');
-	await expect(page.getByText(/invalid regular expression/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/invalid regular expression/i);
 });
 
 test('uuid route generates batches and validates count bounds', async ({ page }) => {
@@ -306,7 +314,7 @@ test('query route parses values and reports malformed encoding', async ({ page }
 
 	await page.getByLabel('Raw query string').fill('?bad=%E0%A4%A');
 	await page.getByRole('button', { name: 'Parse' }).click();
-	await expect(page.getByText(/could not parse this query string/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/could not parse this query string/i);
 });
 
 test('case route converts text and clears to empty outputs', async ({ page }) => {
@@ -342,7 +350,7 @@ test('color route converts valid values and rejects invalid ones', async ({ page
 	await expect(page.getByText('rgb(255, 255, 255)')).toBeVisible();
 
 	await page.getByLabel('Color value').fill('wat');
-	await expect(page.getByText(/could not parse this color/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/could not parse this color/i);
 });
 
 test('jwt route decodes payloads and rejects malformed tokens', async ({ page }) => {
@@ -353,7 +361,9 @@ test('jwt route decodes payloads and rejects malformed tokens', async ({ page })
 
 	await page.getByLabel('JWT').fill('abc');
 	await page.getByRole('button', { name: 'Inspect' }).click();
-	await expect(page.getByText(/must contain header, payload, and signature/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(
+		/must contain header, payload, and signature/i
+	);
 });
 
 test('markdown route renders safe preview output', async ({ page }) => {
@@ -406,7 +416,7 @@ test('barcode route generates previews and validates invalid numeric input', asy
 	await page.getByRole('button', { name: 'EAN-13' }).click();
 	await page.getByLabel('Value').fill('123');
 	await page.getByRole('button', { name: 'Generate' }).click();
-	await expect(page.getByText(/ean-13 accepts 12 digits/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/ean-13 accepts 12 digits/i);
 });
 
 test('sql route formats and minifies source text', async ({ page }) => {
@@ -433,5 +443,7 @@ test('sitemap route extracts URLs and reports invalid roots', async ({ page }) =
 	await expect(page.getByText('https://recica.dev/tools')).toBeVisible();
 
 	await page.getByLabel('Sitemap XML').fill('<xml></xml>');
-	await expect(page.getByText(/must contain a <urlset> or <sitemapindex>/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(
+		/must contain a <urlset> or <sitemapindex>/i
+	);
 });

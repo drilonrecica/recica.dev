@@ -60,6 +60,7 @@
 			<TextInput
 				id="uuid-count"
 				label="Count"
+				error={error || undefined}
 				type="number"
 				inputmode="numeric"
 				help="Choose between 1 and 50 IDs per batch."

@@ -40,6 +40,7 @@
 			<TextInput
 				id="slug-input"
 				label="Source title"
+				error={limit.ok ? undefined : limit.message}
 				placeholder="Recica Tools: JSON Formatter / Validator"
 				help="Normalization happens locally and immediately."
 				bind:value={input}

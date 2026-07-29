@@ -30,11 +30,22 @@
 	<div class="surface-panel p-6">
 		<div class="grid gap-4">
 			<div class="grid gap-4 sm:grid-cols-2">
-				<TextInput id="regex-pattern" label="Pattern" mono bind:value={pattern} />
+				<TextInput
+					id="regex-pattern"
+					label="Pattern"
+					mono
+					error={!result.ok && !result.error.toLowerCase().includes('flag')
+						? result.error
+						: undefined}
+					bind:value={pattern}
+				/>
 				<TextInput
 					id="regex-flags"
 					label="Flags"
 					mono
+					error={!result.ok && result.error.toLowerCase().includes('flag')
+						? result.error
+						: undefined}
 					help="Common flags: g i m s u y"
 					bind:value={flags}
 				/>

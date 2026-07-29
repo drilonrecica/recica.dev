@@ -58,6 +58,7 @@
 			<TextArea
 				id="query-input"
 				label="Raw query string"
+				error={error || undefined}
 				rows={10}
 				mono
 				help="Paste with or without the leading ?."

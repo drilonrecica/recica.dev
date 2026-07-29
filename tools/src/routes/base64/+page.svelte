@@ -55,6 +55,7 @@
 			<TextArea
 				id="base64-input"
 				label="Source"
+				error={error || undefined}
 				rows={16}
 				mono
 				help="Source text stays unchanged if decoding fails."

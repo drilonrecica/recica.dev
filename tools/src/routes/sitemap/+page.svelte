@@ -27,6 +27,7 @@
 		<TextArea
 			id="sitemap-input"
 			label="Sitemap XML"
+			error={result.ok ? undefined : result.error}
 			rows={18}
 			mono
 			help="Parsing updates automatically as the XML changes."

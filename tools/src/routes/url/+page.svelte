@@ -81,6 +81,7 @@
 			<TextArea
 				id="url-input"
 				label="Source"
+				error={error || undefined}
 				rows={16}
 				mono
 				help="Source text remains unchanged if decoding fails."

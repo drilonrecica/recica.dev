@@ -23,6 +23,7 @@
 		<TextArea
 			id="markdown-input"
 			label="Markdown"
+			error={limit.ok ? undefined : limit.message}
 			rows={22}
 			mono
 			help="Preview updates automatically as you edit."

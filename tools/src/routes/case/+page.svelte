@@ -24,6 +24,7 @@
 			<TextArea
 				id="case-input"
 				label="Source text"
+				error={limit.ok ? undefined : limit.message}
 				rows={8}
 				help="Outputs update as you type."
 				bind:value={input}

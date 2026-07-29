@@ -24,6 +24,11 @@
 		<TextArea
 			id="env-input"
 			label="dotenv text"
+			error={!limit.ok
+				? limit.message
+				: parsed.errorCount
+					? `${parsed.errorCount} malformed or duplicate rows require attention.`
+					: undefined}
 			rows={18}
 			mono
 			help="Parsing updates locally as the source changes."

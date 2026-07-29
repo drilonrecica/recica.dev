@@ -50,6 +50,7 @@
 				<TextArea
 					id="diff-left"
 					label="Original"
+					error={limitError || undefined}
 					rows={14}
 					mono
 					placeholder="Paste the original text"
@@ -62,6 +63,7 @@
 				<TextArea
 					id="diff-right"
 					label="Changed"
+					error={limitError || undefined}
 					rows={14}
 					mono
 					placeholder="Paste the updated text"

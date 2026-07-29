@@ -23,6 +23,11 @@
 		<TextArea
 			id="robots-input"
 			label="robots.txt content"
+			error={!limit.ok
+				? limit.message
+				: parsed.errorCount
+					? `${parsed.errorCount} malformed rows require attention.`
+					: undefined}
 			rows={18}
 			mono
 			help="Parsing updates automatically as the content changes."

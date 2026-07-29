@@ -62,6 +62,7 @@
 			<TextArea
 				id="hash-input"
 				label="Source"
+				error={error || undefined}
 				rows={14}
 				mono
 				help="Hashing happens locally in your browser."

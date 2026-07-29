@@ -23,6 +23,7 @@
 		<TextArea
 			id="counter-input"
 			label="Source text"
+			error={limit.ok ? undefined : limit.message}
 			rows={18}
 			help="Paste or type any text block."
 			bind:value={input}

@@ -59,6 +59,7 @@
 		<TextArea
 			id="jwt-input"
 			label="JWT"
+			error={error || undefined}
 			rows={16}
 			mono
 			help="Paste a complete header.payload.signature token."

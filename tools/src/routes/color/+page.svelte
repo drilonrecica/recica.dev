@@ -24,6 +24,7 @@
 			<TextInput
 				id="color-input"
 				label="Color value"
+				error={parsed.ok ? undefined : parsed.error}
 				mono
 				placeholder="#1EC8A5 or rgb(30, 200, 165)"
 				help="Preview updates as you edit the value."
