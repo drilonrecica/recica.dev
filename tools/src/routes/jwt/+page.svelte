@@ -4,6 +4,7 @@
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { inspectJwt } from '$lib/tools/jwt';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input =
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJuYW1lIjoiUmVjaWNhIiwiZXhwIjo0MTAyNDQ0ODAwfQ.signature';
@@ -15,6 +16,16 @@
 	let signatureLength = 0;
 
 	function inspect() {
+		const limit = checkToolInputLimit('jwt', [input]);
+		if (!limit.ok) {
+			error = limit.message;
+			header = '';
+			payload = '';
+			timestamps = [];
+			signatureLength = 0;
+			return;
+		}
+
 		const result = inspectJwt(input);
 		if (!result.ok) {
 			error = result.error;

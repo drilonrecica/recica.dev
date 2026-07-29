@@ -5,6 +5,7 @@
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import type { JsonErrorDetails } from '$lib/tools/json';
 	import { extractJsonError, formatJson, minifyJson, validateJson } from '$lib/tools/json';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = '{\n  "lab": "recica",\n  "localOnly": true,\n  "tools": 7\n}';
 	let output = '';
@@ -27,7 +28,20 @@
 		tone = 'error';
 	}
 
+	function inputIsWithinLimit(): boolean {
+		const result = checkToolInputLimit('json', [input]);
+		if (result.ok) {
+			return true;
+		}
+
+		output = '';
+		status = result.message;
+		tone = 'error';
+		return false;
+	}
+
 	function handleValidate() {
+		if (!inputIsWithinLimit()) return;
 		const result = validateJson(input);
 		if (!result.ok) {
 			setError(result.error);
@@ -40,6 +54,7 @@
 	}
 
 	function handleFormat() {
+		if (!inputIsWithinLimit()) return;
 		try {
 			output = formatJson(input);
 			status = 'Formatted output ready.';
@@ -50,6 +65,7 @@
 	}
 
 	function handleMinify() {
+		if (!inputIsWithinLimit()) return;
 		try {
 			output = minifyJson(input);
 			status = 'Minified output ready.';

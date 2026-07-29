@@ -4,6 +4,7 @@
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { buildQueryString, parseQueryString } from '$lib/tools/query';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	type Row = { id: number; key: string; value: string };
 
@@ -13,6 +14,13 @@
 	let nextId = 1;
 
 	function parseSource() {
+		const limit = checkToolInputLimit('query', [input]);
+		if (!limit.ok) {
+			error = limit.message;
+			rows = [];
+			return;
+		}
+
 		const parsed = parseQueryString(input);
 		if (!parsed.ok) {
 			error = parsed.error;

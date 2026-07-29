@@ -5,6 +5,7 @@
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import type { UrlAction, UrlMode } from '$lib/tools/url';
 	import { transformUrl } from '$lib/tools/url';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = 'https://recica.dev/tools?name=JSON formatter&mode=full url';
 	let output = '';
@@ -18,6 +19,13 @@
 			: 'Encodes the entire string. Use this when embedding a URL or value inside another URL, query string, or fragment.';
 
 	function runTransform(action: UrlAction) {
+		const limit = checkToolInputLimit('url', [input]);
+		if (!limit.ok) {
+			error = limit.message;
+			output = '';
+			return;
+		}
+
 		const result = transformUrl(input, mode, action);
 		if (!result.ok) {
 			error = result.error;

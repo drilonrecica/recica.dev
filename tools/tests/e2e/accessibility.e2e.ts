@@ -10,7 +10,7 @@ async function expectNoViolations(page: Page) {
 }
 
 test('homepage and representative tool routes pass axe', async ({ page }) => {
-	for (const route of ['/', '/json', '/qr', '/regex', '/robots', '/sitemap']) {
+	for (const route of ['/', '/privacy', '/json', '/qr', '/regex', '/robots', '/sitemap']) {
 		await page.goto(route);
 		await expectNoViolations(page);
 	}

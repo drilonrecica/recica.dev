@@ -68,6 +68,7 @@ describe('site indexing helpers', () => {
 		expect(publicPageRoutes.map((route) => route.path)).toContain('/json');
 		expect(publicPageRoutes.map((route) => route.path)).toContain('/sitemap');
 		expect(publicPageRoutes.map((route) => route.path)).toContain('/robots');
-		expect(publicPageRoutes).toHaveLength(25);
+		expect(publicPageRoutes.map((route) => route.path)).toContain('/privacy');
+		expect(publicPageRoutes).toHaveLength(26);
 	});
 });

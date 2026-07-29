@@ -4,13 +4,17 @@
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import TextInput from '$lib/components/ui/TextInput.svelte';
 	import { evaluateRegex } from '$lib/tools/regex';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let pattern = '(json)';
 	let flags = 'gi';
 	let source = 'JSON formatter\njson validator';
 	let replacement = '<$1>';
 
-	$: result = evaluateRegex(pattern, flags, source, replacement);
+	$: limit = checkToolInputLimit('regex', [source]);
+	$: result = limit.ok
+		? evaluateRegex(pattern, flags, source, replacement)
+		: ({ ok: false, error: limit.message } as const);
 </script>
 
 <ToolShell

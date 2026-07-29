@@ -2,10 +2,12 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { parseDotenv } from '$lib/tools/env';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input =
 		'# App config\nAPI_URL="https://recica.dev"\nDEBUG=true\nAPI_URL=https://duplicate.dev\nBROKEN LINE';
-	$: parsed = parseDotenv(input);
+	$: limit = checkToolInputLimit('env', [input]);
+	$: parsed = parseDotenv(limit.ok ? input : '');
 </script>
 
 <ToolShell
@@ -30,8 +32,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${parsed.errorCount ? 'status-error' : 'status-neutral'}`}>
-			{parsed.entryCount} entries · {parsed.duplicateCount} duplicates · {parsed.errorCount} errors
+		<div
+			class={`status-pill ${!limit.ok || parsed.errorCount ? 'status-error' : 'status-neutral'}`}
+		>
+			{limit.ok
+				? `${parsed.entryCount} entries · ${parsed.duplicateCount} duplicates · ${parsed.errorCount} errors`
+				: limit.message}
 		</div>
 
 		<div class="surface-panel p-6">

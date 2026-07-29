@@ -5,6 +5,7 @@
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import type { Base64Action } from '$lib/tools/base64';
 	import { decodeBase64, encodeBase64 } from '$lib/tools/base64';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = 'Recica Tools';
 	let output = '';
@@ -12,6 +13,13 @@
 	let lastAction = 'Choose Encode or Decode.';
 
 	function runTransform(action: Base64Action) {
+		const limit = checkToolInputLimit('base64', [input]);
+		if (!limit.ok) {
+			error = limit.message;
+			output = '';
+			return;
+		}
+
 		if (!input.trim()) {
 			error = 'Enter text to encode or decode.';
 			output = '';

@@ -2,9 +2,11 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { parseRobotsTxt } from '$lib/tools/robots';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = 'User-agent: *\nDisallow: /admin\nSitemap: https://recica.dev/sitemap.xml\nBad line';
-	$: parsed = parseRobotsTxt(input);
+	$: limit = checkToolInputLimit('robots', [input]);
+	$: parsed = parseRobotsTxt(limit.ok ? input : '');
 </script>
 
 <ToolShell
@@ -29,8 +31,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${parsed.errorCount ? 'status-error' : 'status-neutral'}`}>
-			{parsed.directiveCount} directives · {parsed.errorCount} errors
+		<div
+			class={`status-pill ${!limit.ok || parsed.errorCount ? 'status-error' : 'status-neutral'}`}
+		>
+			{limit.ok
+				? `${parsed.directiveCount} directives · ${parsed.errorCount} errors`
+				: limit.message}
 		</div>
 
 		<div class="surface-panel p-6">

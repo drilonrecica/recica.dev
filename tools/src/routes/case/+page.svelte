@@ -3,9 +3,11 @@
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { convertCase } from '$lib/tools/case';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = 'Recica JSON formatter';
-	$: output = convertCase(input);
+	$: limit = checkToolInputLimit('case', [input]);
+	$: output = convertCase(limit.ok ? input : '');
 </script>
 
 <ToolShell
@@ -27,6 +29,10 @@
 				bind:value={input}
 			/>
 		</div>
+
+		{#if !limit.ok}
+			<div class="status-pill status-error">{limit.message}</div>
+		{/if}
 
 		<div class="grid gap-4 md:grid-cols-2">
 			{#each Object.entries(output) as [label, value] (label)}

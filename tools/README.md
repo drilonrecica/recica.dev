@@ -38,12 +38,16 @@ The app is intentionally opinionated.
 
 The homepage at `/` provides:
 
-- brand/positioning
+- the numbered Utility Switchboard
 - search input
 - featured tools
 - category filtering
 - full tool directory
 - curated external resources
+
+The privacy policy at `/privacy` documents the browser-memory processing,
+network-transfer, persistence, download, clipboard, and responsiveness
+contracts for built-in utilities.
 
 ### Built-In Tool Routes
 
@@ -227,6 +231,7 @@ Everything else is dev/build infrastructure.
 
 The app centralizes tool definitions in [`src/lib/constants/tools.ts`](./src/lib/constants/tools.ts). That registry drives:
 
+- stable `TL-01` through `TL-24` switchboard numbers
 - homepage listing
 - featured tool selection
 - category filtering
@@ -234,8 +239,27 @@ The app centralizes tool definitions in [`src/lib/constants/tools.ts`](./src/lib
 - route metadata
 - sitemap generation
 - tool list schema generation
+- visible input limits and route-level reference content
 
 That keeps the public catalog synchronized without duplicating route metadata in multiple places.
+
+### Input and content contracts
+
+Each tool registry entry includes:
+
+- a direct answer and use case
+- a concrete example
+- supported formats and common errors
+- an explicit processing limit
+- limitations and an authoritative reference
+- a substantive review date
+
+Byte limits are measured as UTF-8 with
+[`src/lib/utils/input-policy.ts`](./src/lib/utils/input-policy.ts). Expensive
+operations validate their input before processing, report actual versus
+maximum size, and never silently truncate. The initial limits range from
+512 KiB combined for text diff to 5 MiB for encoding-oriented tools; generator
+and format-specific routes retain stricter count or format constraints.
 
 ## Theme and Interaction Model
 
@@ -307,6 +331,20 @@ The CSP intentionally keeps the app tight:
 
 This matches the product goal: local-first tools with minimal external exposure.
 
+## Privacy model
+
+Built-in tool input and output remain in the current browser tab. They are not:
+
+- uploaded or sent to a third party
+- placed in URLs
+- written to local storage or IndexedDB
+- logged or included in telemetry
+
+The only persisted application value is the selected theme preference.
+Clipboard and file-download actions happen only after an explicit user action.
+Curated external resources are normal links and are not loaded in the
+background.
+
 ## Testing Strategy
 
 `tools/` has both unit coverage and end-to-end coverage.
@@ -332,6 +370,10 @@ It covers:
 - quick-open search panel
 - category filtering
 - theme persistence
+- switchboard numbering and narrow mobile reflow
+- privacy disclosures and canonical metadata
+- local operations producing no network requests
+- explicit oversized-input rejection without truncation
 - route-level behavior for multiple tools
 - `robots.txt`
 - `sitemap.xml`
@@ -487,6 +529,7 @@ tools/
       jwt/
       markdown/
       password/
+      privacy/
       qr/
       query/
       regex/

@@ -47,37 +47,7 @@
 		buildWebsiteSchema(SITE_ORIGIN, homeDescription),
 		buildOrganizationSchema(SITE_ORIGIN),
 		buildCollectionPageSchema(SITE_ORIGIN, homeDescription),
-		buildToolListSchema(SITE_ORIGIN, tools),
-		{
-			'@context': 'https://schema.org',
-			'@type': 'FAQPage',
-			mainEntity: [
-				{
-					'@type': 'Question',
-					name: 'Are these tools secure and private?',
-					acceptedAnswer: {
-						'@type': 'Answer',
-						text: 'Yes, all tools run entirely in your browser. Your data never leaves your device, and no accounts or tracking are required.'
-					}
-				},
-				{
-					'@type': 'Question',
-					name: 'Do I need to install anything?',
-					acceptedAnswer: {
-						'@type': 'Answer',
-						text: 'No installation required. All tools work directly in your web browser with no downloads or setup.'
-					}
-				},
-				{
-					'@type': 'Question',
-					name: 'Are these tools free to use?',
-					acceptedAnswer: {
-						'@type': 'Answer',
-						text: 'Yes, all tools are completely free with no limitations, ads, or premium features.'
-					}
-				}
-			]
-		}
+		buildToolListSchema(SITE_ORIGIN, tools)
 	];
 </script>
 
@@ -101,7 +71,7 @@
 <section class="space-y-14">
 	<div class="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-end">
 		<div class="space-y-6">
-			<div class="kicker">Recica Lab</div>
+			<div class="kicker">Utility Switchboard</div>
 			<h1
 				class="max-w-[12ch] text-5xl font-semibold tracking-[-0.06em] text-[var(--text)] sm:text-6xl"
 			>
@@ -138,7 +108,8 @@
 						class="group flex items-start justify-between gap-4 rounded-[14px] border border-transparent px-1 py-3 transition hover:border-[var(--border-subtle)] hover:bg-[var(--surface-elevated)]"
 					>
 						<div>
-							<div class="text-sm font-semibold text-[var(--text)]">{tool.name}</div>
+							<div class="tool-code">TL-{String(tool.number).padStart(2, '0')}</div>
+							<div class="mt-1 text-sm font-semibold text-[var(--text)]">{tool.name}</div>
 							<div class="mt-1 max-w-[30ch] text-sm leading-6 text-[var(--text-secondary)]">
 								{tool.description}
 							</div>

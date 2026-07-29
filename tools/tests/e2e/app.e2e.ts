@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('homepage search and quick-open work', async ({ page }) => {
 	await page.goto('/');
+	await expect(page.getByText('Utility Switchboard', { exact: true })).toBeVisible();
 	await expect(
 		page.getByRole('heading', {
 			name: /free browser tools for developers and everyday technical work/i
@@ -27,6 +28,64 @@ test('homepage search and quick-open work', async ({ page }) => {
 	await page.getByLabel('Search tools').fill('timestamp');
 	await page.keyboard.press('Enter');
 	await expect(page).toHaveURL(/\/timestamp$/);
+});
+
+test('tool cards use stable switchboard numbers', async ({ page }) => {
+	await page.goto('/');
+
+	await expect(page.getByText('TL-01', { exact: true }).first()).toBeVisible();
+	await expect(page.getByText('TL-24', { exact: true })).toBeVisible();
+	await expect(page.locator('[data-tool-number]')).toHaveCount(24);
+});
+
+test('privacy route explains browser-memory processing and has a production canonical', async ({
+	page
+}) => {
+	await page.goto('/privacy');
+
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'Privacy by construction' })
+	).toBeVisible();
+	await expect(page.getByText(/input and output stay in browser memory/i)).toBeVisible();
+	await expect(page.getByText(/only the selected theme preference is stored/i)).toBeVisible();
+	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+		'href',
+		'https://tools.recica.dev/privacy'
+	);
+});
+
+test('tool operation makes no network request and exposes its reference content', async ({
+	page
+}) => {
+	await page.goto('/json');
+	const operationRequests: string[] = [];
+	page.on('request', (request) => operationRequests.push(request.url()));
+
+	await page.getByLabel('Raw JSON').fill('{"network":"none"}');
+	await page.getByRole('button', { name: 'Format' }).click();
+	await expect(page.getByText(/formatted output ready/i)).toBeVisible();
+	await expect(page.getByText('When to use it', { exact: true })).toBeVisible();
+	await expect(page.getByText('RFC 8259 — JSON', { exact: true })).toBeVisible();
+	expect(operationRequests).toEqual([]);
+});
+
+test('switchboard remains usable at a narrow mobile viewport', async ({ page }) => {
+	await page.setViewportSize({ width: 320, height: 720 });
+	await page.goto('/json');
+
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'JSON Formatter / Validator' })
+	).toBeVisible();
+	await expect(page.getByLabel('Tool operating contract')).toBeVisible();
+	const headerBox = await page.getByRole('banner').boundingBox();
+	const headingBox = await page
+		.getByRole('heading', { level: 1, name: 'JSON Formatter / Validator' })
+		.boundingBox();
+	expect(headingBox?.y).toBeGreaterThanOrEqual(headerBox?.height ?? 0);
+	const hasHorizontalOverflow = await page.evaluate(
+		() => document.documentElement.scrollWidth > document.documentElement.clientWidth
+	);
+	expect(hasHorizontalOverflow).toBe(false);
 });
 
 test('homepage category pills filter the tool grid', async ({ page }) => {
@@ -101,6 +160,24 @@ test('json route formats valid input and reports invalid input', async ({ page }
 	);
 });
 
+test('json route rejects oversized input before parsing without truncating it', async ({
+	page
+}) => {
+	await page.goto('/json');
+	const oversizedInput = `"${'x'.repeat(3 * 1024 * 1024)}"`;
+	await page.getByLabel('Raw JSON').fill(oversizedInput);
+	await page.getByRole('button', { name: 'Format' }).click();
+
+	await expect(page.locator('.status-pill.status-error')).toContainText(
+		/local processing limit is 3 MiB/i
+	);
+	await expect(page.locator('.status-pill.status-error')).toContainText(
+		/nothing was uploaded or truncated/i
+	);
+	await expect(page.getByLabel('Raw JSON')).toHaveValue(oversizedInput);
+	await expect(page.getByText('Formatted output ready.')).toHaveCount(0);
+});
+
 test('password route regenerates and blocks empty charset selection', async ({ page }) => {
 	await page.goto('/password');
 	await expect(page.getByText('Generated Password', { exact: true })).toBeVisible();
@@ -117,7 +194,7 @@ test('url route encodes values and shows malformed decode errors', async ({ page
 	await page.getByLabel('Source').fill('json formatter');
 	await page.getByRole('button', { name: 'Component' }).click();
 	await page.getByRole('button', { name: 'Encode' }).click();
-	await expect(page.getByText('json%20formatter')).toBeVisible();
+	await expect(page.getByText('json%20formatter', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Source').fill('%E0%A4%A');
 	await page.getByRole('button', { name: 'Decode' }).click();
@@ -128,7 +205,7 @@ test('base64 route encodes text and rejects malformed decode input', async ({ pa
 	await page.goto('/base64');
 	await page.getByLabel('Source').fill('Recica Tools');
 	await page.getByRole('button', { name: 'Encode' }).click();
-	await expect(page.getByText('UmVjaWNhIFRvb2xz')).toBeVisible();
+	await expect(page.getByText('UmVjaWNhIFRvb2xz', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Source').fill('abc_def');
 	await page.getByRole('button', { name: 'Decode' }).click();
@@ -148,7 +225,7 @@ test('timestamp route converts values and reports invalid input', async ({ page 
 	await page.goto('/timestamp');
 	await page.getByLabel('Unix timestamp').fill('1715342400');
 	await page.getByRole('button', { name: 'Convert' }).click();
-	await expect(page.getByText('2024-05-10T12:00:00.000Z')).toBeVisible();
+	await expect(page.getByText('2024-05-10T12:00:00.000Z', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Unix timestamp').fill('abc');
 	await page.getByRole('button', { name: 'Convert' }).click();
@@ -187,6 +264,7 @@ test('robots.txt and sitemap.xml expose crawlable public urls', async ({ request
 	expect(sitemapXml).toMatch(/<loc>https?:\/\/[^<]+\/<\/loc>/);
 	expect(sitemapXml).toContain('/json</loc>');
 	expect(sitemapXml).toContain('/robots</loc>');
+	expect(sitemapXml).toContain('/privacy</loc>');
 });
 
 test('regex route previews matches and reports invalid patterns', async ({ page }) => {
@@ -224,7 +302,7 @@ test('query route parses values and reports malformed encoding', async ({ page }
 	await page.goto('/query');
 	await page.getByLabel('Raw query string').fill('?tag=json&tag=tools');
 	await page.getByRole('button', { name: 'Parse' }).click();
-	await expect(page.getByText('?tag=json&tag=tools')).toBeVisible();
+	await expect(page.getByText('?tag=json&tag=tools', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Raw query string').fill('?bad=%E0%A4%A');
 	await page.getByRole('button', { name: 'Parse' }).click();

@@ -2,13 +2,15 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { parseSitemapXml } from '$lib/tools/sitemap';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url><loc>https://recica.dev/</loc></url>
 	<url><loc>https://recica.dev/tools</loc></url>
 </urlset>`;
-	$: result = parseSitemapXml(input);
+	$: limit = checkToolInputLimit('sitemap', [input]);
+	$: result = limit.ok ? parseSitemapXml(input) : ({ ok: false, error: limit.message } as const);
 </script>
 
 <ToolShell

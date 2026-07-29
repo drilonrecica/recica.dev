@@ -39,6 +39,8 @@ test('tool explanations and controls are present before hydration', async ({ pag
 	).toBeVisible();
 	await expect(page.getByLabel('Raw JSON')).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Format' })).toBeVisible();
+	await expect(page.getByText('TL-01', { exact: true })).toBeVisible();
+	await expect(page.getByText('3 MiB input', { exact: true })).toBeVisible();
 });
 
 test('a generated branded document is available for real 404 responses', async ({

@@ -8,6 +8,7 @@
 
 <a
 	href={resolve(tool.route)}
+	data-tool-number={tool.number}
 	class={`group block overflow-hidden rounded-[16px] border transition duration-150 hover:-translate-y-1 ${
 		featured
 			? 'surface-panel-elevated p-5'
@@ -17,6 +18,7 @@
 	<div class="flex items-start justify-between gap-4">
 		<div class="space-y-2">
 			<div class="flex items-center gap-3">
+				<span class="tool-code">TL-{String(tool.number).padStart(2, '0')}</span>
 				<span class="status-pill">{tool.category}</span>
 				{#if tool.localOnly}
 					<span class="tool-code">local</span>
@@ -28,7 +30,9 @@
 				{tool.name}
 			</h3>
 		</div>
-		<span class="tool-code transition group-hover:text-[var(--primary)]">{tool.route}</span>
+		<span class="tool-code hidden transition group-hover:text-[var(--primary)] sm:block"
+			>{tool.route}</span
+		>
 	</div>
 	<p class="mt-3 max-w-[34ch] text-sm leading-6 text-[var(--text-secondary)]">{tool.description}</p>
 </a>

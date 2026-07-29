@@ -3,16 +3,26 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { buildDiffModel, type DiffLine } from '$lib/tools/diff';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 	import { onDestroy } from 'svelte';
 
 	let leftText = '';
 	let rightText = '';
 	let rows: DiffLine[] = [];
 	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+	let limitError = '';
 
 	function scheduleDiffUpdate() {
 		clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
+			const limit = checkToolInputLimit('diff', [leftText, rightText]);
+			if (!limit.ok) {
+				rows = [];
+				limitError = limit.message;
+				return;
+			}
+
+			limitError = '';
 			rows = buildDiffModel(leftText, rightText);
 		}, 180);
 	}
@@ -61,8 +71,12 @@
 			</div>
 		</div>
 
-		<div class={`status-pill ${changedCount ? 'status-success' : 'status-neutral'}`}>
-			{#if leftText || rightText}
+		<div
+			class={`status-pill ${limitError ? 'status-error' : changedCount ? 'status-success' : 'status-neutral'}`}
+		>
+			{#if limitError}
+				{limitError}
+			{:else if leftText || rightText}
 				{changedCount} changed line{changedCount === 1 ? '' : 's'} detected.
 			{:else}
 				Add text on either side to start comparing.

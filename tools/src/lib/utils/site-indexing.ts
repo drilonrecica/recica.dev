@@ -4,6 +4,7 @@ export const PRODUCTION_ORIGIN = 'https://tools.recica.dev';
 
 export const publicPageRoutes = [
 	{ path: '/' },
+	{ path: '/privacy' },
 	...tools.map((tool) => ({ path: tool.route }))
 ] as const;
 
