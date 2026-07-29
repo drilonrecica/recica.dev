@@ -6,6 +6,14 @@ test('browser request policy rejects arbitrary same-origin and cross-origin URLs
 		isAllowedBrowserRequest('http://127.0.0.1:4174/private-input-marker', 'http://127.0.0.1:4174')
 	).toBe(false);
 	expect(isAllowedBrowserRequest('https://example.com/', 'http://127.0.0.1:4174')).toBe(false);
+	expect(
+		isAllowedBrowserRequest(
+			'http://127.0.0.1:4174/json',
+			'http://127.0.0.1:4174',
+			'POST',
+			'private-input'
+		)
+	).toBe(false);
 });
 
 test('homepage search and quick-open work', async ({ page }) => {

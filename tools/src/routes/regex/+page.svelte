@@ -34,7 +34,7 @@
 					id="regex-pattern"
 					label="Pattern"
 					mono
-					error={!result.ok && !result.error.toLowerCase().includes('flag')
+					error={limit.ok && !result.ok && !result.error.toLowerCase().includes('flag')
 						? result.error
 						: undefined}
 					bind:value={pattern}
@@ -43,7 +43,7 @@
 					id="regex-flags"
 					label="Flags"
 					mono
-					error={!result.ok && result.error.toLowerCase().includes('flag')
+					error={limit.ok && !result.ok && result.error.toLowerCase().includes('flag')
 						? result.error
 						: undefined}
 					help="Common flags: g i m s u y"
@@ -64,6 +64,7 @@
 				label="Test text"
 				rows={14}
 				mono
+				error={limit.ok ? undefined : limit.message}
 				help="Results update as you edit the pattern, flags, and text."
 				bind:value={source}
 			/>

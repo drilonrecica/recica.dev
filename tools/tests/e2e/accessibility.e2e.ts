@@ -76,4 +76,10 @@ test('tool errors are announced and associated with representative input types',
 	await barcodeInput.fill('123');
 	await page.getByRole('button', { name: 'Generate' }).click();
 	await expectLinkedFieldError(barcodeInput, page);
+
+	await page.goto('/regex');
+	const regexSource = page.getByLabel('Test text');
+	await regexSource.fill('x'.repeat(1024 * 1024 + 1));
+	await expectLinkedFieldError(regexSource, page);
+	await expect(page.getByLabel('Pattern')).not.toHaveAttribute('aria-invalid', 'true');
 });

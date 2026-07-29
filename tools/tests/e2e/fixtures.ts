@@ -10,9 +10,22 @@ const allowedStaticPaths = new Set([
 	'/service-worker.js'
 ]);
 
-export function isAllowedBrowserRequest(url: string, expectedOrigin: string) {
+export function isAllowedBrowserRequest(
+	url: string,
+	expectedOrigin: string,
+	method = 'GET',
+	postData: string | null = null
+) {
 	const parsed = new URL(url);
-	if (parsed.origin !== expectedOrigin || parsed.search || parsed.hash) return false;
+	if (
+		method !== 'GET' ||
+		postData !== null ||
+		parsed.origin !== expectedOrigin ||
+		parsed.search ||
+		parsed.hash
+	) {
+		return false;
+	}
 
 	return (
 		allowedDocumentPaths.has(parsed.pathname) ||
@@ -49,7 +62,7 @@ export const test = base.extend<{
 				if (
 					expectedOrigin &&
 					!expectedBrowserRequests.has(url) &&
-					!isAllowedBrowserRequest(url, expectedOrigin)
+					!isAllowedBrowserRequest(url, expectedOrigin, request.method(), request.postData())
 				) {
 					unexpectedRequests.push(`${request.method()} ${url}`);
 				}
