@@ -145,7 +145,7 @@
 			<div>
 				<div class="kicker">Reference</div>
 				<svelte:element
-					this={'a'}
+					this={"a"}
 					class="mt-3 inline-block text-sm font-semibold text-[var(--primary)] hover:underline"
 					href={currentTool.reference.href}
 					target="_blank"
