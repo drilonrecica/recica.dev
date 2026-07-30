@@ -6,8 +6,12 @@
 	import { inspectJwt } from '$lib/tools/jwt';
 	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
-	let input =
-		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJuYW1lIjoiUmVjaWNhIiwiZXhwIjo0MTAyNDQ0ODAwfQ.signature';
+	const exampleJwtSections = [
+		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+		'eyJzdWIiOiIxMjMiLCJuYW1lIjoiUmVjaWNhIiwiZXhwIjo0MTAyNDQ0ODAwfQ',
+		'signature'
+	];
+	let input = exampleJwtSections.join('.');
 	let error = '';
 	let status = 'Paste a JWT and inspect it locally.';
 	let header = '';

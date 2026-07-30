@@ -81,11 +81,13 @@ jobs:
       - run: node scripts/check-bundle-budgets.mjs
       - name: Reject remote executable resources
         run: |
-          if rg -n '<script[^>]+src="https?://' recica/dist tools/build labs/build; then
+          if grep -RInE --include='*.html' '<script[^>]+src="https?://' \
+            recica/dist tools/build labs/build; then
             echo 'Unexpected remote script found in generated output.'
             exit 1
           fi
-          if rg -n '<link[^>]+href="https?://[^"]+"[^>]+rel="(?:stylesheet|modulepreload|preload)"' \
+          if grep -RInE --include='*.html' \
+            '<link[^>]+href="https?://[^"]+"[^>]+rel="(stylesheet|modulepreload|preload)"' \
             recica/dist tools/build labs/build; then
             echo 'Unexpected remote stylesheet or preload found in generated output.'
             exit 1
@@ -93,8 +95,8 @@ jobs:
       - name: Verify preview indexing policy
         run: |
           for output in recica/dist tools/build labs/build; do
-            rg -q 'noindex, nofollow' "$output/index.html"
-            rg -q 'Disallow: /' "$output/robots.txt"
+            grep -q 'noindex, nofollow' "$output/index.html"
+            grep -q 'Disallow: /' "$output/robots.txt"
           done
 
   container:
