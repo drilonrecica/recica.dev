@@ -192,12 +192,12 @@ Without client analytics, use:
 
 Representative pages should target:
 
-| Category | Target |
-|---|---:|
-| Performance | 95+ |
-| Accessibility | 98+, preferably 100 |
-| Best Practices | 95+ |
-| SEO | 100 |
+| Category       |              Target |
+| -------------- | ------------------: |
+| Performance    |                 95+ |
+| Accessibility  | 98+, preferably 100 |
+| Best Practices |                 95+ |
+| SEO            |                 100 |
 
 A score is diagnostic, not a waiver for a known defect.
 
@@ -262,21 +262,21 @@ Measure UTF-8 byte size, not JavaScript string length.
 
 Suggested starting hard limits:
 
-| Operation | Initial limit |
-|---|---:|
-| Base64 encode/decode | 5 MiB input |
-| URL/query encode/decode | 5 MiB input |
-| JSON format/validate | 3 MiB |
-| XML/sitemap parse | 3 MiB |
-| SQL format/minify | 2 MiB |
-| Markdown render | 2 MiB |
-| HTML preview | 1 MiB |
-| Text diff | 512 KiB combined |
-| Regex test text | 1 MiB |
-| `.env` parsing | 1 MiB |
-| Bulk UUID generation | 1,000 per action |
-| Bulk password generation | 500 per action |
-| QR text | 2,000 characters default; 4,000 hard ceiling subject to library validation |
+| Operation                |                                                              Initial limit |
+| ------------------------ | -------------------------------------------------------------------------: |
+| Base64 encode/decode     |                                                                5 MiB input |
+| URL/query encode/decode  |                                                                5 MiB input |
+| JSON format/validate     |                                                                      3 MiB |
+| XML/sitemap parse        |                                                                      3 MiB |
+| SQL format/minify        |                                                                      2 MiB |
+| Markdown render          |                                                                      2 MiB |
+| HTML preview             |                                                                      1 MiB |
+| Text diff                |                                                           512 KiB combined |
+| Regex test text          |                                                                      1 MiB |
+| `.env` parsing           |                                                                      1 MiB |
+| Bulk UUID generation     |                                                           1,000 per action |
+| Bulk password generation |                                                             500 per action |
+| QR text                  | 2,000 characters default; 4,000 hard ceiling subject to library validation |
 
 Format-specific limits remain required for:
 

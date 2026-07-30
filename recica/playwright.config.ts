@@ -13,7 +13,7 @@ export default defineConfig({
   },
   webServer: {
     command:
-      "./node_modules/.bin/astro build && ./node_modules/.bin/astro preview --host 127.0.0.1 --port 4173",
+      "PUBLIC_INDEXING_ENABLED=true ./node_modules/.bin/astro build && ./node_modules/.bin/astro preview --host 127.0.0.1 --port 4173",
     cwd: projectRoot,
     port: 4173,
     reuseExistingServer: !process.env.CI,

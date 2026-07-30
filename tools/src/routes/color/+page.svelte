@@ -24,6 +24,7 @@
 			<TextInput
 				id="color-input"
 				label="Color value"
+				error={parsed.ok ? undefined : parsed.error}
 				mono
 				placeholder="#1EC8A5 or rgb(30, 200, 165)"
 				help="Preview updates as you edit the value."
@@ -45,7 +46,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${parsed.ok ? 'status-neutral' : 'status-error'}`}>
+		<div
+			class={`status-pill ${parsed.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{parsed.ok ? 'Color parsed successfully.' : parsed.error}
 		</div>
 

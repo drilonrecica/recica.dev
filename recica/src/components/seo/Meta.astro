@@ -24,7 +24,8 @@ const {
 const origin = Astro.site ?? new URL(siteConfig.origin);
 const canonicalURL = new URL(canonical ?? Astro.url.pathname, origin);
 const socialImageUrl = new URL(image, origin).toString();
-const robotsContent = noindex
+const indexingEnabled = import.meta.env.PUBLIC_INDEXING_ENABLED === "true";
+const robotsContent = noindex || !indexingEnabled
     ? "noindex, nofollow, noarchive"
     : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
 

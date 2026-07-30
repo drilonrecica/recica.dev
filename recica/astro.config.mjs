@@ -15,7 +15,7 @@ export default defineConfig({
 
   integrations: [
     sitemap({
-      filter: (page) => !/\/about\/?$/.test(page),
+      filter: (page) => !/\/404\/?$/.test(page),
     }),
   ],
 });

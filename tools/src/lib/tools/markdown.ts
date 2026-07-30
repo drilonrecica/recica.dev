@@ -14,7 +14,7 @@ function sanitizeUrl(url: string) {
 function renderInline(input: string) {
 	const codeSpans: string[] = [];
 	let value = escapeHtml(input).replace(/`([^`]+)`/g, (_, code: string) => {
-		codeSpans.push(`<code>${escapeHtml(code)}</code>`);
+		codeSpans.push(`<code>${code}</code>`);
 		return `__CODE_${codeSpans.length - 1}__`;
 	});
 
@@ -148,6 +148,7 @@ export function createMarkdownPreviewDocument(markdown: string) {
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'" />
 		<style>
 			body {
 				margin: 0;

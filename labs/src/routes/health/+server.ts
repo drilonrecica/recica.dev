@@ -1,3 +1,5 @@
+export const prerender = true;
+
 export const GET = () => {
 	return new Response('OK', {
 		status: 200,

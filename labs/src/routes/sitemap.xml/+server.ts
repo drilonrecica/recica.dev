@@ -1,10 +1,10 @@
-import { env } from '$env/dynamic/public';
 import type { RequestHandler } from './$types';
-import { buildSitemapXml, resolveSiteOrigin } from '$lib/utils/site-indexing';
+import { buildSitemapXml, SITE_ORIGIN } from '$lib/utils/site-indexing';
 
-export const GET: RequestHandler = ({ url }) => {
-	const origin = resolveSiteOrigin(env.PUBLIC_SITE_URL, url);
-	const body = buildSitemapXml(origin);
+export const prerender = true;
+
+export const GET: RequestHandler = () => {
+	const body = buildSitemapXml(SITE_ORIGIN);
 
 	return new Response(body, {
 		headers: {

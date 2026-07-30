@@ -1,0 +1,37 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /recica
+    schedule:
+      interval: monthly
+    groups:
+      routine-updates:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /tools
+    schedule:
+      interval: monthly
+    groups:
+      routine-updates:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: npm
+    directory: /labs
+    schedule:
+      interval: monthly
+    groups:
+      routine-updates:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    groups:
+      action-updates:
+        update-types: [minor, patch]
+    open-pull-requests-limit: 5

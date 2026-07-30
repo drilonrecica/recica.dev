@@ -3,6 +3,10 @@ import { expect, test } from '@playwright/test';
 test('renders the Labs homepage hero and featured experiments', async ({ page }) => {
 	await page.goto('/');
 
+	await expect(page.getByText('Research Notebook', { exact: true }).first()).toBeVisible();
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'Product questions, tested in public.' })
+	).toBeVisible();
 	await expect(page.getByTestId('labs-home-hero')).toBeVisible();
 	await expect(page.getByTestId('labs-home-section-hero')).toBeVisible();
 	await expect(page.getByTestId('labs-home-section-featured')).toBeVisible();
@@ -11,13 +15,20 @@ test('renders the Labs homepage hero and featured experiments', async ({ page })
 	await expect(page.getByTestId('experiment-card-mobile-analytics-crash-reporting')).toBeVisible();
 	await expect(page.getByText('How Labs works')).toHaveCount(0);
 	await expect(page.getByText('What Labs is')).toHaveCount(0);
-	await expect(page.getByText('2026')).toHaveCount(0);
-	await expect(page.getByText('Anonymous-first event model')).toBeVisible();
-	await expect(page.getByText('Crash grouping and release health')).toBeVisible();
-	await expect(page.getByText('Mobile-first self-hosted deployment')).toBeVisible();
+	await expect(page.getByText('Study 01', { exact: true })).toBeVisible();
+	await expect(page.getByText('Note 02', { exact: true })).toBeVisible();
+	await expect(page.getByText('In progress', { exact: true })).toBeVisible();
+	await expect(
+		page.getByTestId('experiment-card-mobile-analytics-crash-reporting').getByRole('link')
+	).toHaveCount(0);
+	await expect(page.locator('.app-shell')).not.toHaveClass(/theme-lab-dark/);
+	await expect(page.locator('meta[name="color-scheme"]')).toHaveAttribute('content', 'light');
+	expect(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe(
+		'light'
+	);
 	await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 		'content',
-		'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+		'noindex, nofollow, noarchive'
 	);
 	await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
 		'content',
@@ -25,18 +36,18 @@ test('renders the Labs homepage hero and featured experiments', async ({ page })
 	);
 	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 		'href',
-		'http://127.0.0.1:4175/'
+		'https://labs.recica.dev/'
 	);
 });
 
 test('serves robots and sitemap endpoints', async ({ page }) => {
 	await page.goto('/robots.txt');
-	await expect(page.locator('body')).toContainText('Sitemap: http://127.0.0.1:4175/sitemap.xml');
-	await expect(page.locator('body')).toContainText('Disallow: /404');
-	await expect(page.locator('body')).toContainText('Host: 127.0.0.1:4175');
+	await expect(page.locator('body')).toContainText('Sitemap: https://labs.recica.dev/sitemap.xml');
+	await expect(page.locator('body')).toContainText('Disallow: /');
+	await expect(page.locator('body')).toContainText('Host: labs.recica.dev');
 
 	await page.goto('/sitemap.xml');
-	await expect(page.locator('body')).toContainText('http://127.0.0.1:4175/');
-	await expect(page.locator('body')).toContainText('http://127.0.0.1:4175/parental-gate-lab');
-	await expect(page.locator('body')).toContainText('<changefreq>weekly</changefreq>');
+	await expect(page.locator('body')).toContainText('https://labs.recica.dev/');
+	await expect(page.locator('body')).toContainText('https://labs.recica.dev/parental-gate-lab');
+	await expect(page.locator('body')).not.toContainText('<changefreq>');
 });

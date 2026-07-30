@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test('loads the parental gate route with canonical metadata', async ({ page }) => {
 	await page.goto('/parental-gate-lab');
 
+	await expect(page.getByText('Published study / 01', { exact: true })).toBeVisible();
 	await expect(page.getByRole('heading', { name: 'Parental Gate Lab' })).toBeVisible();
 	await expect(page.getByTestId('fit-finder-section')).toBeVisible();
 	await expect(page.getByTestId('guidance-section')).toBeVisible();
@@ -19,7 +20,7 @@ test('loads the parental gate route with canonical metadata', async ({ page }) =
 	await expect(page.locator('.compact-faq__item')).toHaveCount(4);
 	await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
 		'content',
-		'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'
+		'noindex, nofollow, noarchive'
 	);
 	await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute(
 		'content',
@@ -27,8 +28,9 @@ test('loads the parental gate route with canonical metadata', async ({ page }) =
 	);
 	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 		'href',
-		'http://127.0.0.1:4175/parental-gate-lab'
+		'https://labs.recica.dev/parental-gate-lab'
 	);
+	await expect(page.locator('.app-shell')).not.toHaveClass(/theme-lab-dark/);
 });
 
 test('math gate reaches failure and success states', async ({ page }) => {

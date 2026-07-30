@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: install check build test audit \
+.PHONY: install check build test audit verify bundle-budgets \
 	recica-install tools-install labs-install \
 	recica-check tools-check labs-check \
 	recica-build tools-build labs-build \
@@ -17,8 +17,14 @@ test: recica-test tools-test labs-test
 
 audit: recica-audit tools-audit labs-audit
 
+verify: check build bundle-budgets test
+
+bundle-budgets:
+	node --test scripts/check-bundle-budgets.test.mjs
+	node scripts/check-bundle-budgets.mjs
+
 recica-install:
-	cd recica && npm install
+	./scripts/run-pnpm.sh --dir recica install --frozen-lockfile
 
 tools-install:
 	./scripts/run-pnpm.sh --dir tools install --frozen-lockfile
@@ -27,34 +33,39 @@ labs-install:
 	./scripts/run-pnpm.sh --dir labs install --frozen-lockfile
 
 recica-check:
-	cd recica && npm run check && npm run lint
+	./scripts/run-pnpm.sh --dir recica run check
+	./scripts/run-pnpm.sh --dir recica run lint
 
 tools-check:
-	cd tools && npm run check && npm run lint
+	./scripts/run-pnpm.sh --dir tools run check
+	./scripts/run-pnpm.sh --dir tools run lint
 
 labs-check:
-	cd labs && npm run check && npm run lint
+	./scripts/run-pnpm.sh --dir labs run check
+	./scripts/run-pnpm.sh --dir labs run lint
 
 recica-build:
-	cd recica && npm run build
+	./scripts/run-pnpm.sh --dir recica run build
 
 tools-build:
-	cd tools && npm run build
+	./scripts/run-pnpm.sh --dir tools run build
 
 labs-build:
-	cd labs && npm run build
+	./scripts/run-pnpm.sh --dir labs run build
 
 recica-test:
-	env -u MAKEFLAGS -u MFLAGS -u MAKELEVEL bash -lc 'cd recica && npm run test:e2e'
+	env -u MAKEFLAGS -u MFLAGS -u MAKELEVEL ./scripts/run-pnpm.sh --dir recica run test:e2e
 
 tools-test:
-	cd tools && npm run test:unit:run && npm run test:e2e
+	./scripts/run-pnpm.sh --dir tools run test:unit:run
+	./scripts/run-pnpm.sh --dir tools run test:e2e
 
 labs-test:
-	cd labs && npm run test:unit:run && npm run test:e2e
+	./scripts/run-pnpm.sh --dir labs run test:unit:run
+	./scripts/run-pnpm.sh --dir labs run test:e2e
 
 recica-audit:
-	cd recica && npm audit --omit=dev
+	./scripts/run-pnpm.sh --dir recica audit --prod --audit-level moderate
 
 tools-audit:
 	./scripts/run-pnpm.sh --dir tools audit --prod --audit-level moderate

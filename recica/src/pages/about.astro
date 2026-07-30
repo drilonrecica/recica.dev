@@ -1,26 +1,109 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>About Drilon Reçica</title>
-        <meta
-            name="description"
-            content="Compatibility redirect to the about section of Drilon Reçica’s flagship site."
-        />
-        <link rel="canonical" href="https://recica.dev/#about" />
-        <meta name="robots" content="noindex, nofollow, noarchive" />
-        <meta name="googlebot" content="noindex, nofollow, noarchive" />
-        <meta name="theme-color" content="#0b1014" />
-        <meta name="color-scheme" content="dark" />
-        <meta http-equiv="refresh" content="0;url=/#about" />
-        <script>
-            window.location.replace("/#about");
-        </script>
-    </head>
-    <body>
-        <p>
-            Redirecting to <a href="/#about">the about section</a>...
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { experienceItems, principles, siteConfig } from "@/lib/site-content";
+
+const title = "About Drilon Reçica — Mobile & Product Engineering";
+const description =
+  "About Drilon Reçica: senior mobile and product engineering, Android modernization, accessible delivery, and pragmatic technical leadership.";
+---
+
+<BaseLayout title={title} description={description} canonical="/about">
+  <article class="detail-page">
+    <header class="detail-hero">
+      <div>
+        <p class="dossier-index">PROFILE / 001</p>
+        <p class="detail-hero__route">recica.dev/about</p>
+      </div>
+      <div>
+        <h1>About Drilon Reçica</h1>
+        <p class="detail-hero__lead">
+          Senior mobile and product engineer working across Android delivery,
+          system modernization, accessibility, and 0-to-1 product foundations.
         </p>
-    </body>
-</html>
+      </div>
+    </header>
+
+    <section class="detail-section" aria-labelledby="profile-heading">
+      <div>
+        <p class="dossier-index">01 / PROFILE</p>
+        <h2 id="profile-heading">Engineering with product context intact.</h2>
+      </div>
+      <div class="prose-stack">
+        <p>
+          I have worked in Android since 2012, through the platform’s shift from
+          Java and XML toward Kotlin, Compose, Coroutines, Flow, and more
+          maintainable architectural boundaries.
+        </p>
+        <p>
+          My strongest work sits where implementation and product judgment meet:
+          moving live systems forward without reckless rewrites, improving
+          accessibility and UI quality, and keeping delivery dependable while
+          the architecture changes underneath it.
+        </p>
+        <p>
+          I am also comfortable beyond the app surface. Qisara involved product
+          direction, a Flutter app, a Deno and TypeScript backend, deployment,
+          and the decisions connecting those layers.
+        </p>
+      </div>
+    </section>
+
+    <section class="detail-section" aria-labelledby="principles-heading">
+      <div>
+        <p class="dossier-index">02 / PRINCIPLES</p>
+        <h2 id="principles-heading">How I approach the work.</h2>
+      </div>
+      <ol class="detail-list">
+        {
+          principles.map((principle, index) => (
+            <li>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <h3>{principle.title}</h3>
+                <p>{principle.description}</p>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="detail-section" aria-labelledby="record-heading">
+      <div>
+        <p class="dossier-index">03 / RECORD</p>
+        <h2 id="record-heading">Selected experience.</h2>
+      </div>
+      <div class="timeline-list">
+        {
+          experienceItems.map((item, index) => (
+            <article class="timeline-item">
+              <p class="timeline-item__index">
+                {String(index + 1).padStart(2, "0")}
+              </p>
+              <p class="timeline-item__period">{item.period}</p>
+              <div>
+                <h3>{item.title}</h3>
+                <p class="timeline-item__role">{item.role}</p>
+                <p class="timeline-item__summary">{item.summary}</p>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <footer class="detail-cta">
+      <p class="dossier-index">NEXT / CONTACT</p>
+      <h2>For senior mobile work, modernization, or selective consulting.</h2>
+      <div>
+        <a
+          href={`mailto:${siteConfig.email}`}
+          class="action-link action-link--primary">Email Drilon</a
+        >
+        <a href={siteConfig.cvPath} class="action-link action-link--secondary"
+          >Download CV</a
+        >
+      </div>
+    </footer>
+  </article>
+</BaseLayout>

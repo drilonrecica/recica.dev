@@ -2,13 +2,15 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { parseSitemapXml } from '$lib/tools/sitemap';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url><loc>https://recica.dev/</loc></url>
 	<url><loc>https://recica.dev/tools</loc></url>
 </urlset>`;
-	$: result = parseSitemapXml(input);
+	$: limit = checkToolInputLimit('sitemap', [input]);
+	$: result = limit.ok ? parseSitemapXml(input) : ({ ok: false, error: limit.message } as const);
 </script>
 
 <ToolShell
@@ -25,6 +27,7 @@
 		<TextArea
 			id="sitemap-input"
 			label="Sitemap XML"
+			error={result.ok ? undefined : result.error}
 			rows={18}
 			mono
 			help="Parsing updates automatically as the XML changes."
@@ -33,7 +36,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}>
+		<div
+			class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{result.ok ? `${result.kind} with ${result.urls.length} URLs.` : result.error}
 		</div>
 

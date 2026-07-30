@@ -31,7 +31,7 @@
 		aria-invalid={error ? 'true' : undefined}
 	></textarea>
 	{#if error}
-		<span class="field__error" id={errorId}>{error}</span>
+		<span class="field__error" id={errorId} role="alert" aria-live="assertive">{error}</span>
 	{:else if help}
 		<span class="field__help" id={helpId}>{help}</span>
 	{/if}

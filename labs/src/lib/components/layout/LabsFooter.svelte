@@ -1,21 +1,19 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-
-	export let dark = false;
 </script>
 
 <footer class="px-4 pb-8 sm:px-6 lg:px-8">
 	<div class="mx-auto max-w-7xl">
-		<div class={`footer-shell ${dark ? 'footer-shell--dark' : ''}`}>
+		<div class="footer-shell">
 			<div class="grid gap-8 lg:grid-cols-[1.3fr,1fr]">
 				<div class="space-y-3">
 					<p class="eyebrow">Recica ecosystem</p>
 					<h2 class="font-display text-2xl font-semibold tracking-[-0.04em] text-[var(--ink)]">
-						Public experiments with a stable flagship and tools layer behind them.
+						Research notes with a stable flagship and tools publication beside them.
 					</h2>
 					<p class="max-w-2xl text-sm leading-7 text-[var(--ink-soft)] sm:text-base">
-						Labs is where product ideas get tested in public. The flagship lives at `recica.dev`.
-						Stable utilities live at `tools.recica.dev`.
+						Labs is where product questions get tested in public. The flagship lives at recica.dev.
+						Stable utilities live at tools.recica.dev.
 					</p>
 				</div>
 

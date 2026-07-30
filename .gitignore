@@ -1,5 +1,12 @@
 # build output
 dist/
+
+# test artifacts
+playwright-report/
+test-results/
+blob-report/
+coverage/
+.lighthouseci/
 # generated types
 .astro/
 

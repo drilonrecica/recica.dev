@@ -2,13 +2,15 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { createHtmlPreviewDocument } from '$lib/tools/html';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = `<main style="font-family: system-ui; padding: 24px;">
 	<h1>Recica Preview</h1>
 	<p>Scripts are blocked and event handlers are stripped.</p>
 	<button onclick="alert('blocked')">Blocked action</button>
 </main>`;
-	$: preview = createHtmlPreviewDocument(input);
+	$: limit = checkToolInputLimit('html', [input]);
+	$: preview = createHtmlPreviewDocument(limit.ok ? input : '');
 </script>
 
 <ToolShell
@@ -25,6 +27,7 @@
 		<TextArea
 			id="html-input"
 			label="HTML"
+			error={limit.ok ? undefined : limit.message}
 			rows={22}
 			mono
 			help="Preview updates automatically as you edit."
@@ -33,14 +36,21 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class="status-pill status-neutral">HTML preview is sandboxed and scripts are blocked.</div>
+		<div
+			class={`status-pill ${limit.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
+			{limit.ok ? 'HTML preview is sandboxed and scripts are blocked.' : limit.message}
+		</div>
 
 		<div class="surface-panel p-4">
 			<div class="field__label px-2 pt-2">Preview</div>
 			<iframe
 				title="HTML preview"
 				class="mt-4 h-[38rem] w-full rounded-[14px] border border-[var(--border-subtle)] bg-white"
-				sandbox=""
+				sandbox="allow-scripts"
 				srcdoc={preview}
 			></iframe>
 		</div>

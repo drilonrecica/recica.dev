@@ -4,12 +4,20 @@
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { formatSql, minifySql } from '$lib/tools/sql';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = 'select id, name from users where active = 1 order by name';
 	let output = '';
 	let status = 'Choose Format or Minify.';
 
 	function run(action: 'format' | 'minify') {
+		const limit = checkToolInputLimit('sql', [input]);
+		if (!limit.ok) {
+			output = '';
+			status = limit.message;
+			return;
+		}
+
 		output = action === 'format' ? formatSql(input) : minifySql(input);
 		status = action === 'format' ? 'Formatted SQL ready.' : 'Minified SQL ready.';
 	}
@@ -29,6 +37,7 @@
 		<TextArea
 			id="sql-input"
 			label="SQL source"
+			error={status.includes('local processing limit') ? status : undefined}
 			rows={18}
 			mono
 			help="Paste any SQL text block."
@@ -42,7 +51,14 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class="status-pill status-neutral">{status}</div>
+		<div
+			class={`status-pill ${status.includes('local processing limit') ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
+			{status}
+		</div>
 
 		<div class="surface-panel p-6">
 			<div class="flex items-center justify-between gap-3">

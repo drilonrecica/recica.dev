@@ -5,6 +5,7 @@
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import type { UrlAction, UrlMode } from '$lib/tools/url';
 	import { transformUrl } from '$lib/tools/url';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = 'https://recica.dev/tools?name=JSON formatter&mode=full url';
 	let output = '';
@@ -18,6 +19,13 @@
 			: 'Encodes the entire string. Use this when embedding a URL or value inside another URL, query string, or fragment.';
 
 	function runTransform(action: UrlAction) {
+		const limit = checkToolInputLimit('url', [input]);
+		if (!limit.ok) {
+			error = limit.message;
+			output = '';
+			return;
+		}
+
 		const result = transformUrl(input, mode, action);
 		if (!result.ok) {
 			error = result.error;
@@ -73,6 +81,7 @@
 			<TextArea
 				id="url-input"
 				label="Source"
+				error={error || undefined}
 				rows={16}
 				mono
 				help="Source text remains unchanged if decoding fails."
@@ -87,7 +96,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}>
+		<div
+			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{error || lastAction}
 		</div>
 

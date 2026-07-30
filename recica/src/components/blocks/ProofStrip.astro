@@ -2,23 +2,22 @@
 import { proofItems, sectionCopy } from '@/lib/site-content';
 ---
 
-<section class="section-shell section-shell--tight">
-	<div class="section-grid">
-		<div class="section-heading-block">
-			<p class="kicker">{sectionCopy.proof.kicker}</p>
-			<h2 class="section-title">{sectionCopy.proof.title}</h2>
-			<p class="section-copy">{sectionCopy.proof.description}</p>
-		</div>
+<section class="dossier-section dossier-section--proof">
+	<header class="dossier-section__header">
+		<p class="dossier-index">01 / OPERATING PROFILE</p>
+		<h2>{sectionCopy.proof.title}</h2>
+		<p>{sectionCopy.proof.description}</p>
+	</header>
 
-		<div class="proof-grid">
+	<div class="proof-grid">
 			{
-				proofItems.map((item) => (
+				proofItems.map((item, index) => (
 					<article class="proof-item">
+						<p class="proof-item__index">{String(index + 1).padStart(2, '0')}</p>
 						<h3>{item.title}</h3>
 						<p>{item.description}</p>
 					</article>
 				))
 			}
-		</div>
 	</div>
 </section>

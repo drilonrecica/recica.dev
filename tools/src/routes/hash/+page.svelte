@@ -5,6 +5,7 @@
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import type { HashAlgorithm } from '$lib/tools/hash';
 	import { hashText } from '$lib/tools/hash';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let algorithm: HashAlgorithm = 'SHA-256';
 	let input = 'Recica Tools';
@@ -13,6 +14,13 @@
 	let status = 'Choose an algorithm and hash the input.';
 
 	async function runHash() {
+		const limit = checkToolInputLimit('hash', [input]);
+		if (!limit.ok) {
+			error = limit.message;
+			output = '';
+			return;
+		}
+
 		try {
 			output = await hashText(input, algorithm);
 			error = '';
@@ -54,6 +62,7 @@
 			<TextArea
 				id="hash-input"
 				label="Source"
+				error={error || undefined}
 				rows={14}
 				mono
 				help="Hashing happens locally in your browser."
@@ -65,7 +74,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}>
+		<div
+			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{error || status}
 		</div>
 

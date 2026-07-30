@@ -4,9 +4,14 @@
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { inspectJwt } from '$lib/tools/jwt';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
-	let input =
-		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjMiLCJuYW1lIjoiUmVjaWNhIiwiZXhwIjo0MTAyNDQ0ODAwfQ.signature';
+	const exampleJwtSections = [
+		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
+		'eyJzdWIiOiIxMjMiLCJuYW1lIjoiUmVjaWNhIiwiZXhwIjo0MTAyNDQ0ODAwfQ',
+		'signature'
+	];
+	let input = exampleJwtSections.join('.');
 	let error = '';
 	let status = 'Paste a JWT and inspect it locally.';
 	let header = '';
@@ -15,6 +20,16 @@
 	let signatureLength = 0;
 
 	function inspect() {
+		const limit = checkToolInputLimit('jwt', [input]);
+		if (!limit.ok) {
+			error = limit.message;
+			header = '';
+			payload = '';
+			timestamps = [];
+			signatureLength = 0;
+			return;
+		}
+
 		const result = inspectJwt(input);
 		if (!result.ok) {
 			error = result.error;
@@ -48,6 +63,7 @@
 		<TextArea
 			id="jwt-input"
 			label="JWT"
+			error={error || undefined}
 			rows={16}
 			mono
 			help="Paste a complete header.payload.signature token."
@@ -60,7 +76,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}>
+		<div
+			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{error || status}
 		</div>
 

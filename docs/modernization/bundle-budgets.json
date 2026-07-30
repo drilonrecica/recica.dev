@@ -1,0 +1,16 @@
+{
+  "apps": {
+    "recica": {
+      "output": "recica/dist",
+      "maxGzipBytes": 20000
+    },
+    "tools": {
+      "output": "tools/build",
+      "maxGzipBytes": 145000
+    },
+    "labs": {
+      "output": "labs/build",
+      "maxGzipBytes": 100000
+    }
+  }
+}

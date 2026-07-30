@@ -1,0 +1,142 @@
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  schedule:
+    - cron: "17 4 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dependency-audit:
+    name: ${{ matrix.app }} production audit
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        app: [recica, tools, labs]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.18.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: ${{ matrix.app }}/pnpm-lock.yaml
+      - run: pnpm --dir ${{ matrix.app }} install --frozen-lockfile
+      - run: pnpm --dir ${{ matrix.app }} audit --prod --audit-level high
+
+  secret-scan:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          fetch-depth: 0
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: secret
+          exit-code: "1"
+
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: github/codeql-action/init@3b0bd1d116c0bde30213346b22d4f634d96a2fb0 # v3
+        with:
+          languages: javascript-typescript
+      - uses: github/codeql-action/analyze@3b0bd1d116c0bde30213346b22d4f634d96a2fb0 # v3
+
+  static-artifacts:
+    name: Static artifact policy
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_INDEXING_ENABLED: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.18.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+      - run: |
+          for app in recica tools labs; do
+            pnpm --dir "$app" install --frozen-lockfile
+            pnpm --dir "$app" build
+          done
+      - run: node --test scripts/check-bundle-budgets.test.mjs
+      - run: node scripts/check-bundle-budgets.mjs
+      - name: Reject remote executable resources
+        run: |
+          if grep -RInE --include='*.html' '<script[^>]+src="https?://' \
+            recica/dist tools/build labs/build; then
+            echo 'Unexpected remote script found in generated output.'
+            exit 1
+          fi
+          if grep -RInE --include='*.html' \
+            '<link[^>]+href="https?://[^"]+"[^>]+rel="(stylesheet|modulepreload|preload)"' \
+            recica/dist tools/build labs/build; then
+            echo 'Unexpected remote stylesheet or preload found in generated output.'
+            exit 1
+          fi
+      - name: Verify preview indexing policy
+        run: |
+          for output in recica/dist tools/build labs/build; do
+            grep -q 'noindex, nofollow' "$output/index.html"
+            grep -q 'Disallow: /' "$output/robots.txt"
+          done
+
+  container:
+    name: ${{ matrix.app }} container
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - app: tools
+            origin: https://tools.recica.dev
+          - app: labs
+            origin: https://labs.recica.dev
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: ${{ matrix.app }}
+          build-args: |
+            PUBLIC_INDEXING_ENABLED=true
+            PUBLIC_SITE_URL=${{ matrix.origin }}
+          load: true
+          push: false
+          tags: recica-${{ matrix.app }}:ci
+      - run: |
+          image_user=$(docker inspect recica-${{ matrix.app }}:ci --format '{{.Config.User}}')
+          test -n "$image_user"
+          test "$image_user" != root
+          test "$image_user" != 0
+          docker inspect recica-${{ matrix.app }}:ci \
+            --format '{{json .Config.ExposedPorts}}' | grep -q '8080/tcp'
+          docker run --rm --entrypoint sh recica-${{ matrix.app }}:ci \
+            -c "test ! -d /app/node_modules &&
+              test -f /usr/share/nginx/html/index.html &&
+              grep -q '${{ matrix.origin }}' /usr/share/nginx/html/index.html &&
+              grep -Eq 'index, ?follow' /usr/share/nginx/html/index.html &&
+              grep -q 'Allow: /' /usr/share/nginx/html/robots.txt"
+      - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
+        with:
+          image-ref: recica-${{ matrix.app }}:ci
+          severity: HIGH,CRITICAL
+          exit-code: "1"

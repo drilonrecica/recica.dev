@@ -1,23 +1,26 @@
 ---
 import { navigation, siteConfig } from "@/lib/site-content";
 
+const isHome = Astro.url.pathname === "/";
+const anchorHref = (href: `#${string}`) => isHome ? href : `/${href}`;
 ---
 
-<header class="site-header" data-scrolled="false">
+<header class="site-header">
     <div class="site-header__shell">
         <a
             href="/"
             class="site-brand"
             aria-label="recica.dev home"
         >
-            {siteConfig.domain}
+            <span class="site-brand__mark" aria-hidden="true">DR</span>
+            <span>{siteConfig.domain}</span>
         </a>
 
         <nav class="site-nav" aria-label="Primary">
             <div class="site-nav__links">
                 {
                     navigation.map((item) => (
-                        <a href={item.href}>{item.label}</a>
+                        <a href={anchorHref(item.href)}>{item.label}</a>
                     ))
                 }
             </div>
@@ -37,7 +40,7 @@ import { navigation, siteConfig } from "@/lib/site-content";
             <div class="site-nav-mobile__panel">
                 {
                     navigation.map((item) => (
-                        <a href={item.href}>{item.label}</a>
+                        <a href={anchorHref(item.href)}>{item.label}</a>
                     ))
                 }
                 <a href={siteConfig.cvPath}>Download CV</a>
@@ -46,15 +49,3 @@ import { navigation, siteConfig } from "@/lib/site-content";
         </details>
     </div>
 </header>
-
-<script>
-    const header = document.querySelector(".site-header");
-
-    const syncHeaderState = () => {
-        if (!header) return;
-        header.setAttribute("data-scrolled", window.scrollY > 24 ? "true" : "false");
-    };
-
-    syncHeaderState();
-    window.addEventListener("scroll", syncHeaderState, { passive: true });
-</script>

@@ -1,35 +1,26 @@
-FROM node:20-alpine AS base
+FROM node:24-alpine@sha256:a0b9bf06e4e6193cf7a0f58816cc935ff8c2a908f81e6f1a95432d679c54fbfd AS build
+ARG PUBLIC_SITE_URL=https://tools.recica.dev
+ARG PUBLIC_INDEXING_ENABLED=false
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
+ENV PUBLIC_SITE_URL="$PUBLIC_SITE_URL"
+ENV PUBLIC_INDEXING_ENABLED="$PUBLIC_INDEXING_ENABLED"
 WORKDIR /app
 
-FROM base AS deps
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-RUN pnpm install --frozen-lockfile --ignore-scripts
+RUN corepack enable && corepack prepare pnpm@11.18.0 --activate
 
-FROM deps AS build
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN pnpm install --frozen-lockfile
+
 COPY . .
 RUN pnpm run build
 
-FROM build AS prod-deps
-RUN pnpm prune --prod --ignore-scripts
+FROM ghcr.io/nginx/nginx-unprivileged:1.30.4-alpine3.24@sha256:44e36330f74d4f3a1d4e222acca9e23b401fb87811a7597024502bb759c4dd49 AS runtime
 
-FROM node:20-alpine AS runtime
-WORKDIR /app
-ENV NODE_ENV=production
-ENV PORT=3000
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY nginx/security-headers.conf /etc/nginx/security-headers.conf
+COPY --from=build /app/build /usr/share/nginx/html
 
-RUN addgroup -S app && adduser -S app -G app
-RUN apk add --no-cache curl
-
-COPY --from=build /app/build ./build
-COPY --from=build /app/package.json ./package.json
-COPY --from=prod-deps /app/node_modules ./node_modules
-
-USER app
-EXPOSE 3000
+EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3000/health || exit 1
-
-CMD ["node", "build"]
+	CMD wget -q -O - http://127.0.0.1:8080/health | grep -qx OK

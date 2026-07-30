@@ -4,7 +4,7 @@
 
 <button
 	type="button"
-	class="button-base button-ghost min-w-[7.5rem]"
+	class="button-base button-ghost min-w-0 px-3 min-[400px]:min-w-[7.5rem]"
 	on:click={() => theme.toggle()}
 	aria-label="Toggle theme"
 >
@@ -19,7 +19,7 @@
 			/>
 			<circle cx="12" cy="12" r="4.2" />
 		</svg>
-		<span>Dark</span>
+		<span class="hidden min-[400px]:inline">Dark</span>
 	{:else}
 		<svg
 			aria-hidden="true"
@@ -28,6 +28,6 @@
 		>
 			<path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 7.6 7.6 0 1 0 20 15.5Z" />
 		</svg>
-		<span>Light</span>
+		<span class="hidden min-[400px]:inline">Light</span>
 	{/if}
 </button>

@@ -1,0 +1,89 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import { caseStudies, siteConfig, type CaseStudy } from "@/lib/site-content";
+
+export function getStaticPaths() {
+  return caseStudies.map((study) => ({
+    params: { slug: study.slug },
+    props: { study },
+  }));
+}
+
+interface Props {
+  study: CaseStudy;
+}
+
+const { study } = Astro.props;
+const title = `${study.title} — Case Study | ${siteConfig.name}`;
+const description = `${study.summary} ${study.outcome}`;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical={`/work/${study.slug}`}
+  type="article"
+>
+  <article class="detail-page">
+    <header class="detail-hero detail-hero--case">
+      <div>
+        <p class="dossier-index">CASE STUDY / {study.slug.toUpperCase()}</p>
+        <p class="detail-hero__route">recica.dev/work/{study.slug}</p>
+      </div>
+      <div>
+        <h1>{study.title}</h1>
+        <p class="detail-hero__lead">{study.summary}</p>
+      </div>
+    </header>
+
+    <dl class="case-facts">
+      <div><dt>Role</dt><dd>{study.role}</dd></div>
+      <div><dt>Period</dt><dd>{study.period}</dd></div>
+      <div><dt>Scope</dt><dd>{study.stack.join(" / ")}</dd></div>
+    </dl>
+
+    <section class="detail-section" aria-labelledby="brief-heading">
+      <div>
+        <p class="dossier-index">01 / DELIVERY BRIEF</p>
+        <h2 id="brief-heading">Work carried through production constraints.</h2>
+      </div>
+      <ul class="delivery-list">
+        {study.bullets.map((bullet) => <li>{bullet}</li>)}
+      </ul>
+    </section>
+
+    <section class="detail-section outcome-panel" aria-labelledby="outcome-heading">
+      <div>
+        <p class="dossier-index">02 / RESULT</p>
+        <h2 id="outcome-heading">Outcome</h2>
+      </div>
+      <p>{study.outcome}</p>
+    </section>
+
+    <section class="detail-section" aria-labelledby="stack-heading">
+      <div>
+        <p class="dossier-index">03 / WORKING SET</p>
+        <h2 id="stack-heading">Technologies and disciplines.</h2>
+      </div>
+      <ul class="detail-tags">
+        {study.stack.map((tag) => <li>{tag}</li>)}
+      </ul>
+    </section>
+
+    <footer class="detail-cta">
+      <p class="dossier-index">SOURCE / NEXT</p>
+      <h2>Continue with the product or return to the dossier.</h2>
+      <div>
+        <a
+          href={study.externalHref}
+          target="_blank"
+          rel="noreferrer"
+          class="action-link action-link--primary">{study.externalLabel}</a
+        >
+        <a href="/#work" class="action-link action-link--secondary"
+          >All selected work</a
+        >
+      </div>
+    </footer>
+  </article>
+</BaseLayout>

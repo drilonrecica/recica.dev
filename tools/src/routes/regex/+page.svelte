@@ -4,13 +4,17 @@
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import TextInput from '$lib/components/ui/TextInput.svelte';
 	import { evaluateRegex } from '$lib/tools/regex';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let pattern = '(json)';
 	let flags = 'gi';
 	let source = 'JSON formatter\njson validator';
 	let replacement = '<$1>';
 
-	$: result = evaluateRegex(pattern, flags, source, replacement);
+	$: limit = checkToolInputLimit('regex', [source]);
+	$: result = limit.ok
+		? evaluateRegex(pattern, flags, source, replacement)
+		: ({ ok: false, error: limit.message } as const);
 </script>
 
 <ToolShell
@@ -26,11 +30,22 @@
 	<div class="surface-panel p-6">
 		<div class="grid gap-4">
 			<div class="grid gap-4 sm:grid-cols-2">
-				<TextInput id="regex-pattern" label="Pattern" mono bind:value={pattern} />
+				<TextInput
+					id="regex-pattern"
+					label="Pattern"
+					mono
+					error={limit.ok && !result.ok && !result.error.toLowerCase().includes('flag')
+						? result.error
+						: undefined}
+					bind:value={pattern}
+				/>
 				<TextInput
 					id="regex-flags"
 					label="Flags"
 					mono
+					error={limit.ok && !result.ok && result.error.toLowerCase().includes('flag')
+						? result.error
+						: undefined}
 					help="Common flags: g i m s u y"
 					bind:value={flags}
 				/>
@@ -49,6 +64,7 @@
 				label="Test text"
 				rows={14}
 				mono
+				error={limit.ok ? undefined : limit.message}
 				help="Results update as you edit the pattern, flags, and text."
 				bind:value={source}
 			/>
@@ -56,7 +72,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}>
+		<div
+			class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{#if result.ok}
 				{result.matches.length} match{result.matches.length === 1 ? '' : 'es'} found.
 			{:else}

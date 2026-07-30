@@ -60,6 +60,7 @@
 			<TextInput
 				id="uuid-count"
 				label="Count"
+				error={error || undefined}
 				type="number"
 				inputmode="numeric"
 				help="Choose between 1 and 50 IDs per batch."
@@ -71,7 +72,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}>
+		<div
+			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{error || `${output.length} UUID${output.length === 1 ? '' : 's'} ready.`}
 		</div>
 

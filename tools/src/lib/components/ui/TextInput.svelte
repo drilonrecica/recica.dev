@@ -20,15 +20,8 @@
 		| 'url'
 		| undefined = 'off';
 	export let inputmode:
-		| 'none'
-		| 'text'
-		| 'tel'
-		| 'url'
-		| 'email'
-		| 'numeric'
-		| 'decimal'
-		| 'search'
-		| undefined = undefined;
+		'none' | 'text' | 'tel' | 'url' | 'email' | 'numeric' | 'decimal' | 'search' | undefined =
+		undefined;
 	export let spellcheck = false;
 	export let mono = false;
 	export let readonly = false;
@@ -59,7 +52,7 @@
 		aria-invalid={error ? 'true' : undefined}
 	/>
 	{#if error}
-		<span class="field__error" id={errorId}>{error}</span>
+		<span class="field__error" id={errorId} role="alert" aria-live="assertive">{error}</span>
 	{:else if help}
 		<span class="field__help" id={helpId}>{help}</span>
 	{/if}

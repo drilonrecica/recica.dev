@@ -4,6 +4,7 @@
 	export let pathname = '/';
 
 	$: isProject = pathname.startsWith('/parental-gate-lab');
+	$: isHome = pathname === '/';
 </script>
 
 <header class="sticky top-0 z-40 px-4 pt-4 sm:px-6 lg:px-8">
@@ -16,10 +17,10 @@
 					<span class="brand-mark" aria-hidden="true"></span>
 					<span class="min-w-0">
 						<span class="font-display block text-lg font-semibold tracking-[-0.03em]">
-							Labs by Drilon Recica
+							Recica Labs
 						</span>
 						<span class="block text-xs text-[var(--ink-soft)]">
-							{isProject ? 'Interactive product lab' : 'Experiments, prototypes, and concept work'}
+							{isProject ? 'Published study / Research Notebook' : 'Research Notebook'}
 						</span>
 					</span>
 				</a>
@@ -37,9 +38,13 @@
 					<a href="#guidance" class="nav-chip shrink-0">Guidance</a>
 					<a href="#faq" class="nav-chip shrink-0">FAQ</a>
 				{:else}
-					<a href={resolve('/')} class="nav-chip shrink-0" aria-current="page">Home</a>
-					<a href="#experiments" class="nav-chip shrink-0">Experiments</a>
-					<a href="#about" class="nav-chip shrink-0">About</a>
+					<a
+						href={resolve('/')}
+						class="nav-chip shrink-0"
+						aria-current={isHome ? 'page' : undefined}>Home</a
+					>
+					<a href={resolve('/#experiments')} class="nav-chip shrink-0">Notebook</a>
+					<a href={resolve('/#about')} class="nav-chip shrink-0">Policy</a>
 				{/if}
 			</nav>
 

@@ -156,6 +156,45 @@ select:focus-visible {
 	background: var(--surface-strong);
 }
 
+.switchboard-readout {
+	display: grid;
+	border: 1px solid var(--border-strong);
+	border-radius: var(--radius-card);
+	background: var(--surface-elevated);
+	overflow: hidden;
+}
+
+.switchboard-readout > div {
+	padding: 1rem;
+	border-bottom: 1px solid var(--border-subtle);
+}
+
+.switchboard-readout > div:last-child {
+	border-bottom: 0;
+}
+
+.switchboard-readout p {
+	margin-top: 0.45rem;
+	color: var(--text-secondary);
+	font-size: 0.86rem;
+	line-height: 1.55;
+}
+
+@media (min-width: 768px) {
+	.switchboard-readout {
+		grid-template-columns: 1.5fr 1fr 0.8fr;
+	}
+
+	.switchboard-readout > div {
+		border-right: 1px solid var(--border-subtle);
+		border-bottom: 0;
+	}
+
+	.switchboard-readout > div:last-child {
+		border-right: 0;
+	}
+}
+
 .kicker {
 	font-size: 0.72rem;
 	font-weight: 600;
@@ -404,5 +443,28 @@ select:focus-visible {
 		animation-iteration-count: 1 !important;
 		scroll-behavior: auto !important;
 		transition-duration: 0.01ms !important;
+	}
+}
+
+@media (forced-colors: active) {
+	button,
+	a,
+	input,
+	textarea,
+	select,
+	.surface-panel,
+	.surface-panel-elevated,
+	.surface-panel-strong {
+		border-color: CanvasText;
+	}
+
+	button:focus-visible,
+	a:focus-visible,
+	input:focus-visible,
+	textarea:focus-visible,
+	select:focus-visible {
+		outline: 2px solid Highlight;
+		outline-offset: 3px;
+		box-shadow: none;
 	}
 }

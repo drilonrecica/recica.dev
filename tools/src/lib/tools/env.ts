@@ -27,12 +27,15 @@ export type EnvParseResult = {
 };
 
 function unescapeDoubleQuoted(value: string) {
-	return value
-		.replace(/\\n/g, '\n')
-		.replace(/\\r/g, '\r')
-		.replace(/\\t/g, '\t')
-		.replace(/\\"/g, '"')
-		.replace(/\\\\/g, '\\');
+	const escapes: Record<string, string> = {
+		n: '\n',
+		r: '\r',
+		t: '\t',
+		'"': '"',
+		'\\': '\\'
+	};
+
+	return value.replace(/\\([nrt"\\])/g, (_, escaped: string) => escapes[escaped] ?? escaped);
 }
 
 export function parseDotenv(input: string): EnvParseResult {

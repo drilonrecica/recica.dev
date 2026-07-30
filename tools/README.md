@@ -15,7 +15,7 @@ It is responsible for:
 - tool-specific metadata and structured data
 - local-first interaction patterns
 - crawler-facing machine endpoints
-- operational deployment for a Node runtime
+- static generation and container deployment
 
 It is related to the flagship personal site, but it is not a subpage of the flagship. It is its own product with its own public behavior and SEO surface.
 
@@ -38,12 +38,16 @@ The app is intentionally opinionated.
 
 The homepage at `/` provides:
 
-- brand/positioning
+- the numbered Utility Switchboard
 - search input
 - featured tools
 - category filtering
 - full tool directory
 - curated external resources
+
+The privacy policy at `/privacy` documents the browser-memory processing,
+network-transfer, persistence, download, clipboard, and responsiveness
+contracts for built-in utilities.
 
 ### Built-In Tool Routes
 
@@ -135,11 +139,11 @@ The current app ships 24 tool pages.
 
 ### Machine and Platform Routes
 
-| Route          | Purpose                  | Notes                                           |
-| -------------- | ------------------------ | ----------------------------------------------- |
-| `/health`      | Operational health check | Plain text `OK` response                        |
-| `/robots.txt`  | Crawl directives         | Built dynamically from the resolved site origin |
-| `/sitemap.xml` | Public sitemap           | Built dynamically from the tool registry        |
+| Route          | Purpose                  | Notes                                        |
+| -------------- | ------------------------ | -------------------------------------------- |
+| `/health`      | Operational health check | Prerendered plain text `OK` response         |
+| `/robots.txt`  | Crawl directives         | Prerendered from the fixed production origin |
+| `/sitemap.xml` | Public sitemap           | Prerendered from the tool registry           |
 
 ### External Resources
 
@@ -151,16 +155,18 @@ That link is intentionally treated as an external recommendation, not as a built
 
 ## Canonical URL and Origin Strategy
 
-This app is more deployment-flexible than the flagship site.
-
 The intended public production origin is:
 
 - `https://tools.recica.dev`
 
-However, the app does not hardcode that origin in every route. Instead, SEO and indexing infrastructure resolve the origin like this:
+SEO and indexing infrastructure uses that fixed production origin. A loopback
+`PUBLIC_SITE_URL` override is accepted only for non-indexable local tests. Preview
+builds remain on production canonical URLs and default to `noindex, nofollow`;
+production indexing requires:
 
-1. use `PUBLIC_SITE_URL` if it is present and valid
-2. otherwise fall back to the current request origin
+```bash
+PUBLIC_INDEXING_ENABLED=true pnpm build
+```
 
 That logic lives in:
 
@@ -189,7 +195,7 @@ This design supports:
 | -------------------- | -------------------------------------------- |
 | Framework            | SvelteKit 2                                  |
 | Component model      | Svelte 5                                     |
-| Runtime adapter      | `@sveltejs/adapter-node`                     |
+| Build adapter        | `@sveltejs/adapter-static`                   |
 | Styling              | Tailwind CSS v4 plus app-level CSS variables |
 | Language             | TypeScript                                   |
 | Package manager      | pnpm                                         |
@@ -219,12 +225,13 @@ Everything else is dev/build infrastructure.
 | [`src/lib/components/`](./src/lib/components)                        | Shared layout, SEO, UI, and tool-shell components                          |
 | [`src/lib/utils/seo.ts`](./src/lib/utils/seo.ts)                     | JSON-LD and metadata helpers                                               |
 | [`src/lib/utils/site-indexing.ts`](./src/lib/utils/site-indexing.ts) | Canonical origin, robots, and sitemap generation                           |
-| [`src/hooks.server.ts`](./src/hooks.server.ts)                       | Response security headers                                                  |
+| [`nginx/`](./nginx)                                                  | Static routing, cache policy, and response security headers                |
 
 ### Why the Tool Registry Matters
 
 The app centralizes tool definitions in [`src/lib/constants/tools.ts`](./src/lib/constants/tools.ts). That registry drives:
 
+- stable `TL-01` through `TL-24` switchboard numbers
 - homepage listing
 - featured tool selection
 - category filtering
@@ -232,8 +239,27 @@ The app centralizes tool definitions in [`src/lib/constants/tools.ts`](./src/lib
 - route metadata
 - sitemap generation
 - tool list schema generation
+- visible input limits and route-level reference content
 
 That keeps the public catalog synchronized without duplicating route metadata in multiple places.
+
+### Input and content contracts
+
+Each tool registry entry includes:
+
+- a direct answer and use case
+- a concrete example
+- supported formats and common errors
+- an explicit processing limit
+- limitations and an authoritative reference
+- a substantive review date
+
+Byte limits are measured as UTF-8 with
+[`src/lib/utils/input-policy.ts`](./src/lib/utils/input-policy.ts). Expensive
+operations validate their input before processing, report actual versus
+maximum size, and never silently truncate. The initial limits range from
+512 KiB combined for text diff to 5 MiB for encoding-oriented tools; generator
+and format-specific routes retain stricter count or format constraints.
 
 ## Theme and Interaction Model
 
@@ -282,7 +308,10 @@ That reinforces the relationship between the tools product and the flagship doma
 
 ## Security Posture
 
-This app is interactive, so the server layer sets security headers centrally in [`src/hooks.server.ts`](./src/hooks.server.ts).
+SvelteKit generates a hash-based CSP meta policy for executable content. The
+unprivileged static server adds `frame-ancestors 'none'` and defense-in-depth
+response headers from
+[`nginx/security-headers.conf`](./nginx/security-headers.conf).
 
 Current response headers include:
 
@@ -302,6 +331,20 @@ The CSP intentionally keeps the app tight:
 
 This matches the product goal: local-first tools with minimal external exposure.
 
+## Privacy model
+
+Built-in tool input and output remain in the current browser tab. They are not:
+
+- uploaded or sent to a third party
+- placed in URLs
+- written to local storage or IndexedDB
+- logged or included in telemetry
+
+The only persisted application value is the selected theme preference.
+Clipboard and file-download actions happen only after an explicit user action.
+Curated external resources are normal links and are not loaded in the
+background.
+
 ## Testing Strategy
 
 `tools/` has both unit coverage and end-to-end coverage.
@@ -312,8 +355,12 @@ Unit tests live next to tool logic and utility logic:
 
 - `src/lib/tools/*.test.ts`
 - `src/lib/utils/*.test.ts`
+- `src/lib/offline/*.test.ts`
 
-These cover parser behavior, transformations, validation paths, and edge cases for the core utilities.
+These cover parser behavior, transformations, validation paths, cache policy,
+and edge cases for the core utilities. CI enforces global minimums of 80%
+statements, 80% lines, 80% functions, and 70% branches across the covered
+pure-library surface.
 
 ### End-to-end tests
 
@@ -327,23 +374,30 @@ It covers:
 - quick-open search panel
 - category filtering
 - theme persistence
+- switchboard numbering and narrow mobile reflow
+- privacy disclosures and canonical metadata
+- local operations producing no network requests
+- explicit oversized-input rejection without truncation
+- representative routes operating with the network disabled
+- Cache Storage excluding input, output, query variants, and third-party data
 - route-level behavior for multiple tools
 - `robots.txt`
 - `sitemap.xml`
 
-Playwright runs against a built server started from:
+Playwright runs against the generated static output using Vite preview:
 
-- `vite build`
-- `HOST=127.0.0.1 PORT=4173 node build`
+- `pnpm build`
+- `pnpm preview --host 127.0.0.1 --port 4174`
 
-That means the E2E tests validate the production-style adapter-node output, not only dev-mode behavior.
+This validates prerendered routes and hydrated interactions, not only dev-mode
+behavior.
 
 ## Development
 
 ### Requirements
 
-- Node.js 20 or newer
-- pnpm 10 or newer
+- Node.js 24 LTS
+- pnpm 11.18.0
 
 ### Install
 
@@ -368,6 +422,12 @@ pnpm lint
 
 ```bash
 pnpm test:unit:run
+```
+
+### Unit tests with enforced coverage
+
+```bash
+pnpm test:coverage
 ```
 
 ### Install Playwright browser
@@ -400,35 +460,43 @@ pnpm build
 pnpm preview
 ```
 
+## Offline behavior
+
+Tools uses SvelteKit's native service worker after the static site has been
+generated. Each build creates versioned asset and document caches:
+
+- generated application assets and public static files are cache-first
+- public HTML routes are network-first, with the installed version as the
+  offline fallback
+- activation removes older `recica-tools-*` caches before claiming clients
+- a new worker waits for the previous version's clients to close, avoiding a
+  forced mid-session update
+
+Only same-origin, query-free `GET` requests for known assets and public routes
+are eligible. POST requests, third-party requests, arbitrary query variants,
+health/error documents, tool input, and generated output are never cached.
+There is no forced install prompt.
+
 ## Deployment
 
-### Direct Node deployment
+### Indexing build variables
 
-The adapter-node build is started with:
-
-```bash
-node build
-```
-
-Operational variables to care about:
-
-| Variable          | Purpose                                                   |
-| ----------------- | --------------------------------------------------------- |
-| `PORT`            | Server port                                               |
-| `HOST`            | Bind host when starting manually                          |
-| `PUBLIC_SITE_URL` | Canonical public origin for metadata, robots, and sitemap |
+| Variable                  | Purpose                                                           |
+| ------------------------- | ----------------------------------------------------------------- |
+| `PUBLIC_INDEXING_ENABLED` | Exact `true` enables production crawling; all other values do not |
+| `PUBLIC_SITE_URL`         | Loopback-only override for non-indexable local tests              |
 
 ### Docker deployment
 
-The provided [`Dockerfile`](./Dockerfile) uses a multi-stage Node 20 Alpine build:
+The provided [`Dockerfile`](./Dockerfile) uses a Node 24 build stage and an
+unprivileged Nginx runtime:
 
-1. enable corepack
+1. activate the pinned pnpm release
 2. install with `pnpm --frozen-lockfile`
-3. build the app
-4. copy the built server and production dependencies into a runtime image
-5. expose port `3000`
-6. healthcheck `http://localhost:3000/health`
-7. start with `node build`
+3. generate the strict static site
+4. copy only `build/` and the Nginx configuration into the runtime image
+5. expose unprivileged port `8080`
+6. healthcheck `http://127.0.0.1:8080/health`
 
 Build image:
 
@@ -439,7 +507,7 @@ docker build -t recica-tools .
 Run image:
 
 ```bash
-docker run --rm -p 3000:3000 -e PORT=3000 recica-tools
+docker run --rm -p 8080:8080 recica-tools
 ```
 
 ## File Layout
@@ -447,6 +515,7 @@ docker run --rm -p 3000:3000 -e PORT=3000 recica-tools
 ```text
 tools/
   Dockerfile
+  nginx/
   package.json
   playwright.config.ts
   pnpm-lock.yaml
@@ -458,11 +527,12 @@ tools/
     manifest.json
     og-default.svg
   src/
-    hooks.server.ts
+    service-worker.ts
     lib/
       assets/
       components/
       constants/
+      offline/
       search/
       theme/
       tools/
@@ -470,7 +540,9 @@ tools/
       utils/
     routes/
       +layout.svelte
+      +layout.ts
       +page.svelte
+      404/
       health/
       robots.txt/
       sitemap.xml/
@@ -488,6 +560,7 @@ tools/
       jwt/
       markdown/
       password/
+      privacy/
       qr/
       query/
       regex/

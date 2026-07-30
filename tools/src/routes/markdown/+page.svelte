@@ -2,9 +2,11 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { createMarkdownPreviewDocument } from '$lib/tools/markdown';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = '# Recica Lab\n\n- Practical tools\n- Local-first defaults\n- Clean output';
-	$: preview = createMarkdownPreviewDocument(input);
+	$: limit = checkToolInputLimit('markdown', [input]);
+	$: preview = createMarkdownPreviewDocument(limit.ok ? input : '');
 </script>
 
 <ToolShell
@@ -21,6 +23,7 @@
 		<TextArea
 			id="markdown-input"
 			label="Markdown"
+			error={limit.ok ? undefined : limit.message}
 			rows={22}
 			mono
 			help="Preview updates automatically as you edit."
@@ -29,14 +32,21 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class="status-pill status-neutral">Markdown preview is sandboxed and sanitized.</div>
+		<div
+			class={`status-pill ${limit.ok ? 'status-neutral' : 'status-error'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
+			{limit.ok ? 'Markdown preview is sandboxed and sanitized.' : limit.message}
+		</div>
 
 		<div class="surface-panel p-4">
 			<div class="field__label px-2 pt-2">Preview</div>
 			<iframe
 				title="Markdown preview"
 				class="mt-4 h-[38rem] w-full rounded-[14px] border border-[var(--border-subtle)] bg-white"
-				sandbox=""
+				sandbox="allow-scripts"
 				srcdoc={preview}
 			></iframe>
 		</div>

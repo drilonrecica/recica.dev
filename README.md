@@ -71,12 +71,12 @@ If legacy hostnames still exist at infrastructure level, they should be treated 
 
 ## Repository Layout
 
-| Path                  | Responsibility                                      | Runtime Model                           |
-| --------------------- | --------------------------------------------------- | --------------------------------------- |
-| [`recica/`](./recica) | Flagship personal site                              | Static Astro build                      |
-| [`tools/`](./tools)   | Stable browser tools product                        | SvelteKit server build via adapter-node |
-| [`labs/`](./labs)     | Experiments, prototypes, and interactive references | SvelteKit server build via adapter-node |
-| [`docs/`](./docs)     | Repo-level documentation area                       | No runtime role currently               |
+| Path                  | Responsibility                                      | Runtime Model                 |
+| --------------------- | --------------------------------------------------- | ----------------------------- |
+| [`recica/`](./recica) | Flagship personal site                              | Static Astro build            |
+| [`tools/`](./tools)   | Stable browser tools product                        | Strict static SvelteKit build |
+| [`labs/`](./labs)     | Experiments, prototypes, and interactive references | Strict static SvelteKit build |
+| [`docs/`](./docs)     | Repo-level documentation area                       | No runtime role currently     |
 
 ## Product Boundaries
 
@@ -116,11 +116,11 @@ Shared branding is fine. Shared product responsibility is not.
 
 ## Technology Summary
 
-| App       | Framework              | Styling                                | Language   | Package Manager | Build Output              | Automated Tests              |
-| --------- | ---------------------- | -------------------------------------- | ---------- | --------------- | ------------------------- | ---------------------------- |
-| `recica/` | Astro 5                | Tailwind CSS v4 + custom CSS           | TypeScript | npm             | Static `dist/`            | Astro check + Prettier + Playwright |
-| `tools/`  | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
-| `labs/`   | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Adapter-node server build | Vitest + Playwright          |
+| App       | Framework              | Styling                                | Language   | Package Manager | Build Output        | Automated Tests                     |
+| --------- | ---------------------- | -------------------------------------- | ---------- | --------------- | ------------------- | ----------------------------------- |
+| `recica/` | Astro 7                | Tailwind CSS v4 + custom CSS           | TypeScript | pnpm            | Static `dist/`      | Astro check + Prettier + Playwright |
+| `tools/`  | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Strict static build | Vitest + Playwright                 |
+| `labs/`   | SvelteKit 2 + Svelte 5 | Tailwind CSS v4 + custom CSS variables | TypeScript | pnpm            | Strict static build | Vitest + Playwright                 |
 
 ## Why the Apps Are Separate
 
@@ -162,21 +162,22 @@ For day-to-day development, it is still usually better to work inside the app yo
 
 ## Root Verification Commands
 
-The root orchestration layer is intentionally thin. It standardizes cross-app verification without pretending the apps share one runtime or one package manager.
+The root orchestration layer is intentionally thin. It standardizes cross-app verification without pretending the apps share one runtime or lockfile.
 
 ```bash
 make check
 make build
 make test
 make audit
+make verify
 ```
 
 ### `recica/`
 
 ```bash
 cd recica
-npm install
-npm run dev
+pnpm install
+pnpm dev
 ```
 
 ### `tools/`
@@ -201,11 +202,11 @@ pnpm dev
 
 ```bash
 cd recica
-npm run check
-npm run lint
-npm run build
-npm run test:e2e
-npm run preview
+pnpm check
+pnpm lint
+pnpm build
+pnpm test:e2e
+pnpm preview
 ```
 
 ### `tools/`
@@ -243,17 +244,20 @@ pnpm preview
 
 ### `tools/`
 
-- SvelteKit app built with `@sveltejs/adapter-node`
-- runs as a Node server with `node build`
-- exposes `/health` for uptime probes
-- canonical origin is environment-aware via `PUBLIC_SITE_URL`
+- SvelteKit app built with strict `@sveltejs/adapter-static`
+- generated output is served by an unprivileged Nginx container
+- exposes a prerendered `/health` response for uptime probes
+- provides privacy-safe offline reuse through a native service worker
+- uses the fixed production canonical origin
+- preview builds default to `noindex, nofollow`
 
 ### `labs/`
 
-- SvelteKit app built with `@sveltejs/adapter-node`
-- runs as a Node server with `node build`
-- exposes `/health`, `robots.txt`, and `sitemap.xml`
-- canonical origin is environment-aware via `PUBLIC_SITE_URL`
+- SvelteKit app built with strict `@sveltejs/adapter-static`
+- generated output is served by an unprivileged Nginx container
+- exposes prerendered `/health`, `robots.txt`, and `sitemap.xml` responses
+- uses the fixed production canonical origin
+- preview builds default to `noindex, nofollow`
 - current live experiment routing stays inside the single Labs app
 
 ## Domain and Canonical Strategy
@@ -269,21 +273,15 @@ pnpm preview
 
 ### Tools domain
 
-`tools/` resolves public origin like this:
-
-1. use `PUBLIC_SITE_URL` if set to a valid `http` or `https` URL
-2. otherwise fall back to the current request origin
-
-That supports production, previews, and self-hosted environments.
+`tools/` uses `https://tools.recica.dev` for public canonical URLs. Preview
+builds keep production canonicals and default to `noindex, nofollow`. A
+loopback-only origin override exists for non-indexable local tests.
 
 ### Labs domain
 
-`labs/` uses the same operational pattern as `tools/`:
-
-1. use `PUBLIC_SITE_URL` if set and valid
-2. otherwise fall back to the request origin
-
-That origin feeds:
+`labs/` uses `https://labs.recica.dev` for public canonical URLs. As with Tools,
+preview builds retain production canonicals while blocking indexing. The fixed
+origin feeds:
 
 - canonical page URLs
 - `robots.txt`
@@ -309,7 +307,7 @@ The tools app is interactive, so it needs stronger runtime hardening.
 - no account model
 - no analytics or tracking flow in the implemented app
 - no remote uploads for the built-in utilities
-- security headers in `src/hooks.server.ts`
+- security headers in the static Nginx configuration
 
 ### `labs/`
 
@@ -319,7 +317,7 @@ The labs app is also interactive, but it still stays intentionally light:
 - no persistence in the shipped experiment
 - no analytics in the shipped MVP
 - no remote uploads
-- security headers in `src/hooks.server.ts`
+- security headers in the static Nginx configuration
 - deterministic client-side logic where possible
 
 ## Editing Guidance

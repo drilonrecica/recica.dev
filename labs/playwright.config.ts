@@ -9,7 +9,7 @@ export default defineConfig({
 	},
 	webServer: {
 		command:
-			'PUBLIC_SITE_URL=http://127.0.0.1:4175 ./node_modules/.bin/vite build && PUBLIC_SITE_URL=http://127.0.0.1:4175 HOST=127.0.0.1 PORT=4175 node build',
+			'./node_modules/.bin/vite build && ./node_modules/.bin/vite preview --host 127.0.0.1 --port 4175',
 		port: 4175,
 		reuseExistingServer: !process.env.CI
 	}

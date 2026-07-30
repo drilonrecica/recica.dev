@@ -24,6 +24,10 @@ It was prepared from an inspection of the public repository and the following de
 6. `06_COOLIFY_DEPLOYMENT_RUNBOOK.md`
 7. `07_ACCEPTANCE_CHECKLIST.md`
 
+Implementation evidence and remaining owner actions are recorded in
+[`final/2026-07-29.md`](./final/2026-07-29.md). The dated baseline remains an
+unchanged record of the pre-modernization architecture.
+
 The root `AGENTS.md` turns these documents into enforceable operating instructions for coding agents.
 
 ## Placement

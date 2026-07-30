@@ -1,0 +1,115 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  changes:
+    name: Detect affected apps
+    runs-on: ubuntu-latest
+    outputs:
+      recica: ${{ steps.filter.outputs.recica }}
+      tools: ${{ steps.filter.outputs.tools }}
+      labs: ${{ steps.filter.outputs.labs }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: dorny/paths-filter@6852f92c20ea7fd3b0c25de3b5112db3a98da050 # v3
+        id: filter
+        with:
+          filters: |
+            recica:
+              - 'recica/**'
+              - '.node-version'
+              - 'Makefile'
+              - 'AGENTS.md'
+              - 'scripts/**'
+              - '.github/**'
+            tools:
+              - 'tools/**'
+              - '.node-version'
+              - 'Makefile'
+              - 'AGENTS.md'
+              - 'scripts/**'
+              - '.github/**'
+            labs:
+              - 'labs/**'
+              - '.node-version'
+              - 'Makefile'
+              - 'AGENTS.md'
+              - 'scripts/**'
+              - '.github/**'
+
+  recica:
+    name: Recica quality
+    needs: changes
+    if: needs.changes.outputs.recica == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.18.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: recica/pnpm-lock.yaml
+      - run: pnpm --dir recica install --frozen-lockfile
+      - run: pnpm --dir recica check
+      - run: pnpm --dir recica lint
+      - run: pnpm --dir recica build
+
+  tools:
+    name: Tools quality
+    needs: changes
+    if: needs.changes.outputs.tools == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_INDEXING_ENABLED: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.18.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: tools/pnpm-lock.yaml
+      - run: pnpm --dir tools install --frozen-lockfile
+      - run: pnpm --dir tools check
+      - run: pnpm --dir tools lint
+      - run: pnpm --dir tools test:coverage
+      - run: pnpm --dir tools build
+
+  labs:
+    name: Labs quality
+    needs: changes
+    if: needs.changes.outputs.labs == 'true'
+    runs-on: ubuntu-latest
+    env:
+      PUBLIC_INDEXING_ENABLED: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+        with:
+          version: 11.18.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: labs/pnpm-lock.yaml
+      - run: pnpm --dir labs install --frozen-lockfile
+      - run: pnpm --dir labs check
+      - run: pnpm --dir labs lint
+      - run: pnpm --dir labs test:unit:run
+      - run: pnpm --dir labs build

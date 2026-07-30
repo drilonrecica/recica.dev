@@ -107,6 +107,7 @@
 				<TextInput
 					id="timestamp-input"
 					label="Unix timestamp"
+					error={error || undefined}
 					placeholder="1715342400"
 					help="Only whole-number timestamps are accepted."
 					mono
@@ -131,6 +132,7 @@
 				<TextInput
 					id="date-input"
 					label={`Date and time (${timezone.toUpperCase()})`}
+					error={error || undefined}
 					type="datetime-local"
 					help="Choose a wall-clock value and convert it with the selected timezone."
 					bind:value={dateInput}
@@ -165,7 +167,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}>
+		<div
+			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{#if error}
 				{error}
 			{:else if result}

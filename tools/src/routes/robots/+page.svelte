@@ -2,9 +2,11 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { parseRobotsTxt } from '$lib/tools/robots';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input = 'User-agent: *\nDisallow: /admin\nSitemap: https://recica.dev/sitemap.xml\nBad line';
-	$: parsed = parseRobotsTxt(input);
+	$: limit = checkToolInputLimit('robots', [input]);
+	$: parsed = parseRobotsTxt(limit.ok ? input : '');
 </script>
 
 <ToolShell
@@ -21,6 +23,11 @@
 		<TextArea
 			id="robots-input"
 			label="robots.txt content"
+			error={!limit.ok
+				? limit.message
+				: parsed.errorCount
+					? `${parsed.errorCount} malformed rows require attention.`
+					: undefined}
 			rows={18}
 			mono
 			help="Parsing updates automatically as the content changes."
@@ -29,8 +36,15 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${parsed.errorCount ? 'status-error' : 'status-neutral'}`}>
-			{parsed.directiveCount} directives · {parsed.errorCount} errors
+		<div
+			class={`status-pill ${!limit.ok || parsed.errorCount ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
+			{limit.ok
+				? `${parsed.directiveCount} directives · ${parsed.errorCount} errors`
+				: limit.message}
 		</div>
 
 		<div class="surface-panel p-6">

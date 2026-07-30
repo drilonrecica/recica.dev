@@ -1,7 +1,24 @@
-import { expect, test } from '@playwright/test';
+import { expect, isAllowedBrowserRequest, test } from './fixtures';
+
+test('browser request policy rejects arbitrary same-origin and cross-origin URLs', () => {
+	expect(isAllowedBrowserRequest('http://127.0.0.1:4174/json', 'http://127.0.0.1:4174')).toBe(true);
+	expect(
+		isAllowedBrowserRequest('http://127.0.0.1:4174/private-input-marker', 'http://127.0.0.1:4174')
+	).toBe(false);
+	expect(isAllowedBrowserRequest('https://example.com/', 'http://127.0.0.1:4174')).toBe(false);
+	expect(
+		isAllowedBrowserRequest(
+			'http://127.0.0.1:4174/json',
+			'http://127.0.0.1:4174',
+			'POST',
+			'private-input'
+		)
+	).toBe(false);
+});
 
 test('homepage search and quick-open work', async ({ page }) => {
 	await page.goto('/');
+	await expect(page.getByText('Utility Switchboard', { exact: true })).toBeVisible();
 	await expect(
 		page.getByRole('heading', {
 			name: /free browser tools for developers and everyday technical work/i
@@ -27,6 +44,64 @@ test('homepage search and quick-open work', async ({ page }) => {
 	await page.getByLabel('Search tools').fill('timestamp');
 	await page.keyboard.press('Enter');
 	await expect(page).toHaveURL(/\/timestamp$/);
+});
+
+test('tool cards use stable switchboard numbers', async ({ page }) => {
+	await page.goto('/');
+
+	await expect(page.getByText('TL-01', { exact: true }).first()).toBeVisible();
+	await expect(page.getByText('TL-24', { exact: true })).toBeVisible();
+	await expect(page.locator('[data-tool-number]')).toHaveCount(24);
+});
+
+test('privacy route explains browser-memory processing and has a production canonical', async ({
+	page
+}) => {
+	await page.goto('/privacy');
+
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'Privacy by construction' })
+	).toBeVisible();
+	await expect(page.getByText(/input and output stay in browser memory/i)).toBeVisible();
+	await expect(page.getByText(/only the selected theme preference is stored/i)).toBeVisible();
+	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+		'href',
+		'https://tools.recica.dev/privacy'
+	);
+});
+
+test('tool operation makes no network request and exposes its reference content', async ({
+	page
+}) => {
+	await page.goto('/json');
+	const operationRequests: string[] = [];
+	page.on('request', (request) => operationRequests.push(request.url()));
+
+	await page.getByLabel('Raw JSON').fill('{"network":"none"}');
+	await page.getByRole('button', { name: 'Format' }).click();
+	await expect(page.getByText(/formatted output ready/i)).toBeVisible();
+	await expect(page.getByText('When to use it', { exact: true })).toBeVisible();
+	await expect(page.getByText('RFC 8259 — JSON', { exact: true })).toBeVisible();
+	expect(operationRequests).toEqual([]);
+});
+
+test('switchboard remains usable at a narrow mobile viewport', async ({ page }) => {
+	await page.setViewportSize({ width: 320, height: 720 });
+	await page.goto('/json');
+
+	await expect(
+		page.getByRole('heading', { level: 1, name: 'JSON Formatter / Validator' })
+	).toBeVisible();
+	await expect(page.getByLabel('Tool operating contract')).toBeVisible();
+	const headerBox = await page.getByRole('banner').boundingBox();
+	const headingBox = await page
+		.getByRole('heading', { level: 1, name: 'JSON Formatter / Validator' })
+		.boundingBox();
+	expect(headingBox?.y).toBeGreaterThanOrEqual(headerBox?.height ?? 0);
+	const hasHorizontalOverflow = await page.evaluate(
+		() => document.documentElement.scrollWidth > document.documentElement.clientWidth
+	);
+	expect(hasHorizontalOverflow).toBe(false);
 });
 
 test('homepage category pills filter the tool grid', async ({ page }) => {
@@ -101,6 +176,24 @@ test('json route formats valid input and reports invalid input', async ({ page }
 	);
 });
 
+test('json route rejects oversized input before parsing without truncating it', async ({
+	page
+}) => {
+	await page.goto('/json');
+	const oversizedInput = `"${'x'.repeat(3 * 1024 * 1024)}"`;
+	await page.getByLabel('Raw JSON').fill(oversizedInput);
+	await page.getByRole('button', { name: 'Format' }).click();
+
+	await expect(page.locator('.status-pill.status-error')).toContainText(
+		/local processing limit is 3 MiB/i
+	);
+	await expect(page.locator('.status-pill.status-error')).toContainText(
+		/nothing was uploaded or truncated/i
+	);
+	await expect(page.getByLabel('Raw JSON')).toHaveValue(oversizedInput);
+	await expect(page.getByText('Formatted output ready.')).toHaveCount(0);
+});
+
 test('password route regenerates and blocks empty charset selection', async ({ page }) => {
 	await page.goto('/password');
 	await expect(page.getByText('Generated Password', { exact: true })).toBeVisible();
@@ -117,22 +210,22 @@ test('url route encodes values and shows malformed decode errors', async ({ page
 	await page.getByLabel('Source').fill('json formatter');
 	await page.getByRole('button', { name: 'Component' }).click();
 	await page.getByRole('button', { name: 'Encode' }).click();
-	await expect(page.getByText('json%20formatter')).toBeVisible();
+	await expect(page.getByText('json%20formatter', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Source').fill('%E0%A4%A');
 	await page.getByRole('button', { name: 'Decode' }).click();
-	await expect(page.getByText(/could not decode this value/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/could not decode this value/i);
 });
 
 test('base64 route encodes text and rejects malformed decode input', async ({ page }) => {
 	await page.goto('/base64');
 	await page.getByLabel('Source').fill('Recica Tools');
 	await page.getByRole('button', { name: 'Encode' }).click();
-	await expect(page.getByText('UmVjaWNhIFRvb2xz')).toBeVisible();
+	await expect(page.getByText('UmVjaWNhIFRvb2xz', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Source').fill('abc_def');
 	await page.getByRole('button', { name: 'Decode' }).click();
-	await expect(page.getByText(/use standard base64 text only/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/use standard base64 text only/i);
 });
 
 test('slug route generates output and clears to empty state', async ({ page }) => {
@@ -148,11 +241,11 @@ test('timestamp route converts values and reports invalid input', async ({ page 
 	await page.goto('/timestamp');
 	await page.getByLabel('Unix timestamp').fill('1715342400');
 	await page.getByRole('button', { name: 'Convert' }).click();
-	await expect(page.getByText('2024-05-10T12:00:00.000Z')).toBeVisible();
+	await expect(page.getByText('2024-05-10T12:00:00.000Z', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Unix timestamp').fill('abc');
 	await page.getByRole('button', { name: 'Convert' }).click();
-	await expect(page.getByText(/enter a whole unix timestamp/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/enter a whole unix timestamp/i);
 });
 
 test('diff route highlights changed lines', async ({ page }) => {
@@ -177,7 +270,7 @@ test('robots.txt and sitemap.xml expose crawlable public urls', async ({ request
 	expect(robots.ok()).toBeTruthy();
 	const robotsText = await robots.text();
 	expect(robotsText).toContain('User-agent: *');
-	expect(robotsText).toContain('Allow: /');
+	expect(robotsText).toContain('Disallow: /');
 	expect(robotsText).toMatch(/Sitemap: https?:\/\/[^\n]+\/sitemap\.xml/);
 
 	const sitemap = await request.get('/sitemap.xml');
@@ -187,6 +280,7 @@ test('robots.txt and sitemap.xml expose crawlable public urls', async ({ request
 	expect(sitemapXml).toMatch(/<loc>https?:\/\/[^<]+\/<\/loc>/);
 	expect(sitemapXml).toContain('/json</loc>');
 	expect(sitemapXml).toContain('/robots</loc>');
+	expect(sitemapXml).toContain('/privacy</loc>');
 });
 
 test('regex route previews matches and reports invalid patterns', async ({ page }) => {
@@ -197,7 +291,7 @@ test('regex route previews matches and reports invalid patterns', async ({ page 
 	await expect(page.getByText('Match 1 · 0-4')).toBeVisible();
 
 	await page.locator('#regex-pattern').fill('[');
-	await expect(page.getByText(/invalid regular expression/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/invalid regular expression/i);
 });
 
 test('uuid route generates batches and validates count bounds', async ({ page }) => {
@@ -224,11 +318,11 @@ test('query route parses values and reports malformed encoding', async ({ page }
 	await page.goto('/query');
 	await page.getByLabel('Raw query string').fill('?tag=json&tag=tools');
 	await page.getByRole('button', { name: 'Parse' }).click();
-	await expect(page.getByText('?tag=json&tag=tools')).toBeVisible();
+	await expect(page.getByText('?tag=json&tag=tools', { exact: true })).toBeVisible();
 
 	await page.getByLabel('Raw query string').fill('?bad=%E0%A4%A');
 	await page.getByRole('button', { name: 'Parse' }).click();
-	await expect(page.getByText(/could not parse this query string/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/could not parse this query string/i);
 });
 
 test('case route converts text and clears to empty outputs', async ({ page }) => {
@@ -264,7 +358,7 @@ test('color route converts valid values and rejects invalid ones', async ({ page
 	await expect(page.getByText('rgb(255, 255, 255)')).toBeVisible();
 
 	await page.getByLabel('Color value').fill('wat');
-	await expect(page.getByText(/could not parse this color/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/could not parse this color/i);
 });
 
 test('jwt route decodes payloads and rejects malformed tokens', async ({ page }) => {
@@ -275,7 +369,9 @@ test('jwt route decodes payloads and rejects malformed tokens', async ({ page })
 
 	await page.getByLabel('JWT').fill('abc');
 	await page.getByRole('button', { name: 'Inspect' }).click();
-	await expect(page.getByText(/must contain header, payload, and signature/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(
+		/must contain header, payload, and signature/i
+	);
 });
 
 test('markdown route renders safe preview output', async ({ page }) => {
@@ -290,13 +386,26 @@ test('markdown route renders safe preview output', async ({ page }) => {
 test('html route previews markup without executing scripts', async ({ page }) => {
 	await page.goto('/html');
 	const preview = page.frameLocator('iframe[title="HTML preview"]');
+	const previewRequests: string[] = [];
+	page.on('request', (request) => {
+		if (request.url().includes('private-preview-marker')) previewRequests.push(request.url());
+	});
 	await expect(preview.getByRole('heading', { name: 'Recica Preview' })).toBeVisible();
 
 	await page
 		.getByLabel('HTML')
-		.fill('<button onclick="alert(1)">Safe</button><script>document.body.append("owned")</script>');
+		.fill(
+			'<button onclick="alert(1)">Safe</button>' +
+				'<script>document.body.append("owned")</script>' +
+				'<img src="/private-preview-marker-image">' +
+				'<link rel="stylesheet" href="/private-preview-marker-style">' +
+				'<iframe src="/private-preview-marker-frame"></iframe>' +
+				'<video src="/private-preview-marker-media"></video>'
+		);
 	await expect(preview.getByRole('button', { name: 'Safe' })).toBeVisible();
 	await expect(preview.locator('body')).not.toContainText('owned');
+	await page.waitForTimeout(250);
+	expect(previewRequests).toEqual([]);
 });
 
 test('device route reports browser-side information', async ({ page }) => {
@@ -315,7 +424,7 @@ test('barcode route generates previews and validates invalid numeric input', asy
 	await page.getByRole('button', { name: 'EAN-13' }).click();
 	await page.getByLabel('Value').fill('123');
 	await page.getByRole('button', { name: 'Generate' }).click();
-	await expect(page.getByText(/ean-13 accepts 12 digits/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(/ean-13 accepts 12 digits/i);
 });
 
 test('sql route formats and minifies source text', async ({ page }) => {
@@ -342,5 +451,7 @@ test('sitemap route extracts URLs and reports invalid roots', async ({ page }) =
 	await expect(page.getByText('https://recica.dev/tools')).toBeVisible();
 
 	await page.getByLabel('Sitemap XML').fill('<xml></xml>');
-	await expect(page.getByText(/must contain a <urlset> or <sitemapindex>/i)).toBeVisible();
+	await expect(page.getByRole('status')).toContainText(
+		/must contain a <urlset> or <sitemapindex>/i
+	);
 });

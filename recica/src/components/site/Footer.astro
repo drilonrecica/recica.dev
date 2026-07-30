@@ -4,11 +4,12 @@ import { footerLinks, siteConfig } from "@/lib/site-content";
 const year = new Date().getFullYear();
 ---
 
-<footer data-blueprint="Footer.astro" class="site-footer">
+<footer class="site-footer">
     <div class="site-footer__shell">
-        <p>
-            &copy; {year} {siteConfig.name}. All rights reserved.
-        </p>
+        <div>
+            <p class="dossier-index">END / RECICA.DEV</p>
+            <p>&copy; {year} {siteConfig.name}. Independent publication.</p>
+        </div>
         <div class="site-footer__links">
             {
                 footerLinks.map((link) => (

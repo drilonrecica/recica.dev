@@ -23,13 +23,11 @@
 					alt="Recica Tools Logo"
 					class="h-10 w-10 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-elevated)]"
 				/>
-				<div>
+				<div class="hidden min-[560px]:block">
 					<div class="text-sm font-semibold tracking-[0.14em] text-[var(--text)] uppercase">
 						Recica Tools
 					</div>
-					<div class="text-xs text-[var(--text-muted)]">
-						Practical tools, built in the Recica Lab.
-					</div>
+					<div class="text-xs text-[var(--text-muted)]">Private browser utilities.</div>
 				</div>
 			</a>
 			<a
@@ -48,7 +46,7 @@
 			<button
 				bind:this={searchButtonEl}
 				type="button"
-				class={`button-base ${searchOpen ? 'button-secondary' : 'button-ghost'} min-w-[8.5rem]`}
+				class={`button-base ${searchOpen ? 'button-secondary' : 'button-ghost'} min-w-0 px-3 sm:min-w-[8.5rem]`}
 				aria-controls="tool-search-dialog"
 				aria-expanded={searchOpen}
 				aria-haspopup="dialog"

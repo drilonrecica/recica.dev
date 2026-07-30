@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { env } from '$env/dynamic/public';
-	import { resolveSiteOrigin } from '$lib/utils/site-indexing';
+	import { INDEXING_ENABLED, SITE_ORIGIN } from '$lib/utils/site-indexing';
 	import { defaultSocialImagePath, serializeJsonLd, siteName } from '$lib/utils/seo';
 
 	export let title = '';
@@ -16,12 +15,11 @@
 	export let schemas: unknown[] = [];
 	export let omitCanonical = false;
 
-	$: origin = resolveSiteOrigin(env.PUBLIC_SITE_URL, $page.url);
-	$: canonicalUrl = new URL(path || $page.url.pathname, origin).toString();
-	$: imageUrl = imagePath ? new URL(imagePath, origin).toString() : '';
+	$: canonicalUrl = new URL(path || $page.url.pathname, SITE_ORIGIN).toString();
+	$: imageUrl = imagePath ? new URL(imagePath, SITE_ORIGIN).toString() : '';
 	$: fullTitle = title ? `${title} • ${siteName}` : siteName;
 	$: socialTitle = title || siteName;
-	$: resolvedRobots = noindex ? 'noindex, nofollow, noarchive' : robots;
+	$: resolvedRobots = noindex || !INDEXING_ENABLED ? 'noindex, nofollow, noarchive' : robots;
 	$: serializedSchemas = schemas.map((schema) => serializeJsonLd(schema));
 </script>
 

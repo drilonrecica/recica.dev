@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
+
 	const year = new Date().getFullYear();
 </script>
 
@@ -20,6 +22,7 @@
 		</div>
 
 		<nav class="footer-links" aria-label="Footer">
+			<a href={resolve('/privacy')}>Privacy</a>
 			<a href="https://recica.dev" rel="noreferrer">recica.dev</a>
 			<a href="https://labs.recica.dev" rel="noreferrer">labs.recica.dev</a>
 			<a href="https://github.com/drilonrecica" rel="noreferrer">GitHub</a>

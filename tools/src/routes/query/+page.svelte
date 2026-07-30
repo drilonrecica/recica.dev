@@ -4,6 +4,7 @@
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { buildQueryString, parseQueryString } from '$lib/tools/query';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	type Row = { id: number; key: string; value: string };
 
@@ -13,6 +14,13 @@
 	let nextId = 1;
 
 	function parseSource() {
+		const limit = checkToolInputLimit('query', [input]);
+		if (!limit.ok) {
+			error = limit.message;
+			rows = [];
+			return;
+		}
+
 		const parsed = parseQueryString(input);
 		if (!parsed.ok) {
 			error = parsed.error;
@@ -50,6 +58,7 @@
 			<TextArea
 				id="query-input"
 				label="Raw query string"
+				error={error || undefined}
 				rows={10}
 				mono
 				help="Paste with or without the leading ?."
@@ -87,7 +96,12 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}>
+		<div
+			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
 			{error || `${rows.length} row${rows.length === 1 ? '' : 's'} ready.`}
 		</div>
 

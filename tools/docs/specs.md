@@ -362,21 +362,23 @@ The MVP uses a hybrid interaction model:
 - Language: TypeScript
 - Styling: Tailwind CSS with CSS variables for theme tokens
 - Deployment: Docker container on Hetzner VPS via Coolify
-- SvelteKit adapter: `@sveltejs/adapter-node`
+- SvelteKit adapter: strict `@sveltejs/adapter-static`
 - Persistence: none beyond theme preference in `localStorage`
 - Backend API: none in MVP
 - Analytics: none
 - Auth: none
-- PWA: none
+- Offline support: native service worker without a forced install prompt
 
 ### 8.2 Runtime and rendering model
 
-- The app keeps SvelteKit's SSR-capable shell
-- Public shell routes may be prerendered when that improves delivery without changing behavior
+- Every public route is prerendered into complete HTML
 - Tool logic runs in the browser
 - The app is not implemented as an SPA-only client app
 - Browser-only APIs are guarded correctly
-- The runtime target is a Node server inside the deployment container
+- The production container is an unprivileged static Nginx server with no Node runtime
+- Fingerprinted assets are cache-first; public documents are network-first with
+  an offline fallback
+- The service worker rejects non-GET, third-party, and query-string requests
 
 ### 8.3 Architecture principles
 
@@ -941,8 +943,9 @@ Deploy with Docker to a Hetzner VPS through Coolify.
 The shipped baseline is complete when all of the following are true:
 
 - The app is a single SvelteKit application
-- The deployment target uses `@sveltejs/adapter-node`
-- The app runs as a Node server inside Docker on Coolify
+- The deployment target uses strict `@sveltejs/adapter-static`
+- The generated site runs in an unprivileged static Nginx container on Coolify
+- No Node process or production `node_modules` are required
 - All 24 built-in tool routes exist
 - The homepage lists all built-in tools from the central `ToolDefinition` source of truth
 - Tool search uses tool `name`, `description`, and `keywords`

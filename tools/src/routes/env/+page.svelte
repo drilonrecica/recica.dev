@@ -2,10 +2,12 @@
 	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
 	import { parseDotenv } from '$lib/tools/env';
+	import { checkToolInputLimit } from '$lib/utils/input-policy';
 
 	let input =
 		'# App config\nAPI_URL="https://recica.dev"\nDEBUG=true\nAPI_URL=https://duplicate.dev\nBROKEN LINE';
-	$: parsed = parseDotenv(input);
+	$: limit = checkToolInputLimit('env', [input]);
+	$: parsed = parseDotenv(limit.ok ? input : '');
 </script>
 
 <ToolShell
@@ -22,6 +24,11 @@
 		<TextArea
 			id="env-input"
 			label="dotenv text"
+			error={!limit.ok
+				? limit.message
+				: parsed.errorCount
+					? `${parsed.errorCount} malformed or duplicate rows require attention.`
+					: undefined}
 			rows={18}
 			mono
 			help="Parsing updates locally as the source changes."
@@ -30,8 +37,15 @@
 	</div>
 
 	<div class="space-y-4">
-		<div class={`status-pill ${parsed.errorCount ? 'status-error' : 'status-neutral'}`}>
-			{parsed.entryCount} entries · {parsed.duplicateCount} duplicates · {parsed.errorCount} errors
+		<div
+			class={`status-pill ${!limit.ok || parsed.errorCount ? 'status-error' : 'status-neutral'}`}
+			role="status"
+			aria-live="polite"
+			aria-atomic="true"
+		>
+			{limit.ok
+				? `${parsed.entryCount} entries · ${parsed.duplicateCount} duplicates · ${parsed.errorCount} errors`
+				: limit.message}
 		</div>
 
 		<div class="surface-panel p-6">
