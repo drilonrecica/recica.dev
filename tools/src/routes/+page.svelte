@@ -191,7 +191,7 @@
 			<div class="space-y-3">
 				{#each resources as resource (resource.href)}
 					<svelte:element
-						this={'a'}
+						this={"a"}
 						href={resource.href}
 						target="_blank"
 						rel="noreferrer"

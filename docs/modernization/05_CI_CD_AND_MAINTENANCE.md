@@ -120,6 +120,10 @@ Jobs:
 
 Install only required browsers on PR jobs.
 
+Tools Chromium jobs set `PLAYWRIGHT_BROWSER_CHANNEL=chromium` so Playwright uses the full Chromium
+browser in headless mode. This avoids native crashes observed in the separately packaged Chromium
+headless shell during the longer Tools suite. Firefox and WebKit jobs leave the channel unset.
+
 Retain on failure:
 
 - traces
@@ -130,9 +134,11 @@ Do not commit generated test artifacts.
 
 ### Network assertions
 
-Tools E2E should fail if tool operation requests unexpected external origins.
+Tools E2E should fail if tool operation requests unexpected origins or undeclared same-origin paths.
 
-Maintain an explicit allowlist containing only required same-origin development/preview requests.
+Maintain an explicit allowlist containing only public document routes, generated application assets,
+and declared static assets such as favicons. Start operation-specific network assertions only after
+the initial document assets have finished loading.
 
 ### Accessibility
 

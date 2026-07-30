@@ -3,6 +3,9 @@ import { expect, isAllowedBrowserRequest, test } from './fixtures';
 test('browser request policy rejects arbitrary same-origin and cross-origin URLs', () => {
 	expect(isAllowedBrowserRequest('http://127.0.0.1:4174/json', 'http://127.0.0.1:4174')).toBe(true);
 	expect(
+		isAllowedBrowserRequest('http://127.0.0.1:4174/favicons/favicon.svg', 'http://127.0.0.1:4174')
+	).toBe(true);
+	expect(
 		isAllowedBrowserRequest('http://127.0.0.1:4174/private-input-marker', 'http://127.0.0.1:4174')
 	).toBe(false);
 	expect(isAllowedBrowserRequest('https://example.com/', 'http://127.0.0.1:4174')).toBe(false);
@@ -74,6 +77,7 @@ test('tool operation makes no network request and exposes its reference content'
 	page
 }) => {
 	await page.goto('/json');
+	await page.waitForLoadState('networkidle');
 	const operationRequests: string[] = [];
 	page.on('request', (request) => operationRequests.push(request.url()));
 

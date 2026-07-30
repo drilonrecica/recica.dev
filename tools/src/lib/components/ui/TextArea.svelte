@@ -28,8 +28,7 @@
 		{placeholder}
 		{rows}
 		aria-describedby={describedBy}
-		aria-invalid={error ? 'true' : undefined}
-	></textarea>
+		aria-invalid={error ? 'true' : undefined}></textarea>
 	{#if error}
 		<span class="field__error" id={errorId} role="alert" aria-live="assertive">{error}</span>
 	{:else if help}

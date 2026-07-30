@@ -6,6 +6,7 @@ export default defineConfig({
 	workers: 1,
 	use: {
 		baseURL: 'http://127.0.0.1:4174',
+		channel: process.env.PLAYWRIGHT_BROWSER_CHANNEL === 'chromium' ? 'chromium' : undefined,
 		trace: 'retain-on-failure'
 	},
 	webServer: {
