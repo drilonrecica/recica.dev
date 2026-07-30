@@ -3,7 +3,12 @@ import { tools } from '../../src/lib/constants/tools';
 
 const allowedDocumentPaths = new Set(['/', '/404', '/privacy', ...tools.map((tool) => tool.route)]);
 const allowedStaticPaths = new Set([
-	'/favicon.svg',
+	'/favicons/apple-touch-icon.png',
+	'/favicons/favicon-96x96.png',
+	'/favicons/favicon.ico',
+	'/favicons/favicon.svg',
+	'/favicons/web-app-manifest-192x192.png',
+	'/favicons/web-app-manifest-512x512.png',
 	'/manifest.json',
 	'/og-default.svg',
 	'/recica-tools-logo.jpg',
