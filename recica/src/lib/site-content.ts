@@ -123,7 +123,7 @@ export const siteConfig = {
   availability:
     "Open to senior and lead mobile roles, modernization work, and selective consulting.",
   yearsSince: 2012,
-  image: "/og/home.png",
+  image: "/og/home.jpg",
   imageAlt:
     "Drilon Reçica, Senior Mobile & Product Engineer, Prishtina, recica.dev",
   twitterHandle: "@drilonre",

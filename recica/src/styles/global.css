@@ -881,7 +881,6 @@
   }
 
   .page__hero .hero__portrait {
-    width: min(100%, 10rem);
     margin-top: 1.25rem;
   }
 
@@ -1163,6 +1162,11 @@
 
   .hero__portrait {
     width: clamp(14rem, 22vw, 19rem);
+  }
+
+  /* Unlayered on purpose: it must beat the desktop width above. */
+  .page__hero .hero__portrait {
+    width: min(100%, 10rem);
   }
 
   .facts {

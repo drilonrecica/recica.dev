@@ -84,8 +84,8 @@ test("homepage keeps public anchors, metadata, and zero presentation scripts", a
   const ogImage = await page
     .locator('meta[property="og:image"]')
     .getAttribute("content");
-  expect(ogImage).toBe("https://recica.dev/og/home.png");
-  const ogResponse = await request.get("/og/home.png");
+  expect(ogImage).toBe("https://recica.dev/og/home.jpg");
+  const ogResponse = await request.get("/og/home.jpg");
   expect(ogResponse.ok()).toBeTruthy();
 
   await expectNoPresentationScripts(page);
@@ -144,7 +144,7 @@ for (const route of publicRoutes) {
     const ogImage = await page
       .locator('meta[property="og:image"]')
       .getAttribute("content");
-    expect(ogImage).toMatch(/^https:\/\/recica\.dev\/og\/[a-z-]+\.png$/);
+    expect(ogImage).toMatch(/^https:\/\/recica\.dev\/og\/[a-z-]+\.(png|jpg)$/);
     const ogResponse = await request.get(new URL(ogImage!).pathname);
     expect(ogResponse.ok()).toBeTruthy();
 
@@ -203,8 +203,8 @@ test("person structured data carries location, languages, and a portrait", async
 
   expect(person.knowsLanguage).toEqual(["Albanian", "German", "English"]);
   expect(person.address).toMatchObject({ addressLocality: "Prishtina" });
-  expect(person.image).toBe("https://recica.dev/og/portrait.png");
-  const portrait = await request.get("/og/portrait.png");
+  expect(person.image).toBe("https://recica.dev/og/portrait.jpg");
+  const portrait = await request.get("/og/portrait.jpg");
   expect(portrait.ok()).toBeTruthy();
 });
 

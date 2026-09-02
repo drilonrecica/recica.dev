@@ -98,6 +98,7 @@ const page = (
 const documents = [
   {
     name: "home",
+    photo: true,
     html: page(
       siteConfig.role,
       `<div class="body"><div><div class="title xl">${siteConfig.name}</div>
@@ -107,6 +108,7 @@ const documents = [
   },
   {
     name: "about",
+    photo: true,
     html: page(
       "About",
       `<div class="body"><div><div class="title lg">Engineering with product context intact.</div>
@@ -115,6 +117,7 @@ const documents = [
   },
   {
     name: "cv",
+    photo: true,
     html: page(
       "Curriculum vitae",
       `<div class="body"><div><div class="title xl">${siteConfig.name}</div>
@@ -134,6 +137,7 @@ const documents = [
   {
     name: "portrait",
     square: true,
+    photo: true,
     html: page(
       siteConfig.role,
       `<div class="body">${visual}</div>`,
@@ -154,15 +158,19 @@ try {
     await writeFile(tmp, doc.html);
     await tab.goto(pathToFileURL(tmp).href);
     await tab.evaluate(() => document.fonts.ready);
-    const png = await tab.screenshot({
-      type: "png",
+    // Cards carrying the photo are JPEG (a photo in PNG is ~1 MB);
+    // text-only cards stay PNG so the type stays crisp.
+    const ext = doc.photo && portraitUrl ? "jpg" : "png";
+    const image = await tab.screenshot({
+      type: ext === "jpg" ? "jpeg" : "png",
+      quality: ext === "jpg" ? 86 : undefined,
       clip: { x: 0, y: 0, ...size },
     });
-    await writeFile(path.join(outDir, `${doc.name}.png`), png);
+    await writeFile(path.join(outDir, `${doc.name}.${ext}`), image);
     await tab.close();
     await rm(tmp);
     console.log(
-      `rendered og/${doc.name}.png (${(png.length / 1024).toFixed(0)} KB)`,
+      `rendered og/${doc.name}.${ext} (${(image.length / 1024).toFixed(0)} KB)`,
     );
   }
 } finally {
