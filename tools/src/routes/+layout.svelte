@@ -1,10 +1,17 @@
 <script lang="ts">
 	import './layout.css';
+	import '@fontsource/inter/latin-400.css';
+	import '@fontsource/inter/latin-500.css';
+	import '@fontsource/inter/latin-600.css';
+	import '@fontsource/jetbrains-mono/latin-400.css';
+	import '@fontsource/jetbrains-mono/latin-700.css';
 	import Footer from '$lib/components/layout/Footer.svelte';
 	import Header from '$lib/components/layout/Header.svelte';
 	import SearchPanel from '$lib/components/layout/SearchPanel.svelte';
+	import Shortcuts from '$lib/components/workbench/Shortcuts.svelte';
 	import { searchTools } from '$lib/search/tools';
 	import { theme } from '$lib/theme/theme';
+	import { registerShortcut } from '$lib/workbench/keyboard';
 	import { goto, afterNavigate } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { page } from '$app/stores';
@@ -13,10 +20,13 @@
 
 	let { children } = $props();
 	let searchOpen = $state(false);
+	let shortcutsOpen = $state(false);
 	let searchQuery = $state('');
 	let searchResults: ToolDefinition[] = $derived(searchTools(searchQuery).slice(0, 7));
 	let searchButtonEl = $state<HTMLButtonElement | null>(null);
 	let lastFocusedElement = $state<HTMLElement | null>(null);
+
+	const resolvedTheme = theme.resolved;
 
 	async function closeSearch(options: { restoreFocus?: boolean } = {}) {
 		const { restoreFocus = true } = options;
@@ -46,85 +56,97 @@
 	}
 
 	function openSearch() {
+		if (shortcutsOpen) shortcutsOpen = false;
 		lastFocusedElement =
 			document.activeElement instanceof HTMLElement ? document.activeElement : null;
 		searchOpen = true;
 	}
 
+	function openShortcuts() {
+		if (searchOpen) void closeSearch({ restoreFocus: false });
+		lastFocusedElement =
+			document.activeElement instanceof HTMLElement ? document.activeElement : null;
+		shortcutsOpen = true;
+	}
+
+	async function closeShortcuts() {
+		shortcutsOpen = false;
+		const focusTarget = lastFocusedElement;
+		lastFocusedElement = null;
+		await tick();
+		if (focusTarget && document.contains(focusTarget)) focusTarget.focus();
+	}
+
 	afterNavigate(() => {
 		void closeSearch({ restoreFocus: false });
+		shortcutsOpen = false;
 	});
 
 	onMount(() => {
 		theme.init();
 
-		const handleKeydown = (event: KeyboardEvent) => {
-			const target = event.target as HTMLElement | null;
-			const isTypingTarget =
-				target instanceof HTMLInputElement ||
-				target instanceof HTMLTextAreaElement ||
-				target?.isContentEditable;
+		const unregister = [
+			registerShortcut({
+				keys: '/',
+				label: 'Search tools',
+				scope: 'global',
+				handler: openSearch
+			}),
+			registerShortcut({
+				keys: 'Mod+k',
+				label: 'Search tools',
+				scope: 'global',
+				handler: openSearch
+			}),
+			registerShortcut({
+				keys: '?',
+				label: 'Show keyboard shortcuts',
+				scope: 'global',
+				handler: openShortcuts
+			})
+		];
 
-			if (
-				event.key === '/' &&
-				!event.metaKey &&
-				!event.ctrlKey &&
-				!event.altKey &&
-				!isTypingTarget
-			) {
-				event.preventDefault();
-				openSearch();
-			}
-
-			if (event.key === 'Escape' && searchOpen) {
-				void closeSearch();
-			}
+		const handleEscape = (event: KeyboardEvent) => {
+			if (event.key !== 'Escape') return;
+			if (searchOpen) void closeSearch();
+			else if (shortcutsOpen) void closeShortcuts();
 		};
-
-		window.addEventListener('keydown', handleKeydown);
+		window.addEventListener('keydown', handleEscape);
 
 		return () => {
-			window.removeEventListener('keydown', handleKeydown);
+			unregister.forEach((fn) => fn());
+			window.removeEventListener('keydown', handleEscape);
 		};
 	});
+
+	const modalOpen = $derived(searchOpen || shortcutsOpen);
 </script>
 
 <svelte:head>
-	<meta name="theme-color" content="#0b0f14" />
-	<meta name="color-scheme" content="dark light" />
+	<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f7f5" />
+	<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c0f0e" />
+	<meta name="color-scheme" content={$resolvedTheme === 'dark' ? 'dark light' : 'light dark'} />
 </svelte:head>
 
-<div class="min-h-screen bg-[var(--bg)] text-[var(--text)]">
-	<a href="#main-content" class="skip-link">Skip to content</a>
+<a href="#main-content" class="skip-link">Skip to content</a>
 
-	<div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-		<div
-			class="absolute inset-x-0 top-[-12rem] h-[28rem] bg-[radial-gradient(circle_at_top,rgba(30,200,165,0.16),transparent_54%)]"
-		></div>
-		<div
-			class="absolute top-[20%] right-[-6rem] h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(77,163,255,0.16),transparent_68%)] blur-3xl"
-		></div>
-	</div>
+<div inert={modalOpen}>
+	<Header bind:searchButtonEl pathname={$page.url.pathname} {searchOpen} on:search={openSearch} />
 
-	<div inert={searchOpen}>
-		<Header bind:searchButtonEl pathname={$page.url.pathname} {searchOpen} on:search={openSearch} />
+	<main id="main-content" class="app-main">
+		{@render children()}
+	</main>
 
-		<main
-			id="main-content"
-			class="mx-auto w-full max-w-7xl px-4 pt-24 pb-20 sm:px-6 lg:px-8 lg:pt-28"
-		>
-			{@render children()}
-		</main>
-
-		<Footer />
-	</div>
-
-	<SearchPanel
-		open={searchOpen}
-		query={searchQuery}
-		results={searchResults}
-		on:close={() => closeSearch()}
-		on:choose={(event) => chooseTool(event.detail)}
-		on:querychange={handleQueryChange}
-	/>
+	<Footer />
 </div>
+
+<SearchPanel
+	open={searchOpen}
+	query={searchQuery}
+	results={searchResults}
+	on:close={() => closeSearch()}
+	on:choose={(event) => chooseTool(event.detail)}
+	on:querychange={handleQueryChange}
+/>
+
+<Shortcuts open={shortcutsOpen} onclose={closeShortcuts} />

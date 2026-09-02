@@ -25,13 +25,6 @@ test('homepage search and quick-open work', async ({ page }) => {
 		})
 	).toBeVisible();
 
-	const featuredSection = page
-		.locator('section.surface-panel')
-		.filter({ has: page.getByText('Featured Tools') });
-	await expect(featuredSection.locator('a').nth(0)).toContainText('JSON Formatter / Validator');
-	await expect(featuredSection.locator('a').nth(1)).toContainText('Base64 Encoder / Decoder');
-	await expect(featuredSection.locator('a').nth(2)).toContainText('QR Code Generator');
-
 	await page.getByLabel('Find a tool').fill('json');
 	await expect(
 		page.getByRole('link', { name: /json formatter \/ validator/i }).first()
@@ -46,12 +39,12 @@ test('homepage search and quick-open work', async ({ page }) => {
 	await expect(page).toHaveURL(/\/timestamp$/);
 });
 
-test('tool cards use stable switchboard numbers', async ({ page }) => {
+test('tool index lists every tool exactly once, grouped by category', async ({ page }) => {
 	await page.goto('/');
 
-	await expect(page.getByText('TL-01', { exact: true }).first()).toBeVisible();
-	await expect(page.getByText('TL-24', { exact: true })).toBeVisible();
 	await expect(page.locator('[data-tool-number]')).toHaveCount(24);
+	await expect(page.locator('.index__group h2').first()).toHaveText('Format');
+	await expect(page.getByRole('link', { name: /json formatter \/ validator/i })).toHaveCount(1);
 });
 
 test('privacy route explains browser-memory processing and has a production canonical', async ({
@@ -63,7 +56,9 @@ test('privacy route explains browser-memory processing and has a production cano
 		page.getByRole('heading', { level: 1, name: 'Privacy by construction' })
 	).toBeVisible();
 	await expect(page.getByText(/input and output stay in browser memory/i)).toBeVisible();
-	await expect(page.getByText(/only the selected theme preference is stored/i)).toBeVisible();
+	await expect(
+		page.getByText(/only your theme override and the identifiers of favorite/i)
+	).toBeVisible();
 	await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
 		'href',
 		'https://tools.recica.dev/privacy'
@@ -75,7 +70,12 @@ test('tool operation makes no network request and exposes its reference content'
 }) => {
 	await page.goto('/json');
 	const operationRequests: string[] = [];
-	page.on('request', (request) => operationRequests.push(request.url()));
+	// Self-hosted fonts and hashed assets may still stream in; only tool data matters.
+	page.on('request', (request) => {
+		if (!new URL(request.url()).pathname.startsWith('/_app/immutable/')) {
+			operationRequests.push(request.url());
+		}
+	});
 
 	await page.getByLabel('Raw JSON').fill('{"network":"none"}');
 	await page.getByRole('button', { name: 'Format' }).click();
@@ -134,11 +134,22 @@ test('homepage category pills filter the tool grid', async ({ page }) => {
 	).toBeVisible();
 });
 
-test('theme toggle persists a theme change', async ({ page }) => {
+test('theme follows the system until the toggle stores an override', async ({ page }) => {
+	await page.emulateMedia({ colorScheme: 'dark' });
 	await page.goto('/');
+	await expect(page.locator('html')).not.toHaveAttribute('data-theme', /./);
+	expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(
+		'rgb(12, 15, 14)'
+	);
+
 	await page.getByRole('button', { name: /toggle theme/i }).click();
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 	await page.reload();
-	await expect(page.locator('html')).not.toHaveClass(/dark/);
+	await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+	expect(await page.evaluate(() => getComputedStyle(document.body).backgroundColor)).toBe(
+		'rgb(246, 247, 245)'
+	);
+	expect(await page.evaluate(() => localStorage.getItem('recica-theme'))).toBe('light');
 });
 
 test('qr route switches presets, renders output, and handles an oversized value', async ({
@@ -171,9 +182,10 @@ test('json route formats valid input and reports invalid input', async ({ page }
 
 	await page.getByLabel('Raw JSON').fill('{"lab":}');
 	await page.getByRole('button', { name: 'Validate' }).click();
-	await expect(page.locator('.status-pill.status-error')).toContainText(
-		/(invalid json|unexpected token)/i
-	);
+	await expect(page.getByRole('status')).toContainText(/(invalid json|unexpected token)/i);
+	// The gutter marks the failing line and the overlay marks the column.
+	await expect(page.locator('.codefield__gutter [data-mark]')).toHaveCount(1);
+	await expect(page.locator('.codefield__overlay mark')).toHaveCount(1);
 });
 
 test('json route rejects oversized input before parsing without truncating it', async ({
@@ -184,12 +196,8 @@ test('json route rejects oversized input before parsing without truncating it', 
 	await page.getByLabel('Raw JSON').fill(oversizedInput);
 	await page.getByRole('button', { name: 'Format' }).click();
 
-	await expect(page.locator('.status-pill.status-error')).toContainText(
-		/local processing limit is 3 MiB/i
-	);
-	await expect(page.locator('.status-pill.status-error')).toContainText(
-		/nothing was uploaded or truncated/i
-	);
+	await expect(page.getByRole('status')).toContainText(/local processing limit is 3 MiB/i);
+	await expect(page.getByRole('status')).toContainText(/nothing was uploaded or truncated/i);
 	await expect(page.getByLabel('Raw JSON')).toHaveValue(oversizedInput);
 	await expect(page.getByText('Formatted output ready.')).toHaveCount(0);
 });
@@ -302,7 +310,7 @@ test('uuid route generates batches and validates count bounds', async ({ page })
 
 	await page.getByLabel('Count').fill('0');
 	await page.getByRole('button', { name: 'Generate' }).click();
-	await expect(page.locator('.status-pill.status-error')).toContainText('between 1 and 50');
+	await expect(page.getByRole('status')).toContainText('between 1 and 50');
 });
 
 test('hash route generates digests locally', async ({ page }) => {
@@ -338,10 +346,8 @@ test('case route converts text and clears to empty outputs', async ({ page }) =>
 test('counter route updates practical text metrics', async ({ page }) => {
 	await page.goto('/counter');
 	await page.getByLabel('Source text').fill('One two\n\nThree');
-	await expect(page.locator('.surface-panel', { hasText: 'Words' }).first()).toContainText('3');
-	await expect(page.locator('.surface-panel', { hasText: 'Paragraphs' }).first()).toContainText(
-		'2'
-	);
+	await expect(page.locator('[data-metric="words"]')).toContainText('3');
+	await expect(page.locator('[data-metric="paragraphs"]')).toContainText('2');
 });
 
 test('env route parses entries and flags malformed rows', async ({ page }) => {
@@ -410,8 +416,8 @@ test('html route previews markup without executing scripts', async ({ page }) =>
 
 test('device route reports browser-side information', async ({ page }) => {
 	await page.goto('/device');
-	await expect(page.getByText('userAgent')).toBeVisible();
-	await expect(page.getByText('viewport', { exact: true })).toBeVisible();
+	await expect(page.locator('dt', { hasText: 'userAgent' })).toBeVisible();
+	await expect(page.locator('dt', { hasText: 'viewport' })).toBeVisible();
 	await expect(page.getByRole('button', { name: 'Copy JSON' })).toBeEnabled();
 });
 

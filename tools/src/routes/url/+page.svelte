@@ -1,51 +1,121 @@
 <script lang="ts">
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
-	import TextArea from '$lib/components/ui/TextArea.svelte';
+	import { onMount } from 'svelte';
+	import CodeField from '$lib/components/workbench/CodeField.svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import type { UrlAction, UrlMode } from '$lib/tools/url';
 	import { transformUrl } from '$lib/tools/url';
+	import { copyText } from '$lib/utils/clipboard';
 	import { checkToolInputLimit } from '$lib/utils/input-policy';
+	import { createDebounced, timed } from '$lib/workbench/live';
+	import { STANDARD_SHORTCUTS, setupToolPage } from '$lib/workbench/page';
 
-	let input = 'https://recica.dev/tools?name=JSON formatter&mode=full url';
-	let output = '';
-	let error = '';
-	let mode: UrlMode = 'component';
-	let lastAction = 'Choose Encode or Decode.';
+	let input = $state('https://recica.dev/tools?name=JSON formatter&mode=full url');
+	let output = $state('');
+	let mode = $state<UrlMode>('component');
+	let action = $state<UrlAction>('encode');
+	let message = $state('Choose a mode and an action. Output follows as you type.');
+	let tone = $state<'idle' | 'ok' | 'error' | 'warn'>('idle');
+	let fieldError = $state<string | undefined>(undefined);
+	let durationMs = $state<number | null>(null);
 
-	$: modeHelp =
+	const modeHelp = $derived(
 		mode === 'full'
-			? 'Preserves URL structure. Good for normalizing a complete URL without encoding separators like : / ? & =.'
-			: 'Encodes the entire string. Use this when embedding a URL or value inside another URL, query string, or fragment.';
+			? 'Full URL preserves structure and reserved separators like : / ? & =.'
+			: 'Component encodes the entire string. Use it for query values, fragments, or nested URLs.'
+	);
 
-	function runTransform(action: UrlAction) {
+	function run(nextAction: UrlAction) {
+		if (!input.trim()) {
+			output = '';
+			message = 'Enter a URL or value.';
+			tone = 'idle';
+			fieldError = undefined;
+			durationMs = null;
+			return;
+		}
 		const limit = checkToolInputLimit('url', [input]);
 		if (!limit.ok) {
-			error = limit.message;
 			output = '';
+			message = limit.message;
+			fieldError = limit.message;
+			tone = 'error';
+			durationMs = null;
 			return;
 		}
-
-		const result = transformUrl(input, mode, action);
+		const { result, durationMs: elapsed } = timed(() => transformUrl(input, mode, nextAction));
 		if (!result.ok) {
-			error = result.error;
+			message = result.error;
+			fieldError = result.error;
+			tone = 'error';
+			durationMs = null;
 			return;
 		}
-
-		error = '';
 		output = result.output;
-
-		if (action === 'encode' && mode === 'full' && result.output === input) {
-			lastAction =
-				'No visible change. Full URL mode preserves reserved URL characters. Use Component mode to percent-encode the entire string.';
+		durationMs = elapsed;
+		fieldError = undefined;
+		if (nextAction === 'encode' && mode === 'full' && result.output === input) {
+			message =
+				'No visible change. Full URL mode preserves reserved characters; use Component to encode everything.';
+			tone = 'warn';
 			return;
 		}
-
-		lastAction = action === 'encode' ? 'Encoded output ready.' : 'Decoded output ready.';
+		message = nextAction === 'encode' ? 'Encoded output ready.' : 'Decoded output ready.';
+		tone = 'ok';
 	}
+
+	const live = createDebounced(() => run(action), 150);
+
+	function chooseAction(next: UrlAction) {
+		action = next;
+		live.cancel();
+		run(next);
+	}
+
+	function chooseMode(next: UrlMode) {
+		mode = next;
+		live.cancel();
+		run(action);
+	}
+
+	onMount(() => {
+		run(action);
+		const cleanup = setupToolPage({
+			toolId: 'url',
+			onHandoff: (payload) => {
+				input = payload;
+				run(action);
+			},
+			shortcuts: [
+				{
+					keys: STANDARD_SHORTCUTS.run,
+					label: 'Run the current action',
+					handler: () => run(action)
+				},
+				{
+					keys: STANDARD_SHORTCUTS.copy,
+					label: 'Copy output',
+					handler: () => void copyText(output)
+				},
+				{
+					keys: STANDARD_SHORTCUTS.clear,
+					label: 'Clear input',
+					handler: () => {
+						input = '';
+						run(action);
+					}
+				}
+			]
+		});
+		return () => {
+			live.cancel();
+			cleanup();
+		};
+	});
 </script>
 
-<ToolShell
+<Workbench
 	title="URL Encoder / Decoder"
 	description="Encode or decode either full URLs or individual URL components without destroying the source text."
 	split
@@ -55,70 +125,67 @@
 		'Decode errors leave the source input untouched.'
 	]}
 >
-	<div class="surface-panel p-6">
-		<div class="space-y-4">
-			<div class="field">
-				<div class="field__label">Mode</div>
-				<div class="flex flex-wrap gap-2">
-					<button
-						type="button"
-						class={`button-base ${mode === 'full' ? 'button-secondary' : 'button-ghost'}`}
-						on:click={() => (mode = 'full')}
-					>
-						Full URL
-					</button>
-					<button
-						type="button"
-						class={`button-base ${mode === 'component' ? 'button-secondary' : 'button-ghost'}`}
-						on:click={() => (mode = 'component')}
-					>
-						Component / whole string
-					</button>
-				</div>
-				<div class="field__help">{modeHelp}</div>
-			</div>
-
-			<TextArea
-				id="url-input"
-				label="Source"
-				error={error || undefined}
-				rows={16}
-				mono
-				help="Source text remains unchanged if decoding fails."
-				bind:value={input}
-			/>
+	{#snippet actions()}
+		<div class="seg" role="group" aria-label="Mode">
+			<button type="button" aria-pressed={mode === 'full'} onclick={() => chooseMode('full')}>
+				Full URL
+			</button>
+			<button
+				type="button"
+				aria-pressed={mode === 'component'}
+				onclick={() => chooseMode('component')}
+			>
+				Component / whole string
+			</button>
 		</div>
-
-		<div class="mt-5 flex flex-wrap gap-3">
-			<Button on:click={() => runTransform('encode')}>Encode</Button>
-			<Button variant="secondary" on:click={() => runTransform('decode')}>Decode</Button>
+		<div class="seg" role="group" aria-label="Action">
+			<button
+				type="button"
+				aria-pressed={action === 'encode'}
+				onclick={() => chooseAction('encode')}
+			>
+				Encode
+			</button>
+			<button
+				type="button"
+				aria-pressed={action === 'decode'}
+				onclick={() => chooseAction('decode')}
+			>
+				Decode
+			</button>
 		</div>
+		<span class="workbench__note">{modeHelp}</span>
+	{/snippet}
+
+	<div class="workbench__pane">
+		<CodeField
+			id="url-input"
+			label="Source"
+			bind:value={input}
+			rows={12}
+			maxBytes={5 * 1024 * 1024}
+			accept=".txt,text/plain"
+			help="Source text remains unchanged if decoding fails."
+			error={fieldError}
+			wrap
+			oninput={() => live.call()}
+		/>
 	</div>
 
-	<div class="space-y-4">
-		<div
-			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
-			role="status"
-			aria-live="polite"
-			aria-atomic="true"
-		>
-			{error || lastAction}
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="flex items-center justify-between gap-3">
-				<div>
-					<div class="field__label">Output</div>
-					<div class="field__help">Mode determines which native encode/decode function runs.</div>
-				</div>
-				<CopyButton value={output} />
-			</div>
-
-			{#if output}
-				<pre class="mono-surface mt-5 overflow-x-auto p-5">{output}</pre>
-			{:else}
-				<div class="result-empty mt-5">Encoded or decoded output will appear here.</div>
-			{/if}
-		</div>
+	<div class="workbench__pane">
+		<OutputPane
+			id="url-output"
+			label={action === 'encode' ? 'Encoded' : 'Decoded'}
+			value={output}
+			empty="Encoded or decoded output will appear here."
+			filename={action === 'encode' ? 'encoded.txt' : 'decoded.txt'}
+			wrap
+			gutter={false}
+			from="url"
+		/>
 	</div>
-</ToolShell>
+
+	{#snippet status()}
+		<StatusLine {tone} {message} {input} {durationMs} hint="⌘/Ctrl+Enter runs" />
+	{/snippet}
+</Workbench>

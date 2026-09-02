@@ -67,3 +67,14 @@ treats axe "incomplete" results as failures. See `recica/README.md`.
 
 Deferred to the next MVP: real case-study screenshots. The content model and
 templates already carry the slot.
+
+## Post-modernization: Tools workbench (2026-09)
+
+`tools/` was redesigned as a precision-instrument workbench for daily users: smart-paste
+front door, live processing, send-to hand-offs (memory only), file drop and clipboard
+buttons, inline diagnostics with a line gutter, a keyboard layer, favorites/recents (IDs
+only), system-following theme, self-hosted fonts, and a PNG social image. Bundle budget
+unchanged. See `tools/README.md`.
+
+Owner action: disable Cloudflare Web Analytics auto-injection for `tools.recica.dev`;
+the CSP blocks it and logs a console error on every page.

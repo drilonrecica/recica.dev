@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from '$app/environment';
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import Button from '$lib/components/ui/Button.svelte';
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
 	import TextArea from '$lib/components/ui/TextArea.svelte';
@@ -263,7 +263,7 @@
 	});
 </script>
 
-<ToolShell
+<Workbench
 	title="QR Code Generator"
 	seoTitle="Free QR Code Generator"
 	description="Free QR code generator for text, URLs, Wi-Fi credentials, email links, phone numbers, and SMS payloads. Runs locally in your browser with PNG and SVG export."
@@ -543,9 +543,7 @@
 			</div>
 
 			{#if payload && !renderError}
-				<div
-					class="mt-6 overflow-hidden rounded-[20px] border border-[var(--border-subtle)] bg-white p-6"
-				>
+				<div class="mt-6 overflow-hidden rounded-none border border-[var(--rule)] bg-white p-6">
 					<div class="mx-auto w-full max-w-[320px]">
 						<canvas bind:this={canvas} class="block h-auto w-full max-w-full"></canvas>
 					</div>
@@ -575,4 +573,4 @@
 			{/if}
 		</div>
 	</div>
-</ToolShell>
+</Workbench>

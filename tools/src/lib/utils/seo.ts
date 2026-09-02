@@ -2,7 +2,7 @@ import type { ToolDefinition } from '$lib/types/tool';
 
 export const siteName = 'Recica Tools';
 export const siteTagline = 'Practical tools, built in the Recica Lab.';
-export const defaultSocialImagePath = '/og-default.svg';
+export const defaultSocialImagePath = '/og-default.png';
 
 /**
  * Safely serializes JSON-LD data for inline script tags by escaping HTML characters

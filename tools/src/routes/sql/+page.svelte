@@ -1,29 +1,94 @@
 <script lang="ts">
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
-	import TextArea from '$lib/components/ui/TextArea.svelte';
+	import { onMount } from 'svelte';
+	import CodeField from '$lib/components/workbench/CodeField.svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import { formatSql, minifySql } from '$lib/tools/sql';
+	import { copyText } from '$lib/utils/clipboard';
 	import { checkToolInputLimit } from '$lib/utils/input-policy';
+	import { createDebounced, timed } from '$lib/workbench/live';
+	import { STANDARD_SHORTCUTS, setupToolPage } from '$lib/workbench/page';
 
-	let input = 'select id, name from users where active = 1 order by name';
-	let output = '';
-	let status = 'Choose Format or Minify.';
+	type Mode = 'format' | 'minify';
 
-	function run(action: 'format' | 'minify') {
+	let input = $state('select id, name from users where active = 1 order by name');
+	let output = $state('');
+	let mode = $state<Mode>('format');
+	let message = $state('Paste SQL. Output follows the selected mode.');
+	let tone = $state<'idle' | 'ok' | 'error'>('idle');
+	let fieldError = $state<string | undefined>(undefined);
+	let durationMs = $state<number | null>(null);
+
+	function run(action: Mode) {
+		if (!input.trim()) {
+			output = '';
+			message = 'Paste SQL. Output follows the selected mode.';
+			tone = 'idle';
+			fieldError = undefined;
+			durationMs = null;
+			return;
+		}
 		const limit = checkToolInputLimit('sql', [input]);
 		if (!limit.ok) {
 			output = '';
-			status = limit.message;
+			message = limit.message;
+			fieldError = limit.message;
+			tone = 'error';
+			durationMs = null;
 			return;
 		}
-
-		output = action === 'format' ? formatSql(input) : minifySql(input);
-		status = action === 'format' ? 'Formatted SQL ready.' : 'Minified SQL ready.';
+		const { result, durationMs: elapsed } = timed(() =>
+			action === 'format' ? formatSql(input) : minifySql(input)
+		);
+		output = result;
+		durationMs = elapsed;
+		message = action === 'format' ? 'Formatted SQL ready.' : 'Minified SQL ready.';
+		tone = 'ok';
+		fieldError = undefined;
 	}
+
+	const live = createDebounced(() => run(mode), 150);
+
+	function choose(next: Mode) {
+		mode = next;
+		live.cancel();
+		run(next);
+	}
+
+	onMount(() => {
+		run(mode);
+		const cleanup = setupToolPage({
+			toolId: 'sql',
+			onHandoff: (payload) => {
+				input = payload;
+				run(mode);
+			},
+			shortcuts: [
+				{ keys: STANDARD_SHORTCUTS.run, label: 'Run the current mode', handler: () => run(mode) },
+				{
+					keys: STANDARD_SHORTCUTS.copy,
+					label: 'Copy output',
+					handler: () => void copyText(output)
+				},
+				{
+					keys: STANDARD_SHORTCUTS.clear,
+					label: 'Clear input',
+					handler: () => {
+						input = '';
+						run(mode);
+					}
+				}
+			]
+		});
+		return () => {
+			live.cancel();
+			cleanup();
+		};
+	});
 </script>
 
-<ToolShell
+<Workbench
 	title="SQL Formatter / Minifier"
 	description="Format and minify SQL text locally without executing, linting, or validating queries."
 	split
@@ -33,47 +98,43 @@
 		'Quoted strings are preserved while whitespace and clauses are normalized.'
 	]}
 >
-	<div class="surface-panel p-6">
-		<TextArea
+	{#snippet actions()}
+		<div class="seg" role="group" aria-label="Mode">
+			<button type="button" aria-pressed={mode === 'format'} onclick={() => choose('format')}>
+				Format
+			</button>
+			<button type="button" aria-pressed={mode === 'minify'} onclick={() => choose('minify')}>
+				Minify
+			</button>
+		</div>
+	{/snippet}
+
+	<div class="workbench__pane">
+		<CodeField
 			id="sql-input"
 			label="SQL source"
-			error={status.includes('local processing limit') ? status : undefined}
-			rows={18}
-			mono
-			help="Paste any SQL text block."
 			bind:value={input}
+			rows={18}
+			maxBytes={2 * 1024 * 1024}
+			accept=".sql,.txt,text/plain"
+			help="Paste any SQL text block or drop a .sql file."
+			error={fieldError}
+			oninput={() => live.call()}
 		/>
-
-		<div class="mt-5 flex flex-wrap gap-3">
-			<Button on:click={() => run('format')}>Format</Button>
-			<Button variant="secondary" on:click={() => run('minify')}>Minify</Button>
-		</div>
 	</div>
 
-	<div class="space-y-4">
-		<div
-			class={`status-pill ${status.includes('local processing limit') ? 'status-error' : 'status-neutral'}`}
-			role="status"
-			aria-live="polite"
-			aria-atomic="true"
-		>
-			{status}
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="flex items-center justify-between gap-3">
-				<div>
-					<div class="field__label">Output</div>
-					<div class="field__help">Formatting is text-only and safe to copy.</div>
-				</div>
-				<CopyButton value={output} />
-			</div>
-
-			{#if output}
-				<pre class="mono-surface mt-5 overflow-x-auto p-5">{output}</pre>
-			{:else}
-				<div class="result-empty mt-5">Formatted SQL will appear here.</div>
-			{/if}
-		</div>
+	<div class="workbench__pane">
+		<OutputPane
+			id="sql-output"
+			label={mode === 'format' ? 'Formatted' : 'Minified'}
+			value={output}
+			empty="Formatted SQL will appear here."
+			filename={mode === 'format' ? 'formatted.sql' : 'minified.sql'}
+			from="sql"
+		/>
 	</div>
-</ToolShell>
+
+	{#snippet status()}
+		<StatusLine {tone} {message} {input} {durationMs} hint="⌘/Ctrl+Enter runs" />
+	{/snippet}
+</Workbench>

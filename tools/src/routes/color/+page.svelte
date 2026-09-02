@@ -1,15 +1,41 @@
 <script lang="ts">
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
+	import { onMount } from 'svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
 	import TextInput from '$lib/components/ui/TextInput.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import { formatColorOutputs, parseColor } from '$lib/tools/color';
+	import { setupToolPage, STANDARD_SHORTCUTS } from '$lib/workbench/page';
 
-	let input = '#1EC8A5';
-	$: parsed = parseColor(input);
-	$: outputs = parsed.ok ? formatColorOutputs(parsed.value) : null;
+	let input = $state('#0F7A4C');
+	const parsed = $derived(parseColor(input));
+	const outputs = $derived(parsed.ok ? Object.entries(formatColorOutputs(parsed.value)) : []);
+	const swatch = $derived(
+		parsed.ok
+			? `rgba(${parsed.value.r}, ${parsed.value.g}, ${parsed.value.b}, ${parsed.value.a})`
+			: ''
+	);
+
+	onMount(() =>
+		setupToolPage({
+			toolId: 'color',
+			onHandoff: (value) => {
+				input = value;
+			},
+			shortcuts: [
+				{
+					keys: STANDARD_SHORTCUTS.clear,
+					label: 'Clear input',
+					handler: () => {
+						input = '';
+					}
+				}
+			]
+		})
+	);
 </script>
 
-<ToolShell
+<Workbench
 	title="Color Converter"
 	description="Convert between HEX, RGB(A), and HSL(A) locally with a live swatch preview."
 	split
@@ -19,56 +45,47 @@
 		'This version intentionally stops at the common web color formats.'
 	]}
 >
-	<div class="surface-panel p-6">
-		<div class="space-y-5">
-			<TextInput
-				id="color-input"
-				label="Color value"
-				error={parsed.ok ? undefined : parsed.error}
-				mono
-				placeholder="#1EC8A5 or rgb(30, 200, 165)"
-				help="Preview updates as you edit the value."
-				bind:value={input}
-			/>
-
-			{#if parsed.ok}
-				<div
-					class="rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-5"
-				>
-					<div class="field__label">Swatch</div>
-					<div
-						class="mt-4 h-32 rounded-[14px] border border-[var(--border-strong)]"
-						style={`background: rgba(${parsed.value.r}, ${parsed.value.g}, ${parsed.value.b}, ${parsed.value.a})`}
-					></div>
-				</div>
-			{/if}
-		</div>
-	</div>
-
-	<div class="space-y-4">
+	<div class="workbench__pane">
+		<TextInput
+			id="color-input"
+			label="Color value"
+			error={parsed.ok ? undefined : parsed.error}
+			mono
+			placeholder="#0F7A4C or rgb(15, 122, 76)"
+			help="Preview updates as you edit the value."
+			bind:value={input}
+		/>
+		<div class="codefield__bar"><div class="field__label">Swatch</div></div>
 		<div
-			class={`status-pill ${parsed.ok ? 'status-neutral' : 'status-error'}`}
-			role="status"
-			aria-live="polite"
-			aria-atomic="true"
-		>
-			{parsed.ok ? 'Color parsed successfully.' : parsed.error}
-		</div>
-
-		<div class="grid gap-4 md:grid-cols-2">
-			{#if outputs}
-				{#each Object.entries(outputs) as [label, value] (label)}
-					<div class="surface-panel p-5">
-						<div class="flex items-center justify-between gap-3">
-							<div class="field__label">{label.toUpperCase()}</div>
-							<CopyButton {value} />
-						</div>
-						<pre class="mono-surface mt-4 overflow-x-auto p-4">{value}</pre>
-					</div>
-				{/each}
-			{:else}
-				<div class="result-empty md:col-span-2">Converted outputs will appear here.</div>
-			{/if}
-		</div>
+			class="preview-frame"
+			style={`min-height: 8rem; height: 8rem; background: ${swatch || 'transparent'}`}
+			aria-hidden="true"
+		></div>
 	</div>
-</ToolShell>
+
+	<div class="workbench__pane">
+		{#if outputs.length}
+			{#each outputs as [label, value] (label)}
+				<OutputPane
+					id={`color-${label}`}
+					label={label.toUpperCase()}
+					{value}
+					filename={`${label}.txt`}
+					gutter={false}
+					wrap
+					from="color"
+				/>
+			{/each}
+		{:else}
+			<div class="result-empty">Converted outputs will appear here.</div>
+		{/if}
+	</div>
+
+	{#snippet status()}
+		<StatusLine
+			tone={parsed.ok ? 'ok' : 'error'}
+			message={parsed.ok ? 'Color parsed successfully.' : parsed.error}
+			{input}
+		/>
+	{/snippet}
+</Workbench>

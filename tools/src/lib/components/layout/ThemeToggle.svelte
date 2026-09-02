@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { theme } from '$lib/theme/theme';
+
+	const resolved = theme.resolved;
 </script>
 
 <button
 	type="button"
-	class="button-base button-ghost min-w-0 px-3 min-[400px]:min-w-[7.5rem]"
+	class="button-base button-ghost"
 	on:click={() => theme.toggle()}
 	aria-label="Toggle theme"
+	title={$theme === 'system' ? 'Following the system theme' : `Theme override: ${$theme}`}
 >
-	{#if $theme === 'dark'}
+	{#if $resolved === 'dark'}
 		<svg
 			aria-hidden="true"
 			viewBox="0 0 24 24"
@@ -19,7 +22,6 @@
 			/>
 			<circle cx="12" cy="12" r="4.2" />
 		</svg>
-		<span class="hidden min-[400px]:inline">Dark</span>
 	{:else}
 		<svg
 			aria-hidden="true"
@@ -28,6 +30,6 @@
 		>
 			<path d="M20 15.5A8.5 8.5 0 0 1 8.5 4 7.6 7.6 0 1 0 20 15.5Z" />
 		</svg>
-		<span class="hidden min-[400px]:inline">Light</span>
 	{/if}
+	<span class="hidden min-[400px]:inline">{$resolved === 'dark' ? 'Dark' : 'Light'}</span>
 </button>

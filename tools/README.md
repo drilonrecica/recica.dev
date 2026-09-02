@@ -32,17 +32,47 @@ The app is intentionally opinionated.
 | No tool engine abstraction | Tool logic stays explicit and readable instead of disappearing into a generic framework       |
 | Searchable catalog         | The homepage and quick-search model should make discovery fast                                |
 
+## The Workbench
+
+Every tool page is a **workbench**: the instrument fills the screen, one status line
+reports state, and documentation sits below the fold (still in the HTML for search).
+
+- **Smart paste front door.** The homepage has one field. Paste anything and local
+  detection (`src/lib/workbench/detect.ts`) ranks the matching tools; Ctrl/⌘+Enter opens
+  the top suggestion with the content already loaded.
+- **Live processing.** Output follows the input as you type; buttons only pick modes
+  (Format/Minify, Encode/Decode, algorithms) or run explicit actions.
+- **Send to.** Every output pane has a hand-off menu. State travels in memory during
+  client-side navigation (`src/lib/workbench/handoff.ts`), never in the URL, storage, or
+  the offline cache.
+- **Files and clipboard.** Every input accepts a dropped file, has a Load file button,
+  and Paste/Clear buttons. File size is checked against the tool limit before reading.
+- **Inline diagnostics.** `CodeField` draws a line-number gutter and marks the exact
+  line and column of an error with an overlay on a plain textarea. No editor library.
+  JSON positions come from `src/lib/workbench/json-position.ts`, so they are the same in
+  every browser.
+- **Keyboard.** `/` or Ctrl/⌘+K search, `?` shortcuts sheet, Ctrl/⌘+Enter run,
+  Ctrl/⌘+Shift+C copy output, Ctrl/⌘+Shift+X clear (`src/lib/workbench/keyboard.ts`).
+- **Favorites and recent tools.** Tool IDs only, in `localStorage`
+  (`src/lib/workbench/prefs.ts`). Never any content.
+- **Theme.** Follows the system on first visit. The toggle stores an explicit override;
+  `src/app.html` applies it before paint (its inline script hash is listed in the CSP).
+- **Fonts** are self-hosted latin subsets of Inter and JetBrains Mono, precached offline.
+
+Visual direction: **precision instrument**. Graphite and paper, hairline rules, 2px
+radius, monospace-forward labels, one green accent, light and dark as equals. Solid
+backgrounds only so automated contrast checks always resolve.
+
 ## Public Surface
 
 ### Primary Routes
 
 The homepage at `/` provides:
 
-- the numbered Utility Switchboard
-- search input
-- featured tools
-- category filtering
-- full tool directory
+- the smart-paste front door
+- favorites and recently used tools
+- search input and category filtering
+- the full tool index grouped by category
 - curated external resources
 
 The privacy policy at `/privacy` documents the browser-memory processing,

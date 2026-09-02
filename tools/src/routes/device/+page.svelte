@@ -1,11 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
 	import CopyButton from '$lib/components/ui/CopyButton.svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
+	import { setupToolPage } from '$lib/workbench/page';
 
 	type DeviceInfo = Record<string, string | number | boolean>;
 
-	let info: DeviceInfo = {};
+	let info = $state<DeviceInfo>({});
 
 	function storageAvailable(type: 'localStorage' | 'sessionStorage') {
 		try {
@@ -17,7 +20,7 @@
 		}
 	}
 
-	onMount(() => {
+	function collect() {
 		const userAgentData = navigator as Navigator & { userAgentData?: { platform?: string } };
 		info = {
 			userAgent: navigator.userAgent,
@@ -34,42 +37,70 @@
 			sessionStorage: storageAvailable('sessionStorage'),
 			online: navigator.onLine
 		};
-	});
+	}
 
-	$: json = JSON.stringify(info, null, 2);
+	const json = $derived(JSON.stringify(info, null, 2));
+	const entries = $derived(Object.entries(info));
+
+	onMount(() => {
+		collect();
+		window.addEventListener('resize', collect);
+		const cleanup = setupToolPage({ toolId: 'device' });
+		return () => {
+			window.removeEventListener('resize', collect);
+			cleanup();
+		};
+	});
 </script>
 
-<ToolShell
+<Workbench
 	title="Device / Browser Info"
 	description="Inspect practical client-side environment details such as viewport, platform, language, storage support, and theme preference."
+	split
 	tips={[
 		'All values are collected locally from browser APIs.',
 		'Useful for quick support checks and responsive debugging.',
 		'This page is informational only and does not send the data anywhere.'
 	]}
 >
-	<div class="surface-panel p-6">
-		<div class="flex items-center justify-between gap-3">
-			<div>
-				<div class="field__label">Environment snapshot</div>
-				<div class="field__help">Collected locally from the current browser session.</div>
-			</div>
-			<CopyButton value={json} label="Copy JSON" />
-		</div>
+	{#snippet actions()}
+		<button type="button" class="button-base button-ghost" onclick={collect}>Refresh</button>
+		<CopyButton value={json} label="Copy JSON" />
+	{/snippet}
 
-		{#if Object.keys(info).length}
-			<div class="mt-5 grid gap-4 md:grid-cols-2">
-				{#each Object.entries(info) as [label, value] (label)}
-					<div
-						class="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4"
-					>
-						<div class="field__label">{label}</div>
-						<div class="mt-2 font-mono text-sm break-words text-[var(--text)]">{value}</div>
+	<div class="workbench__pane">
+		<div class="codefield__bar"><div class="field__label">Environment snapshot</div></div>
+		{#if entries.length}
+			<dl class="metrics">
+				{#each entries as [label, value] (label)}
+					<div>
+						<dt>{label}</dt>
+						<dd class="text-sm break-words">{value}</dd>
 					</div>
 				{/each}
-			</div>
+			</dl>
 		{:else}
-			<div class="result-empty mt-5">Loading current browser information.</div>
+			<div class="result-empty">Loading current browser information.</div>
 		{/if}
 	</div>
-</ToolShell>
+
+	<div class="workbench__pane">
+		<OutputPane
+			id="device-json"
+			label="As JSON"
+			value={entries.length ? json : ''}
+			filename="device.json"
+			mime="application/json"
+			from="device"
+		/>
+	</div>
+
+	{#snippet status()}
+		<StatusLine
+			tone={entries.length ? 'ok' : 'idle'}
+			message={entries.length
+				? 'Collected from this browser session. Nothing is sent anywhere.'
+				: 'Collecting…'}
+		/>
+	{/snippet}
+</Workbench>

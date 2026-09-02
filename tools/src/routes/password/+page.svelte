@@ -1,122 +1,150 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { browser } from '$app/environment';
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
 	import Toggle from '$lib/components/ui/Toggle.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import {
 		generatePassword,
 		type PasswordOptions,
 		validatePasswordOptions
 	} from '$lib/tools/password';
+	import { copyText } from '$lib/utils/clipboard';
+	import { STANDARD_SHORTCUTS, setupToolPage } from '$lib/workbench/page';
 
-	let length = 20;
-	let uppercase = true;
-	let lowercase = true;
-	let numbers = true;
-	let symbols = true;
-	let password = '';
-	let error = '';
+	let length = $state(20);
+	let uppercase = $state(true);
+	let lowercase = $state(true);
+	let numbers = $state(true);
+	let symbols = $state(true);
+	let password = $state('');
+	let error = $state('');
+	let ready = $state(false);
 
-	$: options = { length, uppercase, lowercase, numbers, symbols } satisfies PasswordOptions;
+	const options = $derived({
+		length,
+		uppercase,
+		lowercase,
+		numbers,
+		symbols
+	} satisfies PasswordOptions);
 
 	function refreshPassword() {
 		if (!browser) return;
-		password = generatePassword(options);
-	}
-
-	$: if (browser && options) {
 		const validationError = validatePasswordOptions(options);
-
 		if (validationError) {
 			error = validationError;
 			password = '';
-		} else {
-			error = '';
-			password = generatePassword(options);
+			return;
 		}
+		error = '';
+		password = generatePassword(options);
 	}
+
+	$effect(() => {
+		// Regenerate whenever any option changes, after mount.
+		void options;
+		if (ready) refreshPassword();
+	});
+
+	onMount(() => {
+		ready = true;
+		refreshPassword();
+		return setupToolPage({
+			toolId: 'password',
+			shortcuts: [
+				{ keys: STANDARD_SHORTCUTS.run, label: 'Regenerate', handler: refreshPassword },
+				{
+					keys: STANDARD_SHORTCUTS.copy,
+					label: 'Copy password',
+					handler: () => void copyText(password)
+				}
+			]
+		});
+	});
 </script>
 
-<ToolShell
+<Workbench
 	title="Password Generator"
 	description="Generate strong passwords with secure browser randomness and guaranteed character-set coverage."
 	tips={[
 		'At least one character set must stay enabled.',
 		'Each enabled set is guaranteed to appear at least once in the generated password.',
-		'Passwords are generated client-side with crypto.getRandomValues.'
+		'Passwords are generated client-side with crypto.getRandomValues and never stored.'
 	]}
 >
-	<div class="space-y-6">
-		<div class="surface-panel p-6">
-			<div class="grid gap-5">
-				<div class="space-y-3">
-					<div class="flex items-center justify-between gap-4">
-						<div>
-							<div class="field__label">Length</div>
-							<div class="field__help">Adjust the slider to regenerate instantly.</div>
-						</div>
-						<div class="tool-code text-base">{length}</div>
-					</div>
-					<input
-						aria-label="Password length"
-						type="range"
-						min="8"
-						max="64"
-						step="1"
-						bind:value={length}
-						class="w-full accent-[var(--primary)]"
-					/>
-				</div>
+	{#snippet actions()}
+		<button type="button" class="button-base button-primary" onclick={refreshPassword}
+			>Regenerate</button
+		>
+	{/snippet}
 
-				<div class="grid gap-3 sm:grid-cols-2">
-					<Toggle
-						checked={uppercase}
-						label="Uppercase"
-						hint="A-Z"
-						on:change={(event) => (uppercase = event.detail)}
-					/>
-					<Toggle
-						checked={lowercase}
-						label="Lowercase"
-						hint="a-z"
-						on:change={(event) => (lowercase = event.detail)}
-					/>
-					<Toggle
-						checked={numbers}
-						label="Numbers"
-						hint="0-9"
-						on:change={(event) => (numbers = event.detail)}
-					/>
-					<Toggle
-						checked={symbols}
-						label="Symbols"
-						hint="!#$"
-						on:change={(event) => (symbols = event.detail)}
-					/>
-				</div>
+	<div class="workbench__pane">
+		<div class="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+			<label class="field">
+				<span class="field__label">Length <span class="tool-code">{length}</span></span>
+				<input
+					aria-label="Password length"
+					type="range"
+					min="8"
+					max="64"
+					step="1"
+					bind:value={length}
+					class="w-full accent-[var(--accent)]"
+				/>
+			</label>
+			<div class="flex flex-wrap gap-2">
+				<Toggle
+					checked={uppercase}
+					label="Uppercase"
+					hint="A-Z"
+					on:change={(event) => (uppercase = event.detail)}
+				/>
+				<Toggle
+					checked={lowercase}
+					label="Lowercase"
+					hint="a-z"
+					on:change={(event) => (lowercase = event.detail)}
+				/>
+				<Toggle
+					checked={numbers}
+					label="Numbers"
+					hint="0-9"
+					on:change={(event) => (numbers = event.detail)}
+				/>
+				<Toggle
+					checked={symbols}
+					label="Symbols"
+					hint="!#$"
+					on:change={(event) => (symbols = event.detail)}
+				/>
 			</div>
 		</div>
 
-		<div class="surface-panel p-6">
-			<div class="flex flex-wrap items-center justify-between gap-3">
-				<div>
-					<div class="field__label">Generated Password</div>
-					<div class="field__help">Regenerates automatically when the settings change.</div>
-				</div>
-				<div class="flex flex-wrap gap-2">
-					<Button variant="secondary" on:click={refreshPassword}>Regenerate</Button>
-					<CopyButton value={password} />
-				</div>
-			</div>
-
-			{#if error}
-				<div class="status-pill status-error mt-5" role="alert" aria-live="assertive">
-					{error}
-				</div>
-			{:else}
-				<div class="mono-surface mt-5 overflow-x-auto p-5 text-base">{password}</div>
-			{/if}
-		</div>
+		<OutputPane
+			id="password-output"
+			label="Generated Password"
+			value={password}
+			empty="Enable at least one set to generate a password."
+			filename="password.txt"
+			gutter={false}
+			wrap
+			from="password"
+			help="Regenerates automatically when the settings change."
+		/>
 	</div>
-</ToolShell>
+
+	{#snippet status()}
+		<StatusLine
+			tone={error ? 'error' : password ? 'ok' : 'idle'}
+			message={error || `${length}-character password ready. Save it in a password manager.`}
+			cells={[
+				{
+					label: 'sets',
+					value: String([uppercase, lowercase, numbers, symbols].filter(Boolean).length)
+				}
+			]}
+		/>
+	{/snippet}
+</Workbench>

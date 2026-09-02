@@ -12,50 +12,42 @@
 	$: homeActive = pathname === '/';
 </script>
 
-<header
-	class="fixed inset-x-0 top-0 z-30 border-b border-[var(--border-subtle)] bg-[color:var(--bg)]/84 backdrop-blur-xl"
->
-	<div class="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-		<div class="flex items-center gap-4">
-			<a href={resolve('/')} class="group flex items-center gap-3">
-				<img
-					src="/recica-tools-logo.jpg"
-					alt="Recica Tools Logo"
-					class="h-10 w-10 rounded-2xl border border-[var(--border-strong)] bg-[var(--surface-elevated)]"
-				/>
-				<div class="hidden min-[560px]:block">
-					<div class="text-sm font-semibold tracking-[0.14em] text-[var(--text)] uppercase">
-						Recica Tools
-					</div>
-					<div class="text-xs text-[var(--text-muted)]">Private browser utilities.</div>
-				</div>
-			</a>
+<header class="app-header">
+	<div class="app-header__shell">
+		<a href={resolve('/')} class="brand" aria-label="Recica Tools home">
+			<span class="brand__mark" aria-hidden="true">RT</span>
+			<span>Recica Tools</span>
+			<span class="brand__sub">Private browser utilities</span>
+		</a>
+
+		<nav class="app-nav" aria-label="Primary">
 			<a
 				href={resolve('/')}
-				class={`hidden text-sm font-medium transition-colors sm:inline-flex ${
-					homeActive
-						? 'text-[var(--text)]'
-						: 'text-[var(--text-secondary)] hover:text-[var(--text)]'
-				}`}
+				class="app-nav__link hidden sm:inline-flex"
+				aria-current={homeActive ? 'page' : undefined}
 			>
 				Tools
 			</a>
-		</div>
-
-		<div class="flex items-center gap-2">
+			<a
+				href={resolve('/privacy')}
+				class="app-nav__link hidden sm:inline-flex"
+				aria-current={pathname === '/privacy' ? 'page' : undefined}
+			>
+				Privacy
+			</a>
 			<button
 				bind:this={searchButtonEl}
 				type="button"
-				class={`button-base ${searchOpen ? 'button-secondary' : 'button-ghost'} min-w-0 px-3 sm:min-w-[8.5rem]`}
+				class={`button-base ${searchOpen ? 'button-secondary' : 'button-ghost'}`}
 				aria-controls="tool-search-dialog"
 				aria-expanded={searchOpen}
 				aria-haspopup="dialog"
 				on:click={() => dispatch('search')}
 			>
 				<span>Search</span>
-				<span class="tool-code">/</span>
+				<kbd class="kbd" aria-hidden="true">/</kbd>
 			</button>
 			<ThemeToggle />
-		</div>
+		</nav>
 	</div>
 </header>

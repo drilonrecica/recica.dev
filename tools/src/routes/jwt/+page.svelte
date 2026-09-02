@@ -1,136 +1,173 @@
 <script lang="ts">
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
-	import TextArea from '$lib/components/ui/TextArea.svelte';
+	import { onMount } from 'svelte';
+	import CodeField from '$lib/components/workbench/CodeField.svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import { inspectJwt } from '$lib/tools/jwt';
+	import { copyText } from '$lib/utils/clipboard';
 	import { checkToolInputLimit } from '$lib/utils/input-policy';
+	import { createDebounced, timed } from '$lib/workbench/live';
+	import { STANDARD_SHORTCUTS, setupToolPage } from '$lib/workbench/page';
 
 	const exampleJwtSections = [
 		'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
 		'eyJzdWIiOiIxMjMiLCJuYW1lIjoiUmVjaWNhIiwiZXhwIjo0MTAyNDQ0ODAwfQ',
 		'signature'
 	];
-	let input = exampleJwtSections.join('.');
-	let error = '';
-	let status = 'Paste a JWT and inspect it locally.';
-	let header = '';
-	let payload = '';
-	let timestamps: Array<{ key: string; iso: string; expired?: boolean }> = [];
-	let signatureLength = 0;
+
+	let input = $state(exampleJwtSections.join('.'));
+	let fieldError = $state<string | undefined>(undefined);
+	let message = $state('Paste a JWT. It is decoded locally as you type.');
+	let tone = $state<'idle' | 'ok' | 'error'>('idle');
+	let header = $state('');
+	let payload = $state('');
+	let timestamps = $state<Array<{ key: string; iso: string; expired?: boolean }>>([]);
+	let signatureLength = $state(0);
+	let durationMs = $state<number | null>(null);
+
+	function reset() {
+		header = '';
+		payload = '';
+		timestamps = [];
+		signatureLength = 0;
+		durationMs = null;
+	}
 
 	function inspect() {
+		if (!input.trim()) {
+			reset();
+			message = 'Paste a JWT. It is decoded locally as you type.';
+			tone = 'idle';
+			fieldError = undefined;
+			return;
+		}
 		const limit = checkToolInputLimit('jwt', [input]);
 		if (!limit.ok) {
-			error = limit.message;
-			header = '';
-			payload = '';
-			timestamps = [];
-			signatureLength = 0;
+			reset();
+			message = limit.message;
+			fieldError = limit.message;
+			tone = 'error';
 			return;
 		}
-
-		const result = inspectJwt(input);
+		const { result, durationMs: elapsed } = timed(() => inspectJwt(input));
 		if (!result.ok) {
-			error = result.error;
-			header = '';
-			payload = '';
-			timestamps = [];
-			signatureLength = 0;
+			reset();
+			message = result.error;
+			fieldError = result.error;
+			tone = 'error';
 			return;
 		}
-
-		error = '';
-		status = 'JWT decoded locally. No verification was performed.';
+		fieldError = undefined;
+		message = 'JWT decoded locally. No verification was performed.';
+		tone = 'ok';
 		header = JSON.stringify(result.header, null, 2);
 		payload = JSON.stringify(result.payload, null, 2);
 		timestamps = result.timestamps;
 		signatureLength = result.signatureLength;
+		durationMs = elapsed;
 	}
+
+	const live = createDebounced(inspect, 150);
+
+	onMount(() => {
+		inspect();
+		const cleanup = setupToolPage({
+			toolId: 'jwt',
+			onHandoff: (value) => {
+				input = value;
+				inspect();
+			},
+			shortcuts: [
+				{ keys: STANDARD_SHORTCUTS.run, label: 'Inspect now', handler: inspect },
+				{
+					keys: STANDARD_SHORTCUTS.copy,
+					label: 'Copy payload',
+					handler: () => void copyText(payload)
+				},
+				{
+					keys: STANDARD_SHORTCUTS.clear,
+					label: 'Clear input',
+					handler: () => {
+						input = '';
+						inspect();
+					}
+				}
+			]
+		});
+		return () => {
+			live.cancel();
+			cleanup();
+		};
+	});
 </script>
 
-<ToolShell
+<Workbench
 	title="JWT Inspector"
 	description="Decode JWT headers and payloads locally, with timestamp interpretation, without claiming signature verification."
 	split
 	tips={[
 		'This tool decodes and inspects only. It does not verify signatures.',
 		'Header and payload must be valid Base64URL-encoded UTF-8 JSON.',
-		'Useful for quickly checking claims, expiry, and token shape.'
+		'Send the payload to the JSON formatter or any other tool from the output menu.'
 	]}
 >
-	<div class="surface-panel p-6">
-		<TextArea
+	{#snippet actions()}
+		<button type="button" class="button-base button-primary" onclick={inspect}>Inspect</button>
+	{/snippet}
+
+	<div class="workbench__pane">
+		<CodeField
 			id="jwt-input"
 			label="JWT"
-			error={error || undefined}
-			rows={16}
-			mono
-			help="Paste a complete header.payload.signature token."
 			bind:value={input}
+			rows={10}
+			maxBytes={1024 * 1024}
+			accept=".txt,.jwt,text/plain"
+			help="Paste a complete header.payload.signature token."
+			error={fieldError}
+			wrap
+			oninput={() => live.call()}
 		/>
-
-		<div class="mt-5 flex flex-wrap gap-3">
-			<Button on:click={inspect}>Inspect</Button>
-		</div>
-	</div>
-
-	<div class="space-y-4">
-		<div
-			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
-			role="status"
-			aria-live="polite"
-			aria-atomic="true"
-		>
-			{error || status}
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="field__label">Header</div>
-			<div class="mt-3 flex justify-end">
-				<CopyButton value={header} />
-			</div>
-			{#if header}
-				<pre class="mono-surface mt-4 overflow-x-auto p-4">{header}</pre>
-			{:else}
-				<div class="result-empty mt-4">Decoded header will appear here.</div>
-			{/if}
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="field__label">Payload</div>
-			<div class="mt-3 flex justify-end">
-				<CopyButton value={payload} />
-			</div>
-			{#if payload}
-				<pre class="mono-surface mt-4 overflow-x-auto p-4">{payload}</pre>
-				<div class="mt-4 text-sm text-[var(--text-secondary)]">
-					Signature length: {signatureLength} characters
-				</div>
-			{:else}
-				<div class="result-empty mt-4">Decoded payload will appear here.</div>
-			{/if}
-		</div>
-
 		{#if timestamps.length}
-			<div class="surface-panel p-6">
-				<div class="field__label">Token timestamps</div>
-				<div class="mt-4 grid gap-3">
-					{#each timestamps as item (item.key)}
-						<div
-							class="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4"
-						>
-							<div class="tool-code">{item.key}</div>
-							<div class="mt-2 font-mono text-sm text-[var(--text)]">{item.iso}</div>
-							{#if item.key === 'exp'}
-								<div class="mt-2 text-sm text-[var(--text-secondary)]">
-									{item.expired ? 'Expired' : 'Not expired'}
-								</div>
-							{/if}
-						</div>
-					{/each}
+			<dl class="metrics" aria-label="Token timestamps">
+				{#each timestamps as item (item.key)}
+					<div>
+						<dt>
+							{item.key}{item.key === 'exp' ? (item.expired ? ' · expired' : ' · valid') : ''}
+						</dt>
+						<dd class="text-sm">{item.iso}</dd>
+					</div>
+				{/each}
+				<div>
+					<dt>signature</dt>
+					<dd class="text-sm">{signatureLength} chars</dd>
 				</div>
-			</div>
+			</dl>
 		{/if}
 	</div>
-</ToolShell>
+
+	<div class="workbench__pane">
+		<OutputPane
+			id="jwt-payload"
+			label="Payload"
+			value={payload}
+			empty="Decoded payload will appear here."
+			filename="jwt-payload.json"
+			mime="application/json"
+			from="jwt"
+		/>
+		<OutputPane
+			id="jwt-header"
+			label="Header"
+			value={header}
+			empty="Decoded header will appear here."
+			filename="jwt-header.json"
+			mime="application/json"
+		/>
+	</div>
+
+	{#snippet status()}
+		<StatusLine {tone} {message} {input} {durationMs} hint="⌘/Ctrl+Enter inspects" />
+	{/snippet}
+</Workbench>

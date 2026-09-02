@@ -96,18 +96,18 @@
 </script>
 
 {#if open}
-	<div class="fixed inset-0 z-40 px-3 py-20 md:px-6">
+	<div class="dialog-scrim">
 		<button
 			type="button"
 			tabindex="-1"
 			aria-hidden="true"
-			class="absolute inset-0 bg-[rgba(7,10,14,0.4)] backdrop-blur-sm md:bg-transparent"
+			class="dialog-scrim__bg"
 			on:click={() => dispatch('close')}
 		></button>
 		<div
 			bind:this={dialogEl}
 			id="tool-search-dialog"
-			class="surface-panel-elevated relative mx-auto w-full max-w-2xl overflow-hidden md:mt-2 md:max-w-[31rem]"
+			class="dialog"
 			role="dialog"
 			tabindex="-1"
 			aria-modal="true"
@@ -115,70 +115,63 @@
 			aria-describedby={dialogDescriptionId}
 			on:keydown={handleDialogKeydown}
 		>
-			<div class="border-b border-[var(--border-subtle)] p-4">
-				<div class="flex items-start justify-between gap-4">
-					<div>
-						<div class="kicker" id={dialogTitleId}>Tool Search</div>
-						<p class="mt-2 text-sm leading-6 text-[var(--text-secondary)]" id={dialogDescriptionId}>
-							Search by tool name, task, or keyword. Use Arrow keys to move through results and
-							Enter to open the active tool.
-						</p>
-					</div>
-					<button
-						type="button"
-						class="button-base button-ghost"
-						aria-label="Close tool search"
-						on:click={() => dispatch('close')}
-					>
-						Close
-					</button>
+			<div class="dialog__head">
+				<div>
+					<div class="kicker" id={dialogTitleId}>Tool Search</div>
+					<p class="mt-1 text-sm text-[var(--ink-muted)]" id={dialogDescriptionId}>
+						Search by name, task, or keyword. Arrow keys move, Enter opens.
+					</p>
 				</div>
-				<div class="mt-3">
-					<input
-						bind:this={inputEl}
-						value={query}
-						on:input={(event) =>
-							dispatch('querychange', (event.currentTarget as HTMLInputElement).value)}
-						on:keydown={handleInputKeydown}
-						class="input-base"
-						placeholder="Search tools by name, task, or keyword…"
-						aria-label="Search tools"
-					/>
-				</div>
+				<button
+					type="button"
+					class="button-base button-ghost"
+					aria-label="Close tool search"
+					on:click={() => dispatch('close')}
+				>
+					Close
+				</button>
+			</div>
+			<div class="px-4 pb-3">
+				<input
+					bind:this={inputEl}
+					value={query}
+					on:input={(event) =>
+						dispatch('querychange', (event.currentTarget as HTMLInputElement).value)}
+					on:keydown={handleInputKeydown}
+					class="input-base mono"
+					placeholder="Search tools by name, task, or keyword…"
+					aria-label="Search tools"
+				/>
 			</div>
 
-			<div class="max-h-[60vh] overflow-y-auto p-2">
+			<div class="dialog__body">
 				{#if results.length}
 					<ul class="grid gap-1">
 						{#each results as tool, index (tool.id)}
 							<li>
 								<button
 									type="button"
-									class={`w-full rounded-[14px] border p-3 text-left transition ${
-										index === activeIndex
-											? 'border-[var(--border-strong)] bg-[var(--surface-strong)]'
-											: 'border-transparent bg-transparent hover:border-[var(--border-subtle)] hover:bg-[var(--surface)]'
-									}`}
+									class="dialog__row"
 									on:mouseenter={() => (activeIndex = index)}
 									on:click={() => dispatch('choose', tool)}
 									aria-current={index === activeIndex ? 'true' : undefined}
 								>
-									<div class="flex items-center justify-between gap-3">
-										<div class="text-sm font-semibold text-[var(--text)]">{tool.name}</div>
-										<div class="tool-code">{tool.route}</div>
-									</div>
-									<div class="mt-1 text-sm text-[var(--text-secondary)]">{tool.description}</div>
+									<span>
+										<strong>{tool.name}</strong>
+										<p>{tool.description}</p>
+									</span>
+									<span class="tool-code">{tool.route}</span>
 								</button>
 							</li>
 						{/each}
 					</ul>
 				{:else}
-					<div class="result-empty min-h-[14rem]">
+					<div class="result-empty">
 						<div>
-							<div class="text-base font-semibold text-[var(--text)]">
+							<div class="text-base font-semibold text-[var(--ink)]">
 								No tool matches that query.
 							</div>
-							<div class="mt-2 text-sm text-[var(--text-muted)]">
+							<div class="mt-2 text-sm">
 								Try a broader keyword like json, timestamp, slug, or password.
 							</div>
 						</div>

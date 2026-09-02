@@ -25,7 +25,8 @@
 		"test": "pnpm run test:unit:run && pnpm run test:e2e",
 		"audit:security": "pnpm audit --audit-level moderate",
 		"audit:deps": "pnpm outdated",
-		"build:analyze": "vite build --mode analyze"
+		"build:analyze": "vite build --mode analyze",
+		"og": "node scripts/render-og.mjs"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.12.1",
@@ -55,6 +56,8 @@
 		"vitest": "^4.1.10"
 	},
 	"dependencies": {
+		"@fontsource/inter": "^5.3.0",
+		"@fontsource/jetbrains-mono": "^5.3.0",
 		"diff": "^9.0.0",
 		"qrcode": "^1.5.4"
 	}

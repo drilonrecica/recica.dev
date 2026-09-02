@@ -5,8 +5,7 @@ const allowedDocumentPaths = new Set(['/', '/404', '/privacy', ...tools.map((too
 const allowedStaticPaths = new Set([
 	'/favicon.svg',
 	'/manifest.json',
-	'/og-default.svg',
-	'/recica-tools-logo.jpg',
+	'/og-default.png',
 	'/service-worker.js'
 ]);
 

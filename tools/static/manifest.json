@@ -4,8 +4,8 @@
 	"description": "Essential browser tools for developers: QR codes, JSON formatter, Base64 encoder, URL tools, timestamps, hashing, and more.",
 	"start_url": "/",
 	"display": "standalone",
-	"background_color": "#0b0f14",
-	"theme_color": "#1ec8a5",
+	"background_color": "#f6f7f5",
+	"theme_color": "#0f7a4c",
 	"icons": [
 		{
 			"src": "/favicons/web-app-manifest-192x192.png",

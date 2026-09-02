@@ -19,7 +19,9 @@ const config = {
 				'font-src': ['self'],
 				'img-src': ['self', 'data:', 'blob:'],
 				'style-src': ['self', 'unsafe-inline'],
-				'script-src': ['self'],
+				// The second entry is the no-flash theme script in src/app.html.
+				// Recompute with: printf '%s' "<script body>" | openssl dgst -sha256 -binary | openssl base64 -A
+				'script-src': ['self', 'sha256-nnqAk3TjM/kLxeOjfcrYj2ipBpb2GHv/r4S2osCOWZg='],
 				'connect-src': ['self'],
 				'frame-src': ['self', 'blob:'],
 				'object-src': ['none'],

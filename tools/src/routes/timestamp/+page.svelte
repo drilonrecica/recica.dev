@@ -1,8 +1,9 @@
 <script lang="ts">
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
+	import { onMount } from 'svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
 	import TextInput from '$lib/components/ui/TextInput.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import type { ParsedTimeResult, TimestampUnit, TimezoneMode } from '$lib/tools/timestamp';
 	import {
 		formatLocalDisplay,
@@ -10,63 +11,86 @@
 		parseTimestampInput,
 		toDateTimeInputValue
 	} from '$lib/tools/timestamp';
+	import { copyText } from '$lib/utils/clipboard';
+	import { STANDARD_SHORTCUTS, setupToolPage } from '$lib/workbench/page';
 
-	let mode: 'timestamp' | 'date' = 'timestamp';
-	let timestampInput = '';
-	let unit: TimestampUnit = 'auto';
-	let timezone: TimezoneMode = 'local';
-	let dateInput = '';
-	let result: ParsedTimeResult | null = null;
-	let error = '';
+	let mode = $state<'timestamp' | 'date'>('timestamp');
+	let timestampInput = $state('');
+	let unit = $state<TimestampUnit>('auto');
+	let timezone = $state<TimezoneMode>('local');
+	let dateInput = $state('');
+	let result = $state<ParsedTimeResult | null>(null);
+	let error = $state('');
 
 	function convert() {
-		if (mode === 'timestamp') {
-			const parsed = parseTimestampInput(timestampInput, unit);
-			if (!parsed.ok) {
-				error = parsed.error;
-				result = null;
-				return;
-			}
-
-			error = '';
-			result = parsed.value;
-			return;
-		}
-
-		const parsed = parseDateTimeInput(dateInput, timezone);
+		const parsed =
+			mode === 'timestamp'
+				? parseTimestampInput(timestampInput, unit)
+				: parseDateTimeInput(dateInput, timezone);
 		if (!parsed.ok) {
 			error = parsed.error;
 			result = null;
 			return;
 		}
-
 		error = '';
 		result = parsed.value;
 	}
 
 	function fillNow() {
 		const now = new Date();
-
 		if (mode === 'timestamp') {
 			timestampInput = String(Math.trunc(now.getTime() / 1000));
 			unit = 'seconds';
 		} else {
 			dateInput = toDateTimeInputValue(now, timezone);
 		}
-
 		convert();
 	}
 
 	function setTimezone(next: TimezoneMode) {
 		timezone = next;
+		if (mode === 'date') dateInput = toDateTimeInputValue(result?.date ?? new Date(), next);
+	}
 
-		if (mode === 'date') {
-			dateInput = toDateTimeInputValue(result?.date ?? new Date(), next);
+	function setMode(next: 'timestamp' | 'date') {
+		mode = next;
+		if (next === 'date' && !dateInput) {
+			dateInput = toDateTimeInputValue(result?.date ?? new Date(), timezone);
 		}
 	}
+
+	const summary = $derived(
+		result
+			? [
+					`Local        ${formatLocalDisplay(result.date)}`,
+					`UTC / ISO    ${result.utcIso}`,
+					`Seconds      ${result.seconds}`,
+					`Milliseconds ${result.milliseconds}`
+				].join('\n')
+			: ''
+	);
+
+	onMount(() =>
+		setupToolPage({
+			toolId: 'timestamp',
+			onHandoff: (value) => {
+				mode = 'timestamp';
+				timestampInput = value;
+				convert();
+			},
+			shortcuts: [
+				{ keys: STANDARD_SHORTCUTS.run, label: 'Convert', handler: convert },
+				{
+					keys: STANDARD_SHORTCUTS.copy,
+					label: 'Copy ISO value',
+					handler: () => void copyText(result?.utcIso ?? '')
+				}
+			]
+		})
+	);
 </script>
 
-<ToolShell
+<Workbench
 	title="Timestamp Converter"
 	description="Convert cleanly between Unix timestamps, local wall time, and UTC without pulling in a date library."
 	split
@@ -76,165 +100,110 @@
 		'Date mode uses the selected timezone when interpreting the input value.'
 	]}
 >
-	<div class="surface-panel p-6">
-		<div class="space-y-5">
+	{#snippet actions()}
+		<div class="seg" role="group" aria-label="Conversion mode">
+			<button type="button" aria-pressed={mode === 'timestamp'} onclick={() => setMode('timestamp')}
+				>Timestamp → Date</button
+			>
+			<button type="button" aria-pressed={mode === 'date'} onclick={() => setMode('date')}
+				>Date → Timestamp</button
+			>
+		</div>
+		<button type="button" class="button-base button-primary" onclick={convert}>Convert</button>
+		<button type="button" class="button-base button-ghost" onclick={fillNow}>Now</button>
+	{/snippet}
+
+	<div class="workbench__pane">
+		{#if mode === 'timestamp'}
+			<TextInput
+				id="timestamp-input"
+				label="Unix timestamp"
+				error={error || undefined}
+				placeholder="1715342400"
+				help="Only whole-number timestamps are accepted."
+				mono
+				bind:value={timestampInput}
+			/>
 			<div class="field">
-				<div class="field__label">Conversion mode</div>
-				<div class="flex flex-wrap gap-2">
-					<button
-						type="button"
-						class={`button-base ${mode === 'timestamp' ? 'button-secondary' : 'button-ghost'}`}
-						on:click={() => (mode = 'timestamp')}
-					>
-						Timestamp → Date
-					</button>
-					<button
-						type="button"
-						class={`button-base ${mode === 'date' ? 'button-secondary' : 'button-ghost'}`}
-						on:click={() => {
-							mode = 'date';
-							if (!dateInput) {
-								dateInput = toDateTimeInputValue(result?.date ?? new Date(), timezone);
-							}
-						}}
-					>
-						Date → Timestamp
-					</button>
-				</div>
-			</div>
-
-			{#if mode === 'timestamp'}
-				<TextInput
-					id="timestamp-input"
-					label="Unix timestamp"
-					error={error || undefined}
-					placeholder="1715342400"
-					help="Only whole-number timestamps are accepted."
-					mono
-					bind:value={timestampInput}
-				/>
-
-				<div class="field">
-					<div class="field__label">Unit</div>
-					<div class="flex flex-wrap gap-2">
-						{#each ['auto', 'seconds', 'milliseconds'] as option (option)}
-							<button
-								type="button"
-								class={`button-base ${unit === option ? 'button-secondary' : 'button-ghost'}`}
-								on:click={() => (unit = option as TimestampUnit)}
-							>
-								{option}
-							</button>
-						{/each}
-					</div>
-				</div>
-			{:else}
-				<TextInput
-					id="date-input"
-					label={`Date and time (${timezone.toUpperCase()})`}
-					error={error || undefined}
-					type="datetime-local"
-					help="Choose a wall-clock value and convert it with the selected timezone."
-					bind:value={dateInput}
-				/>
-
-				<div class="field">
-					<div class="field__label">Timezone</div>
-					<div class="flex flex-wrap gap-2">
+				<div class="field__label">Unit</div>
+				<div class="seg" role="group" aria-label="Unit">
+					{#each ['auto', 'seconds', 'milliseconds'] as option (option)}
 						<button
 							type="button"
-							class={`button-base ${timezone === 'local' ? 'button-secondary' : 'button-ghost'}`}
-							on:click={() => setTimezone('local')}
+							aria-pressed={unit === option}
+							onclick={() => (unit = option as TimestampUnit)}>{option}</button
 						>
-							Local
-						</button>
-						<button
-							type="button"
-							class={`button-base ${timezone === 'utc' ? 'button-secondary' : 'button-ghost'}`}
-							on:click={() => setTimezone('utc')}
-						>
-							UTC
-						</button>
-					</div>
+					{/each}
 				</div>
-			{/if}
-
-			<div class="flex flex-wrap gap-3">
-				<Button on:click={convert}>Convert</Button>
-				<Button variant="ghost" on:click={fillNow}>Now</Button>
 			</div>
-		</div>
-	</div>
-
-	<div class="space-y-4">
-		<div
-			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
-			role="status"
-			aria-live="polite"
-			aria-atomic="true"
-		>
-			{#if error}
-				{error}
-			{:else if result}
-				Resolved from {result.unit}.
-			{:else}
-				Choose a mode, enter a value, then convert.
-			{/if}
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="field__label">Result</div>
-
-			{#if result}
-				<div class="mt-5 grid gap-4">
-					<div
-						class="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4"
+		{:else}
+			<TextInput
+				id="date-input"
+				label={`Date and time (${timezone.toUpperCase()})`}
+				error={error || undefined}
+				type="datetime-local"
+				help="Choose a wall-clock value and convert it with the selected timezone."
+				bind:value={dateInput}
+			/>
+			<div class="field">
+				<div class="field__label">Timezone</div>
+				<div class="seg" role="group" aria-label="Timezone">
+					<button
+						type="button"
+						aria-pressed={timezone === 'local'}
+						onclick={() => setTimezone('local')}>Local</button
 					>
-						<div class="tool-code">Local</div>
-						<div class="mt-2 text-sm leading-7 text-[var(--text)]">
-							{formatLocalDisplay(result.date)}
-						</div>
-					</div>
-
-					<div
-						class="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4"
+					<button type="button" aria-pressed={timezone === 'utc'} onclick={() => setTimezone('utc')}
+						>UTC</button
 					>
-						<div class="flex items-center justify-between gap-3">
-							<div class="tool-code">UTC / ISO</div>
-							<CopyButton value={result.utcIso} />
-						</div>
-						<div class="mt-2 font-mono text-sm leading-7 text-[var(--text)]">{result.utcIso}</div>
-					</div>
-
-					<div class="grid gap-4 lg:grid-cols-2">
-						<div
-							class="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4"
-						>
-							<div class="flex items-center justify-between gap-3">
-								<div class="tool-code">Unix Seconds</div>
-								<CopyButton value={String(result.seconds)} />
-							</div>
-							<div class="mt-2 font-mono text-sm leading-7 text-[var(--text)]">
-								{result.seconds}
-							</div>
-						</div>
-
-						<div
-							class="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4"
-						>
-							<div class="flex items-center justify-between gap-3">
-								<div class="tool-code">Unix Milliseconds</div>
-								<CopyButton value={String(result.milliseconds)} />
-							</div>
-							<div class="mt-2 font-mono text-sm leading-7 text-[var(--text)]">
-								{result.milliseconds}
-							</div>
-						</div>
-					</div>
 				</div>
-			{:else}
-				<div class="result-empty mt-5">Converted values will appear here.</div>
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
-</ToolShell>
+
+	<div class="workbench__pane">
+		{#if result}
+			<dl class="metrics" aria-label="Converted values">
+				<div>
+					<dt>Local</dt>
+					<dd class="text-sm">{formatLocalDisplay(result.date)}</dd>
+				</div>
+				<div>
+					<dt>Seconds</dt>
+					<dd class="text-sm">{result.seconds}</dd>
+				</div>
+				<div>
+					<dt>Milliseconds</dt>
+					<dd class="text-sm">{result.milliseconds}</dd>
+				</div>
+			</dl>
+			<OutputPane
+				id="timestamp-iso"
+				label="UTC / ISO"
+				value={result.utcIso}
+				filename="timestamp.txt"
+				gutter={false}
+				wrap
+				from="timestamp"
+			/>
+			<OutputPane
+				id="timestamp-summary"
+				label="Summary"
+				value={summary}
+				filename="timestamp-summary.txt"
+				gutter={false}
+				wrap
+			/>
+		{:else}
+			<div class="result-empty">Converted values will appear here.</div>
+		{/if}
+	</div>
+
+	{#snippet status()}
+		<StatusLine
+			tone={error ? 'error' : result ? 'ok' : 'idle'}
+			message={error ||
+				(result ? `Resolved from ${result.unit}.` : 'Choose a mode, enter a value, then convert.')}
+		/>
+	{/snippet}
+</Workbench>

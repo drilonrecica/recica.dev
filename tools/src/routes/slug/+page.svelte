@@ -1,71 +1,89 @@
 <script lang="ts">
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
+	import { onMount } from 'svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
 	import TextInput from '$lib/components/ui/TextInput.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import { slugify } from '$lib/tools/slug';
+	import { copyText } from '$lib/utils/clipboard';
 	import { checkToolInputLimit } from '$lib/utils/input-policy';
-	import { onDestroy } from 'svelte';
+	import { createDebounced } from '$lib/workbench/live';
+	import { STANDARD_SHORTCUTS, setupToolPage } from '$lib/workbench/page';
 
-	let input = '';
-	let debouncedInput = '';
-	let output = '';
-	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
-	$: limit = checkToolInputLimit('slug', [debouncedInput]);
+	let input = $state('');
+	let output = $state('');
+	let limitError = $state('');
 
-	function scheduleSlugUpdate() {
-		clearTimeout(debounceTimer);
-		debounceTimer = setTimeout(() => {
-			debouncedInput = input;
-			const limit = checkToolInputLimit('slug', [input]);
-			output = limit.ok ? slugify(input) : '';
-		}, 140);
+	function run() {
+		const limit = checkToolInputLimit('slug', [input]);
+		limitError = limit.ok ? '' : limit.message;
+		output = limit.ok ? slugify(input) : '';
 	}
 
-	onDestroy(() => {
-		clearTimeout(debounceTimer);
+	const live = createDebounced(run, 120);
+
+	onMount(() => {
+		const cleanup = setupToolPage({
+			toolId: 'slug',
+			onHandoff: (payload) => {
+				input = payload;
+				run();
+			},
+			shortcuts: [
+				{ keys: STANDARD_SHORTCUTS.copy, label: 'Copy slug', handler: () => void copyText(output) },
+				{
+					keys: STANDARD_SHORTCUTS.clear,
+					label: 'Clear input',
+					handler: () => {
+						input = '';
+						run();
+					}
+				}
+			]
+		});
+		return () => {
+			live.cancel();
+			cleanup();
+		};
 	});
 </script>
 
-<ToolShell
+<Workbench
 	title="Slug Generator"
 	description="Generate clean lowercase slugs with Unicode normalization, diacritic stripping, and collapsed separators."
 	tips={[
 		'Numbers are preserved by default.',
 		'Repeated punctuation and spaces collapse into a single hyphen.',
-		'The generated slug updates after a short debounce.'
+		'The generated slug updates as you type.'
 	]}
 >
-	<div class="space-y-6">
-		<div class="surface-panel p-6">
-			<TextInput
-				id="slug-input"
-				label="Source title"
-				error={limit.ok ? undefined : limit.message}
-				placeholder="Recica Tools: JSON Formatter / Validator"
-				help="Normalization happens locally and immediately."
-				bind:value={input}
-				on:input={scheduleSlugUpdate}
-			/>
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="flex items-center justify-between gap-3">
-				<div>
-					<div class="field__label">Slug</div>
-					<div class="field__help">Lowercase output with trimmed edges and collapsed hyphens.</div>
-				</div>
-				<CopyButton value={output} />
-			</div>
-
-			{#if !limit.ok}
-				<div class="status-pill status-error mt-5" role="alert" aria-live="assertive">
-					{limit.message}
-				</div>
-			{:else if debouncedInput && output}
-				<div class="mono-surface mt-5 overflow-x-auto p-5">{output}</div>
-			{:else}
-				<div class="result-empty mt-5">Enter a title to generate a slug.</div>
-			{/if}
-		</div>
+	<div class="workbench__pane">
+		<TextInput
+			id="slug-input"
+			label="Source title"
+			error={limitError || undefined}
+			placeholder="Recica Tools: JSON Formatter / Validator"
+			help="Normalization happens locally and immediately."
+			bind:value={input}
+			on:input={() => live.call()}
+		/>
+		<OutputPane
+			id="slug-output"
+			label="Slug"
+			value={output}
+			empty="Enter a title to generate a slug."
+			filename="slug.txt"
+			gutter={false}
+			wrap
+			from="slug"
+		/>
 	</div>
-</ToolShell>
+
+	{#snippet status()}
+		<StatusLine
+			tone={limitError ? 'error' : output ? 'ok' : 'idle'}
+			message={limitError || (output ? 'Slug ready.' : 'Type a title to begin.')}
+			{input}
+		/>
+	{/snippet}
+</Workbench>

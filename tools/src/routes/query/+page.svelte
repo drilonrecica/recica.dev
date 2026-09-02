@@ -1,34 +1,36 @@
 <script lang="ts">
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import Button from '$lib/components/ui/Button.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
-	import TextArea from '$lib/components/ui/TextArea.svelte';
+	import { onMount } from 'svelte';
+	import CodeField from '$lib/components/workbench/CodeField.svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import { buildQueryString, parseQueryString } from '$lib/tools/query';
+	import { copyText } from '$lib/utils/clipboard';
 	import { checkToolInputLimit } from '$lib/utils/input-policy';
+	import { createDebounced } from '$lib/workbench/live';
+	import { STANDARD_SHORTCUTS, setupToolPage } from '$lib/workbench/page';
 
 	type Row = { id: number; key: string; value: string };
 
-	let input = '?tag=json&tag=tools&mode=full+url';
-	let rows: Row[] = [];
-	let error = '';
+	let input = $state('?tag=json&tag=tools&mode=full+url');
+	let rows = $state<Row[]>([]);
+	let fieldError = $state<string | undefined>(undefined);
 	let nextId = 1;
 
 	function parseSource() {
 		const limit = checkToolInputLimit('query', [input]);
 		if (!limit.ok) {
-			error = limit.message;
+			fieldError = limit.message;
 			rows = [];
 			return;
 		}
-
 		const parsed = parseQueryString(input);
 		if (!parsed.ok) {
-			error = parsed.error;
+			fieldError = parsed.error;
 			rows = [];
 			return;
 		}
-
-		error = '';
+		fieldError = undefined;
 		rows = parsed.entries.map((entry) => ({ id: nextId++, ...entry }));
 	}
 
@@ -40,10 +42,42 @@
 		rows = rows.filter((row) => row.id !== id);
 	}
 
-	$: builtQuery = buildQueryString(rows);
+	const built = $derived(buildQueryString(rows));
+	const live = createDebounced(parseSource, 150);
+
+	onMount(() => {
+		parseSource();
+		const cleanup = setupToolPage({
+			toolId: 'query',
+			onHandoff: (value) => {
+				input = value;
+				parseSource();
+			},
+			shortcuts: [
+				{ keys: STANDARD_SHORTCUTS.run, label: 'Parse now', handler: parseSource },
+				{
+					keys: STANDARD_SHORTCUTS.copy,
+					label: 'Copy built query',
+					handler: () => void copyText(built)
+				},
+				{
+					keys: STANDARD_SHORTCUTS.clear,
+					label: 'Clear input',
+					handler: () => {
+						input = '';
+						parseSource();
+					}
+				}
+			]
+		});
+		return () => {
+			live.cancel();
+			cleanup();
+		};
+	});
 </script>
 
-<ToolShell
+<Workbench
 	title="Query String Parser / Builder"
 	description="Parse raw query strings into editable key/value rows and rebuild the query locally."
 	split
@@ -53,72 +87,76 @@
 		'Built output uses standard URL component encoding and starts with a leading ?.'
 	]}
 >
-	<div class="space-y-6">
-		<div class="surface-panel p-6">
-			<TextArea
-				id="query-input"
-				label="Raw query string"
-				error={error || undefined}
-				rows={10}
-				mono
-				help="Paste with or without the leading ?."
-				bind:value={input}
-			/>
+	{#snippet actions()}
+		<button type="button" class="button-base button-primary" onclick={parseSource}>Parse</button>
+		<button type="button" class="button-base button-ghost" onclick={addRow}>Add row</button>
+	{/snippet}
 
-			<div class="mt-5 flex flex-wrap gap-3">
-				<Button on:click={parseSource}>Parse</Button>
-				<Button variant="ghost" on:click={addRow}>Add row</Button>
-			</div>
+	<div class="workbench__pane">
+		<CodeField
+			id="query-input"
+			label="Raw query string"
+			bind:value={input}
+			rows={6}
+			maxBytes={5 * 1024 * 1024}
+			help="Paste with or without the leading ?. Rows update as you type."
+			error={fieldError}
+			wrap
+			oninput={() => live.call()}
+		/>
+		<div class="codefield__bar">
+			<div class="field__label">Entries</div>
+			<span class="workbench__note">Edit rows directly; the built query follows.</span>
 		</div>
-
-		<div class="surface-panel p-6">
-			<div class="flex items-center justify-between gap-3">
-				<div>
-					<div class="field__label">Entries</div>
-					<div class="field__help">Edit rows directly after parsing.</div>
-				</div>
+		{#if rows.length}
+			<div class="grid gap-2">
+				{#each rows as row (row.id)}
+					<div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
+						<input
+							class="input-base mono"
+							bind:value={row.key}
+							placeholder="key"
+							aria-label="Key"
+						/>
+						<input
+							class="input-base mono"
+							bind:value={row.value}
+							placeholder="value"
+							aria-label="Value"
+						/>
+						<button
+							type="button"
+							class="button-base button-ghost"
+							onclick={() => removeRow(row.id)}
+						>
+							Remove
+						</button>
+					</div>
+				{/each}
 			</div>
-
-			{#if rows.length}
-				<div class="mt-5 grid gap-3">
-					{#each rows as row (row.id)}
-						<div class="grid gap-3 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto]">
-							<input class="input-base mono" bind:value={row.key} placeholder="key" />
-							<input class="input-base mono" bind:value={row.value} placeholder="value" />
-							<Button variant="ghost" on:click={() => removeRow(row.id)}>Remove</Button>
-						</div>
-					{/each}
-				</div>
-			{:else}
-				<div class="result-empty mt-5">Parsed query entries will appear here.</div>
-			{/if}
-		</div>
+		{:else}
+			<div class="result-empty">Parsed query entries will appear here.</div>
+		{/if}
 	</div>
 
-	<div class="space-y-4">
-		<div
-			class={`status-pill ${error ? 'status-error' : 'status-neutral'}`}
-			role="status"
-			aria-live="polite"
-			aria-atomic="true"
-		>
-			{error || `${rows.length} row${rows.length === 1 ? '' : 's'} ready.`}
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="flex items-center justify-between gap-3">
-				<div>
-					<div class="field__label">Built query string</div>
-					<div class="field__help">Rebuilt from the editable rows on the left.</div>
-				</div>
-				<CopyButton value={builtQuery} />
-			</div>
-
-			{#if builtQuery}
-				<pre class="mono-surface mt-5 overflow-x-auto p-5">{builtQuery}</pre>
-			{:else}
-				<div class="result-empty mt-5">Built output will appear here.</div>
-			{/if}
-		</div>
+	<div class="workbench__pane">
+		<OutputPane
+			id="query-output"
+			label="Built query string"
+			value={built}
+			empty="Built output will appear here."
+			filename="query.txt"
+			gutter={false}
+			wrap
+			from="query"
+		/>
 	</div>
-</ToolShell>
+
+	{#snippet status()}
+		<StatusLine
+			tone={fieldError ? 'error' : rows.length ? 'ok' : 'idle'}
+			message={fieldError ?? `${rows.length} row${rows.length === 1 ? '' : 's'} ready.`}
+			{input}
+		/>
+	{/snippet}
+</Workbench>

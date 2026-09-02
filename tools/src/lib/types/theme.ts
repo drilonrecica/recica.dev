@@ -1,1 +1,2 @@
-export type ThemePreference = 'dark' | 'light';
+export type ThemePreference = 'system' | 'light' | 'dark';
+export type ResolvedTheme = 'light' | 'dark';

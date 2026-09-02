@@ -1,23 +1,64 @@
 <script lang="ts">
-	import ToolShell from '$lib/components/tools/ToolShell.svelte';
-	import CopyButton from '$lib/components/ui/CopyButton.svelte';
-	import TextArea from '$lib/components/ui/TextArea.svelte';
+	import { onMount } from 'svelte';
+	import CodeField from '$lib/components/workbench/CodeField.svelte';
+	import OutputPane from '$lib/components/workbench/OutputPane.svelte';
+	import StatusLine from '$lib/components/workbench/StatusLine.svelte';
 	import TextInput from '$lib/components/ui/TextInput.svelte';
+	import Workbench from '$lib/components/workbench/Workbench.svelte';
 	import { evaluateRegex } from '$lib/tools/regex';
 	import { checkToolInputLimit } from '$lib/utils/input-policy';
+	import { setupToolPage, STANDARD_SHORTCUTS } from '$lib/workbench/page';
 
-	let pattern = '(json)';
-	let flags = 'gi';
-	let source = 'JSON formatter\njson validator';
-	let replacement = '<$1>';
+	let pattern = $state('(json)');
+	let flags = $state('gi');
+	let source = $state('JSON formatter\njson validator');
+	let replacement = $state('<$1>');
 
-	$: limit = checkToolInputLimit('regex', [source]);
-	$: result = limit.ok
-		? evaluateRegex(pattern, flags, source, replacement)
-		: ({ ok: false, error: limit.message } as const);
+	const limit = $derived(checkToolInputLimit('regex', [source]));
+	const result = $derived(
+		limit.ok
+			? evaluateRegex(pattern, flags, source, replacement)
+			: ({ ok: false, error: limit.message } as const)
+	);
+	const patternError = $derived(
+		limit.ok && !result.ok && !result.error.toLowerCase().includes('flag')
+			? result.error
+			: undefined
+	);
+	const flagsError = $derived(
+		limit.ok && !result.ok && result.error.toLowerCase().includes('flag') ? result.error : undefined
+	);
+	const matchList = $derived(
+		result.ok
+			? result.matches
+					.map(
+						(match, index) =>
+							`Match ${index + 1} · ${match.index}-${match.end}\n${match.text}${match.groups.length ? `\nGroups: ${match.groups.join(' · ')}` : ''}`
+					)
+					.join('\n\n')
+			: ''
+	);
+
+	onMount(() =>
+		setupToolPage({
+			toolId: 'regex',
+			onHandoff: (value) => {
+				source = value;
+			},
+			shortcuts: [
+				{
+					keys: STANDARD_SHORTCUTS.clear,
+					label: 'Clear test text',
+					handler: () => {
+						source = '';
+					}
+				}
+			]
+		})
+	);
 </script>
 
-<ToolShell
+<Workbench
 	title="Regex Tester"
 	description="Test ECMAScript regular expressions locally with flags, match results, capture groups, and replace preview."
 	split
@@ -27,103 +68,72 @@
 		'Invalid patterns fail inline without changing your source text.'
 	]}
 >
-	<div class="surface-panel p-6">
-		<div class="grid gap-4">
-			<div class="grid gap-4 sm:grid-cols-2">
-				<TextInput
-					id="regex-pattern"
-					label="Pattern"
-					mono
-					error={limit.ok && !result.ok && !result.error.toLowerCase().includes('flag')
-						? result.error
-						: undefined}
-					bind:value={pattern}
-				/>
-				<TextInput
-					id="regex-flags"
-					label="Flags"
-					mono
-					error={limit.ok && !result.ok && result.error.toLowerCase().includes('flag')
-						? result.error
-						: undefined}
-					help="Common flags: g i m s u y"
-					bind:value={flags}
-				/>
-			</div>
-
+	<div class="workbench__pane">
+		<div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_8rem]">
 			<TextInput
-				id="regex-replacement"
-				label="Replacement"
+				id="regex-pattern"
+				label="Pattern"
 				mono
-				help="Used only for the replace preview."
-				bind:value={replacement}
+				error={patternError}
+				bind:value={pattern}
 			/>
-
-			<TextArea
-				id="regex-source"
-				label="Test text"
-				rows={14}
+			<TextInput
+				id="regex-flags"
+				label="Flags"
 				mono
-				error={limit.ok ? undefined : limit.message}
-				help="Results update as you edit the pattern, flags, and text."
-				bind:value={source}
+				error={flagsError}
+				help="g i m s u y"
+				bind:value={flags}
 			/>
 		</div>
+		<TextInput
+			id="regex-replacement"
+			label="Replacement"
+			mono
+			help="Used only for the replace preview."
+			bind:value={replacement}
+		/>
+		<CodeField
+			id="regex-source"
+			label="Test text"
+			bind:value={source}
+			rows={12}
+			maxBytes={1024 * 1024}
+			accept=".txt,text/plain"
+			help="Results update as you edit the pattern, flags, and text."
+			error={limit.ok ? undefined : limit.message}
+		/>
 	</div>
 
-	<div class="space-y-4">
-		<div
-			class={`status-pill ${result.ok ? 'status-neutral' : 'status-error'}`}
-			role="status"
-			aria-live="polite"
-			aria-atomic="true"
-		>
-			{#if result.ok}
-				{result.matches.length} match{result.matches.length === 1 ? '' : 'es'} found.
-			{:else}
-				{result.error}
-			{/if}
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="flex items-center justify-between gap-3">
-				<div>
-					<div class="field__label">Replace Preview</div>
-					<div class="field__help">Preview only. The source text is not overwritten.</div>
-				</div>
-				<CopyButton value={result.ok ? result.replaced : ''} />
-			</div>
-
-			{#if result.ok}
-				<pre class="mono-surface mt-5 overflow-x-auto p-5">{result.replaced}</pre>
-			{:else}
-				<div class="result-empty mt-5">Fix the pattern to preview replacements.</div>
-			{/if}
-		</div>
-
-		<div class="surface-panel p-6">
-			<div class="field__label">Matches</div>
-			{#if result.ok && result.matches.length}
-				<div class="mt-5 grid gap-4">
-					{#each result.matches as match, index (`${match.index}-${match.end}-${index}`)}
-						<div
-							class="rounded-[14px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4"
-						>
-							<div class="tool-code">Match {index + 1} · {match.index}-{match.end}</div>
-							<div class="mt-2 font-mono text-sm text-[var(--text)]">{match.text}</div>
-							{#if match.groups.length}
-								<div class="mt-3 text-sm text-[var(--text-secondary)]">
-									Groups: {match.groups.join(' · ')}
-								</div>
-							{/if}
-						</div>
-					{/each}
-				</div>
-			{:else if result.ok}
-				<div class="result-empty mt-5">No matches found for the current pattern.</div>
-			{:else}
-				<div class="result-empty mt-5">Match details will appear here.</div>
-			{/if}
-		</div>
+	<div class="workbench__pane">
+		<OutputPane
+			id="regex-replaced"
+			label="Replace preview"
+			value={result.ok ? result.replaced : ''}
+			empty="Fix the pattern to preview replacements."
+			filename="replaced.txt"
+			from="regex"
+		/>
+		<OutputPane
+			id="regex-matches"
+			label="Matches"
+			value={matchList}
+			empty={result.ok
+				? 'No matches found for the current pattern.'
+				: 'Match details will appear here.'}
+			filename="matches.txt"
+			gutter={false}
+			wrap
+		/>
 	</div>
-</ToolShell>
+
+	{#snippet status()}
+		<StatusLine
+			tone={result.ok ? (result.matches.length ? 'ok' : 'idle') : 'error'}
+			message={result.ok
+				? `${result.matches.length} match${result.matches.length === 1 ? '' : 'es'} found.`
+				: result.error}
+			input={source}
+		/>
+	{/snippet}
+</Workbench>
