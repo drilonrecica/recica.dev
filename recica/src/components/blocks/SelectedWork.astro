@@ -1,35 +1,63 @@
 ---
-import { caseStudies, sectionCopy } from '@/lib/site-content';
+import { caseStudies, sectionCopy } from "@/lib/site-content";
 ---
 
-<section id="work" class="dossier-section anchor-target">
-	<header class="dossier-section__header">
-		<p class="dossier-index">02 / SELECTED WORK</p>
-		<h2>{sectionCopy.work.title}</h2>
-		<p>{sectionCopy.work.description}</p>
-	</header>
+<section id="work" class="shell section section--stack" aria-labelledby="work-title">
+  <header class="section__header">
+    <p class="kicker">{sectionCopy.work.kicker}</p>
+    <h2 id="work-title">{sectionCopy.work.title}</h2>
+    <p class="lede">{sectionCopy.work.description}</p>
+  </header>
 
-	<div class="case-index">
-		{
-			caseStudies.map((study, index) => (
-				<article class="case-entry">
-					<p class="case-entry__number">CS-{String(index + 1).padStart(2, '0')}</p>
-					<div class="case-entry__identity">
-						<p class="case-entry__period">{study.period}</p>
-						<h3>{study.title}</h3>
-						<p>{study.role}</p>
-					</div>
-					<div class="case-entry__brief">
-						<p>{study.summary}</p>
-						<ul class="tag-row" aria-label="Technologies and disciplines">
-							{study.stack.map((tag) => <li>{tag}</li>)}
-						</ul>
-					</div>
-					<a href={`/work/${study.slug}`} class="case-entry__link">
-						Read case study <span aria-hidden="true">↗</span>
-					</a>
-				</article>
-			))
-		}
-	</div>
+  <div class="case-list">
+    {
+      caseStudies.map((study) => (
+        <article
+          class={`case-card${study.screenshots.length ? " case-card--with-image" : ""}`}
+        >
+          <div class="case-card__meta">
+            <p class="label">{study.period}</p>
+            <p class="label">
+              Role<strong>{study.role}</strong>
+            </p>
+            <p class="label">
+              For<strong>{study.client}</strong>
+            </p>
+          </div>
+
+          <div class="case-card__body">
+            <h3>
+              <a href={`/work/${study.slug}`}>{study.title}</a>
+            </h3>
+            <p class="case-card__summary">{study.summary}</p>
+            <ol class="decision-teasers" aria-label="Key decisions">
+              {study.decisions.map((decision) => (
+                <li>{decision.title}</li>
+              ))}
+            </ol>
+            <div class="case-card__foot">
+              <ul class="tags" aria-label="Technologies and disciplines">
+                {study.stack.map((tag) => (
+                  <li>{tag}</li>
+                ))}
+              </ul>
+              <a href={`/work/${study.slug}`} class="text-link">
+                Read the case study
+              </a>
+            </div>
+          </div>
+
+          {study.screenshots.length > 0 && (
+            <figure class="case-card__image">
+              <img
+                src={study.screenshots[0].src}
+                alt={study.screenshots[0].alt}
+                loading="lazy"
+              />
+            </figure>
+          )}
+        </article>
+      ))
+    }
+  </div>
 </section>

@@ -1,32 +1,32 @@
 ---
-import { contactLinks, sectionCopy, siteConfig } from '@/lib/site-content';
+import { contactLinks, sectionCopy, siteConfig } from "@/lib/site-content";
 ---
 
-<section id="contact" class="dossier-section anchor-target">
-	<header class="dossier-section__header">
-			<p class="dossier-index">07 / CONTACT CHANNELS</p>
-			<h2>{sectionCopy.contact.title}</h2>
-			<p>{sectionCopy.contact.description}</p>
-			<p class="contact-address">
-				{sectionCopy.contact.emailLabel}:
-				<a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
-			</p>
-	</header>
+<section id="contact" class="shell section section--stack" aria-labelledby="contact-title">
+  <div class="band contact-band">
+    <div>
+      <p class="kicker">{sectionCopy.contact.kicker}</p>
+      <h2 id="contact-title">{sectionCopy.contact.title}</h2>
+      <p class="lede">{sectionCopy.contact.description}</p>
+      <p class="contact-band__email">
+        <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a>
+      </p>
+    </div>
 
-	<div class="contact-list">
-			{
-				contactLinks.map((link) => (
-					<a
-						href={link.href}
-						class={`contact-item${link.primary ? ' contact-item--primary' : ''}${link.subdued ? ' contact-item--subdued' : ''}`}
-						target={link.href.startsWith('http') ? '_blank' : undefined}
-						rel={link.href.startsWith('http') ? 'noreferrer' : undefined}
-					>
-						<p class="contact-item__eyebrow">{link.eyebrow} / channel</p>
-						<h3>{link.label}</h3>
-						<p>{link.description}</p>
-					</a>
-				))
-			}
-	</div>
+    <div class="contact-grid">
+      {
+        contactLinks.map((link) => (
+          <a
+            href={link.href}
+            data-primary={link.primary ? "" : undefined}
+            target={link.href.startsWith("http") ? "_blank" : undefined}
+            rel={link.href.startsWith("http") ? "noreferrer" : undefined}
+          >
+            <h3>{link.label}</h3>
+            <p>{link.description}</p>
+          </a>
+        ))
+      }
+    </div>
+  </div>
 </section>

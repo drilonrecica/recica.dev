@@ -1,0 +1,45 @@
+---
+import { Image } from "astro:assets";
+import type { ImageMetadata } from "astro";
+import { siteConfig } from "@/lib/site-content";
+
+export interface Props {
+  class?: string;
+}
+
+const { class: className = "" } = Astro.props;
+
+// The portrait is supplied by the owner as src/assets/portrait.{jpg,jpeg,png,webp}.
+// Until it exists, a monogram plate keeps the layout and the build intact.
+const candidates = import.meta.glob<{ default: ImageMetadata }>(
+  "/src/assets/portrait.{jpg,jpeg,png,webp}",
+  { eager: true },
+);
+const portrait = Object.values(candidates)[0]?.default;
+---
+
+{
+  portrait ? (
+    <figure class={`hero__portrait ${className}`}>
+      <Image
+        src={portrait}
+        alt={`Portrait of ${siteConfig.name}`}
+        width={608}
+        height={760}
+        densities={[1, 2]}
+        format="avif"
+        loading="eager"
+        fetchpriority="high"
+      />
+      <figcaption>{siteConfig.location}</figcaption>
+    </figure>
+  ) : (
+    <div
+      class={`hero__portrait hero__portrait--placeholder ${className}`}
+      role="img"
+      aria-label={`${siteConfig.name} monogram`}
+    >
+      DR
+    </div>
+  )
+}

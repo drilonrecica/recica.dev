@@ -3,47 +3,48 @@ import Meta from "@/components/seo/Meta.astro";
 import Header from "@/components/site/Header.astro";
 import Footer from "@/components/site/Footer.astro";
 import "../styles/global.css";
-import "@fontsource/inter";
-import "@fontsource/jetbrains-mono";
+import "@fontsource/inter/latin-400.css";
+import "@fontsource/inter/latin-500.css";
+import "@fontsource/inter/latin-600.css";
+import "@fontsource/inter/latin-800.css";
+import "@fontsource/jetbrains-mono/latin-400.css";
+import "@fontsource/jetbrains-mono/latin-700.css";
 
 export interface Props {
-    title: string;
-    description: string;
-    image?: string;
-    type?: "website" | "article";
-    canonical?: string;
-    noindex?: boolean;
+  title: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  type?: "website" | "article";
+  canonical?: string;
+  noindex?: boolean;
+  schema?: Record<string, unknown>[];
 }
 
-const { title, description, image, type, canonical, noindex } = Astro.props;
+const { title, description, image, imageAlt, type, canonical, noindex, schema } =
+  Astro.props;
 ---
 
 <!doctype html>
 <html lang="en" class="scroll-smooth">
-    <head>
-        <Meta
-            title={title}
-            description={description}
-            image={image}
-            type={type}
-            canonical={canonical}
-            noindex={noindex}
-        />
-    </head>
-    <body data-publication="technical-dossier">
-        <a
-            href="#main-content"
-            class="skip-link"
-        >
-            Skip to content
-        </a>
-
-        <Header />
-
-        <main id="main-content" class="main-site">
-            <slot />
-        </main>
-
-        <Footer />
-    </body>
+  <head>
+    <Meta
+      title={title}
+      description={description}
+      image={image}
+      imageAlt={imageAlt}
+      type={type}
+      canonical={canonical}
+      noindex={noindex}
+      schema={schema}
+    />
+  </head>
+  <body data-publication="technical-dossier">
+    <a href="#main-content" class="skip-link">Skip to content</a>
+    <Header />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+  </body>
 </html>

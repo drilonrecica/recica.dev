@@ -1,30 +1,36 @@
 ---
-import { featuredTools, sectionCopy } from '@/lib/site-content';
+import { featuredTools, sectionCopy, siteConfig } from "@/lib/site-content";
 ---
 
-<section id="tools" class="dossier-section anchor-target">
-	<header class="dossier-section__header">
-		<p class="dossier-index">03 / INDEPENDENT PUBLICATIONS</p>
-		<h2>{sectionCopy.tools.title}</h2>
-		<p>{sectionCopy.tools.description}</p>
-	</header>
+<section id="tools" class="shell section section--split" aria-labelledby="tools-title">
+  <header class="section__header">
+    <p class="kicker">{sectionCopy.tools.kicker}</p>
+    <h2 id="tools-title">{sectionCopy.tools.title}</h2>
+    <p class="lede">{sectionCopy.tools.description}</p>
+  </header>
 
-	<div class="publication-index">
-			{
-				featuredTools.map((tool, index) => (
-					<a href={tool.href} target="_blank" rel="noreferrer" class="publication-entry">
-						<span>TL-{String(index + 1).padStart(2, '0')}</span>
-						<div><p>{tool.category}</p><h3>{tool.name}</h3></div>
-						<p class="publication-entry__copy">{tool.description}</p>
-						<span aria-hidden="true">↗</span>
-					</a>
-				))
-			}
-	</div>
+  <div>
+    <div class="tool-list">
+      {
+        featuredTools.map((tool) => (
+          <a href={tool.href} target="_blank" rel="noreferrer" class="tool-entry">
+            <p class="label">{tool.category}</p>
+            <h3>{tool.name}</h3>
+            <p>{tool.description}</p>
+            <span aria-hidden="true">↗</span>
+          </a>
+        ))
+      }
+    </div>
 
-	<div class="publication-links">
-		<p>{sectionCopy.tools.footer}</p>
-		<a href="https://tools.recica.dev" target="_blank" rel="noreferrer">Explore Recica Tools</a>
-		<a href="https://labs.recica.dev" target="_blank" rel="noreferrer">Explore Labs</a>
-	</div>
+    <div class="tool-links">
+      <p>{sectionCopy.tools.footer}</p>
+      <a href={siteConfig.toolsUrl} target="_blank" rel="noreferrer" class="text-link">
+        Explore Recica Tools
+      </a>
+      <a href={siteConfig.labsUrl} target="_blank" rel="noreferrer" class="text-link">
+        Explore Labs
+      </a>
+    </div>
+  </div>
 </section>

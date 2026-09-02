@@ -3,23 +3,21 @@ import BaseLayout from "@/layouts/BaseLayout.astro";
 ---
 
 <BaseLayout
-  title="404 — Dossier entry not found | Drilon Reçica"
-  description="This recica.dev dossier entry does not exist."
+  title="Page not found | Drilon Reçica"
+  description="This page does not exist on recica.dev."
   canonical="/404"
   noindex={true}
 >
-  <section class="not-found">
-    <p class="dossier-index">ERROR / 404</p>
-    <h1>Dossier entry not found</h1>
+  <section class="shell not-found">
+    <p class="kicker">404</p>
+    <h1>Page not found</h1>
     <p>
-      The requested record is not part of this publication. Return to the main
-      dossier or review the selected work index.
+      The address may be mistyped or the page may have moved. Start from the
+      homepage or go straight to the selected work.
     </p>
-    <div>
-      <a href="/" class="action-link action-link--primary">Return home</a>
-      <a href="/#work" class="action-link action-link--secondary"
-        >Selected work</a
-      >
+    <div class="actions">
+      <a href="/" class="action-link action-link--primary">Go to the homepage</a>
+      <a href="/#work" class="action-link action-link--secondary">Selected work</a>
     </div>
   </section>
 </BaseLayout>

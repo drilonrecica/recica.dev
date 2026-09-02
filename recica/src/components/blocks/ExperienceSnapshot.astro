@@ -1,27 +1,50 @@
 ---
-import { experienceItems, sectionCopy, siteConfig } from '@/lib/site-content';
+import { employers, sectionCopy, siteConfig } from "@/lib/site-content";
 ---
 
-<section id="experience" class="dossier-section anchor-target">
-	<header class="dossier-section__header">
-		<p class="dossier-index">04 / EXPERIENCE LOG</p>
-		<h2>{sectionCopy.experience.title}</h2>
-		<a href={siteConfig.cvPath} class="text-link">Download the full CV ↗</a>
-	</header>
+<section
+  id="experience"
+  class="shell section section--split"
+  aria-labelledby="experience-title"
+>
+  <header class="section__header">
+    <p class="kicker">{sectionCopy.experience.kicker}</p>
+    <h2 id="experience-title">{sectionCopy.experience.title}</h2>
+    <p class="lede">{sectionCopy.experience.description}</p>
+    <a href={siteConfig.cvPage} class="text-link">
+      Open the full CV
+    </a>
+  </header>
 
-	<div class="timeline-list">
-			{
-				experienceItems.map((item, index) => (
-					<article class="timeline-item">
-						<p class="timeline-item__index">{String(index + 1).padStart(2, '0')}</p>
-						<p class="timeline-item__period">{item.period}</p>
-						<div>
-							<h3>{item.title}</h3>
-							<p class="timeline-item__role">{item.role}</p>
-							<p class="timeline-item__summary">{item.summary}</p>
-						</div>
-					</article>
-				))
-			}
-	</div>
+  <div class="record">
+    {
+      employers.map((employer) => (
+        <article class="record__row">
+          <p class="label">{employer.period}</p>
+          <div>
+            <h3>{employer.company}</h3>
+            <p class="record__role">{employer.role}</p>
+            <p class="record__summary">{employer.summary}</p>
+            {employer.products.length > 0 && (
+              <ul class="record__products" aria-label={`Products at ${employer.company}`}>
+                {employer.products.map((product) => (
+                  <li>
+                    <span class="label">{product.period}</span>
+                    <span>
+                      {product.caseStudySlug ? (
+                        <a href={`/work/${product.caseStudySlug}`}>{product.name}</a>
+                      ) : (
+                        product.name
+                      )}
+                      <span class="muted"> · {product.summary}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </article>
+      ))
+    }
+  </div>
 </section>

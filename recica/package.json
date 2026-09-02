@@ -18,7 +18,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "test:e2e": "playwright test",
-    "test:e2e:install": "playwright install chromium"
+    "test:e2e:install": "playwright install chromium",
+    "og": "node scripts/render-og.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

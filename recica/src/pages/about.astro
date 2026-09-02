@@ -1,108 +1,154 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { experienceItems, principles, siteConfig } from "@/lib/site-content";
+import Portrait from "@/components/blocks/Portrait.astro";
+import {
+  aboutParagraphs,
+  credentials,
+  education,
+  expertise,
+  languages,
+  personId,
+  principles,
+  siteConfig,
+} from "@/lib/site-content";
 
 const title = "About Drilon Reçica — Mobile & Product Engineering";
 const description =
-  "About Drilon Reçica: senior mobile and product engineering, Android modernization, accessible delivery, and pragmatic technical leadership.";
+  "About Drilon Reçica: senior mobile and product engineering, Android modernization, accessible delivery, and pragmatic technical leadership, based in Prishtina and working with German and EU teams.";
+
+const schema = [
+  {
+    "@type": "ProfilePage",
+    "@id": `${siteConfig.origin}/about#profile`,
+    url: `${siteConfig.origin}/about`,
+    name: title,
+    mainEntity: { "@id": personId },
+  },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.origin },
+      { "@type": "ListItem", position: 2, name: "About", item: `${siteConfig.origin}/about` },
+    ],
+  },
+];
 ---
 
-<BaseLayout title={title} description={description} canonical="/about">
-  <article class="detail-page">
-    <header class="detail-hero">
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/about"
+  image="/og/about.png"
+  imageAlt="About Drilon Reçica, senior mobile and product engineer"
+  schema={schema}
+>
+  <article class="shell page">
+    <header class="page__hero">
       <div>
-        <p class="dossier-index">PROFILE / 001</p>
-        <p class="detail-hero__route">recica.dev/about</p>
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            <li aria-current="page">About</li>
+          </ol>
+        </nav>
+        <Portrait />
       </div>
       <div>
+        <p class="kicker">Profile</p>
         <h1>About Drilon Reçica</h1>
-        <p class="detail-hero__lead">
+        <p class="lede">
           Senior mobile and product engineer working across Android delivery,
           system modernization, accessibility, and 0-to-1 product foundations.
+          Based in {siteConfig.location}. {siteConfig.workStyle}.
         </p>
       </div>
     </header>
 
-    <section class="detail-section" aria-labelledby="profile-heading">
-      <div>
-        <p class="dossier-index">01 / PROFILE</p>
-        <h2 id="profile-heading">Engineering with product context intact.</h2>
-      </div>
-      <div class="prose-stack">
-        <p>
-          I have worked in Android since 2012, through the platform’s shift from
-          Java and XML toward Kotlin, Compose, Coroutines, Flow, and more
-          maintainable architectural boundaries.
-        </p>
-        <p>
-          My strongest work sits where implementation and product judgment meet:
-          moving live systems forward without reckless rewrites, improving
-          accessibility and UI quality, and keeping delivery dependable while
-          the architecture changes underneath it.
-        </p>
-        <p>
-          I am also comfortable beyond the app surface. Qisara involved product
-          direction, a Flutter app, a Deno and TypeScript backend, deployment,
-          and the decisions connecting those layers.
-        </p>
+    <section class="section section--split" aria-labelledby="story-title">
+      <header class="section__header">
+        <p class="kicker">Story</p>
+        <h2 id="story-title">Engineering with product context intact.</h2>
+      </header>
+      <div class="prose">
+        {aboutParagraphs.map((paragraph) => <p>{paragraph}</p>)}
       </div>
     </section>
 
-    <section class="detail-section" aria-labelledby="principles-heading">
-      <div>
-        <p class="dossier-index">02 / PRINCIPLES</p>
-        <h2 id="principles-heading">How I approach the work.</h2>
-      </div>
-      <ol class="detail-list">
+    <section class="section section--split" aria-labelledby="principles-title">
+      <header class="section__header">
+        <p class="kicker">Principles</p>
+        <h2 id="principles-title">How I approach the work.</h2>
+      </header>
+      <ul class="principles">
         {
-          principles.map((principle, index) => (
+          principles.map((principle) => (
             <li>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <div>
-                <h3>{principle.title}</h3>
-                <p>{principle.description}</p>
-              </div>
+              <h3>{principle.title}</h3>
+              <p>{principle.description}</p>
             </li>
           ))
         }
-      </ol>
+      </ul>
     </section>
 
-    <section class="detail-section" aria-labelledby="record-heading">
-      <div>
-        <p class="dossier-index">03 / RECORD</p>
-        <h2 id="record-heading">Selected experience.</h2>
-      </div>
-      <div class="timeline-list">
+    <section class="section section--split" aria-labelledby="background-title">
+      <header class="section__header">
+        <p class="kicker">Background</p>
+        <h2 id="background-title">Expertise, education, languages.</h2>
+        <a href={siteConfig.cvPage} class="text-link">
+          Open the full CV
+        </a>
+      </header>
+      <dl class="cv__list">
+        <div>
+          <dt class="label">Expertise</dt>
+          <dd>
+            <ul class="tags tags--strong">
+              {expertise.map((item) => <li>{item}</li>)}
+            </ul>
+          </dd>
+        </div>
         {
-          experienceItems.map((item, index) => (
-            <article class="timeline-item">
-              <p class="timeline-item__index">
-                {String(index + 1).padStart(2, "0")}
-              </p>
-              <p class="timeline-item__period">{item.period}</p>
-              <div>
-                <h3>{item.title}</h3>
-                <p class="timeline-item__role">{item.role}</p>
-                <p class="timeline-item__summary">{item.summary}</p>
-              </div>
-            </article>
+          education.map((entry) => (
+            <div>
+              <dt class="label">Education</dt>
+              <dd>
+                {entry.degree}, {entry.institution}
+                <p>{entry.period}</p>
+              </dd>
+            </div>
           ))
         }
-      </div>
+        {
+          credentials.map((credential) => (
+            <div>
+              <dt class="label">Credential</dt>
+              <dd>
+                {credential.title}
+                <p>
+                  {credential.issuer}, {credential.year}
+                </p>
+              </dd>
+            </div>
+          ))
+        }
+        <div>
+          <dt class="label">Languages</dt>
+          <dd>
+            {languages.map((language) => `${language.name} (${language.level})`).join(", ")}
+          </dd>
+        </div>
+      </dl>
     </section>
 
-    <footer class="detail-cta">
-      <p class="dossier-index">NEXT / CONTACT</p>
+    <footer class="band page__cta">
+      <p class="kicker">Next</p>
       <h2>For senior mobile work, modernization, or selective consulting.</h2>
-      <div>
-        <a
-          href={`mailto:${siteConfig.email}`}
-          class="action-link action-link--primary">Email Drilon</a
-        >
-        <a href={siteConfig.cvPath} class="action-link action-link--secondary"
-          >Download CV</a
-        >
+      <div class="actions">
+        <a href={`mailto:${siteConfig.email}`} class="action-link action-link--primary">
+          Email Drilon
+        </a>
+        <a href={siteConfig.cvPage} class="action-link action-link--secondary">Open the CV</a>
       </div>
     </footer>
   </article>

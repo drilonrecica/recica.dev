@@ -1,26 +1,34 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
 import ContactSection from "@/components/blocks/ContactSection.astro";
-import CollaborationSection from "@/components/blocks/CollaborationSection.astro";
 import ExperienceSnapshot from "@/components/blocks/ExperienceSnapshot.astro";
 import FeaturedTools from "@/components/blocks/FeaturedTools.astro";
 import FlagshipHero from "@/components/blocks/FlagshipHero.astro";
 import HowIWork from "@/components/blocks/HowIWork.astro";
-import ProofStrip from "@/components/blocks/ProofStrip.astro";
 import SelectedWork from "@/components/blocks/SelectedWork.astro";
-import { siteConfig } from "@/lib/site-content";
+import { personId, siteConfig } from "@/lib/site-content";
+
+const schema = [
+  {
+    "@type": "ProfilePage",
+    "@id": `${siteConfig.origin}/#profile`,
+    url: siteConfig.origin,
+    name: siteConfig.title,
+    mainEntity: { "@id": personId },
+  },
+];
 ---
 
 <BaseLayout
-	title={siteConfig.title}
-	description={siteConfig.description}
+  title={siteConfig.title}
+  description={siteConfig.description}
+  image="/og/home.png"
+  schema={schema}
 >
-	<FlagshipHero />
-	<ProofStrip />
-	<SelectedWork />
-	<FeaturedTools />
-	<ExperienceSnapshot />
-	<HowIWork />
-	<CollaborationSection />
-	<ContactSection />
+  <FlagshipHero />
+  <SelectedWork />
+  <ExperienceSnapshot />
+  <HowIWork />
+  <FeaturedTools />
+  <ContactSection />
 </BaseLayout>

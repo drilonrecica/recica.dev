@@ -1,6 +1,12 @@
 ---
 import BaseLayout from "@/layouts/BaseLayout.astro";
-import { caseStudies, siteConfig, type CaseStudy } from "@/lib/site-content";
+import {
+  caseStudies,
+  getAdjacentCaseStudies,
+  personId,
+  siteConfig,
+  type CaseStudy,
+} from "@/lib/site-content";
 
 export function getStaticPaths() {
   return caseStudies.map((study) => ({
@@ -14,8 +20,42 @@ interface Props {
 }
 
 const { study } = Astro.props;
+const { previous, next } = getAdjacentCaseStudies(study.slug);
+const pageUrl = `${siteConfig.origin}/work/${study.slug}`;
 const title = `${study.title} — Case Study | ${siteConfig.name}`;
-const description = `${study.summary} ${study.outcome}`;
+const description = `${study.summary} ${study.reflection}`;
+
+const schema = [
+  {
+    "@type": "CreativeWork",
+    "@id": `${pageUrl}#case-study`,
+    url: pageUrl,
+    name: `${study.title} case study`,
+    headline: study.title,
+    description: study.summary,
+    author: { "@id": personId },
+    about: {
+      "@type": "SoftwareApplication",
+      name: study.product,
+      url: study.externalHref,
+    },
+    keywords: study.stack.join(", "),
+    inLanguage: "en-US",
+  },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.origin },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Selected work",
+        item: `${siteConfig.origin}/#work`,
+      },
+      { "@type": "ListItem", position: 3, name: study.title, item: pageUrl },
+    ],
+  },
+];
 ---
 
 <BaseLayout
@@ -23,67 +63,156 @@ const description = `${study.summary} ${study.outcome}`;
   description={description}
   canonical={`/work/${study.slug}`}
   type="article"
+  image={`/og/${study.slug}.png`}
+  imageAlt={`${study.title} case study by ${siteConfig.name}`}
+  schema={schema}
 >
-  <article class="detail-page">
-    <header class="detail-hero detail-hero--case">
+  <article class="shell page">
+    <header class="page__hero">
       <div>
-        <p class="dossier-index">CASE STUDY / {study.slug.toUpperCase()}</p>
-        <p class="detail-hero__route">recica.dev/work/{study.slug}</p>
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            <li><a href="/#work">Work</a></li>
+            <li aria-current="page">{study.product}</li>
+          </ol>
+        </nav>
       </div>
       <div>
+        <p class="kicker">Case study · {study.client}</p>
         <h1>{study.title}</h1>
-        <p class="detail-hero__lead">{study.summary}</p>
+        <p class="lede">{study.summary}</p>
       </div>
     </header>
 
-    <dl class="case-facts">
-      <div><dt>Role</dt><dd>{study.role}</dd></div>
-      <div><dt>Period</dt><dd>{study.period}</dd></div>
-      <div><dt>Scope</dt><dd>{study.stack.join(" / ")}</dd></div>
+    <dl class="facts facts--case">
+      <div><dt class="label">Role</dt><dd>{study.role}</dd></div>
+      <div><dt class="label">Period</dt><dd>{study.period}</dd></div>
+      <div><dt class="label">Product</dt><dd>{study.product}</dd></div>
+      <div><dt class="label">Stack</dt><dd>{study.stack.join(" · ")}</dd></div>
     </dl>
 
-    <section class="detail-section" aria-labelledby="brief-heading">
-      <div>
-        <p class="dossier-index">01 / DELIVERY BRIEF</p>
-        <h2 id="brief-heading">Work carried through production constraints.</h2>
-      </div>
-      <ul class="delivery-list">
-        {study.bullets.map((bullet) => <li>{bullet}</li>)}
+    <section class="section section--split" aria-labelledby="context-title">
+      <header class="section__header">
+        <p class="kicker">Context</p>
+        <h2 id="context-title">What the product is and where I came in.</h2>
+      </header>
+      <div class="prose"><p>{study.context}</p></div>
+    </section>
+
+    <section class="section section--split" aria-labelledby="constraints-title">
+      <header class="section__header">
+        <p class="kicker">Constraints</p>
+        <h2 id="constraints-title">What could not change.</h2>
+      </header>
+      <ul class="bullets">
+        {study.constraints.map((item) => <li>{item}</li>)}
       </ul>
     </section>
 
-    <section class="detail-section outcome-panel" aria-labelledby="outcome-heading">
-      <div>
-        <p class="dossier-index">02 / RESULT</p>
-        <h2 id="outcome-heading">Outcome</h2>
-      </div>
-      <p>{study.outcome}</p>
-    </section>
-
-    <section class="detail-section" aria-labelledby="stack-heading">
-      <div>
-        <p class="dossier-index">03 / WORKING SET</p>
-        <h2 id="stack-heading">Technologies and disciplines.</h2>
-      </div>
-      <ul class="detail-tags">
-        {study.stack.map((tag) => <li>{tag}</li>)}
+    <section class="section section--split" aria-labelledby="approach-title">
+      <header class="section__header">
+        <p class="kicker">Approach</p>
+        <h2 id="approach-title">What I did.</h2>
+      </header>
+      <ul class="bullets">
+        {study.approach.map((item) => <li>{item}</li>)}
       </ul>
     </section>
 
-    <footer class="detail-cta">
-      <p class="dossier-index">SOURCE / NEXT</p>
-      <h2>Continue with the product or return to the dossier.</h2>
-      <div>
+    <section class="section section--stack" aria-labelledby="decisions-title">
+      <header class="section__header">
+        <p class="kicker">Decision log</p>
+        <h2 id="decisions-title">The calls that shaped the work, in order.</h2>
+        <p class="lede">
+          Each record pairs the choice with the trade-off it accepted. The
+          reasoning is the point.
+        </p>
+      </header>
+      <ol class="decisions">
+        {
+          study.decisions.map((decision) => (
+            <li class="decision">
+              <span class="decision__index" aria-hidden="true" />
+              <div>
+                <h3>{decision.title}</h3>
+                <dl>
+                  <div>
+                    <dt class="label">Chose</dt>
+                    <dd>{decision.choice}</dd>
+                  </div>
+                  <div>
+                    <dt class="label">Trade-off</dt>
+                    <dd>{decision.tradeoff}</dd>
+                  </div>
+                </dl>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="section section--split" aria-labelledby="reflection-title">
+      <header class="section__header">
+        <p class="kicker">Reflection</p>
+        <h2 id="reflection-title">What I would tell the next team.</h2>
+      </header>
+      <p class="reflection">{study.reflection}</p>
+    </section>
+
+    {
+      study.screenshots.length > 0 && (
+        <section class="section section--stack" aria-labelledby="screens-title">
+          <header class="section__header">
+            <p class="kicker">Screens</p>
+            <h2 id="screens-title">In the product.</h2>
+          </header>
+          <div class="gallery">
+            {study.screenshots.map((shot) => (
+              <figure>
+                <img src={shot.src} alt={shot.alt} loading="lazy" />
+                {shot.caption && <figcaption>{shot.caption}</figcaption>}
+              </figure>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    <footer class="band page__cta">
+      <p class="kicker">Next</p>
+      <h2>See the product, or continue with the next case study.</h2>
+      <div class="actions">
         <a
           href={study.externalHref}
           target="_blank"
           rel="noreferrer"
-          class="action-link action-link--primary">{study.externalLabel}</a
+          class="action-link action-link--primary"
         >
-        <a href="/#work" class="action-link action-link--secondary"
-          >All selected work</a
-        >
+          {study.externalLabel} <span aria-hidden="true">↗</span>
+        </a>
+        <a href="/#work" class="action-link action-link--secondary">All selected work</a>
       </div>
     </footer>
+
+    <nav class={`pager${previous && next ? "" : " pager--single"}`} aria-label="Case studies">
+      {
+        previous && (
+          <a href={`/work/${previous.slug}`} rel="prev">
+            <span class="label">Previous</span>
+            <strong>{previous.title}</strong>
+          </a>
+        )
+      }
+      {
+        next && (
+          <a href={`/work/${next.slug}`} rel="next">
+            <span class="label">Next</span>
+            <strong>{next.title}</strong>
+          </a>
+        )
+      }
+    </nav>
   </article>
 </BaseLayout>

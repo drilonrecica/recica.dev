@@ -1,56 +1,44 @@
 ---
-import { heroActions, sectionCopy, siteConfig } from '@/lib/site-content';
-
-const capabilities = [
-	['01', 'Android product engineering'],
-	['02', 'Legacy modernization'],
-	['03', 'Accessible delivery'],
-	['04', '0-to-1 product systems']
-];
+import Portrait from "@/components/blocks/Portrait.astro";
+import { heroActions, heroFacts, siteConfig } from "@/lib/site-content";
 ---
 
-<section class="hero-stage" aria-labelledby="hero-title">
-	<div class="hero-stage__shell">
-		<div class="hero-copy">
-			<div class="hero-copy__meta">
-				<p class="dossier-index">DOSSIER 001 / 2026</p>
-				<p>Static · Independent</p>
-			</div>
-			<h1 id="hero-title" class="hero-title">{siteConfig.name}</h1>
-			<p class="hero-role">Senior mobile &amp;<br />product engineer.</p>
-			<p class="hero-support">{siteConfig.supportingLine}</p>
-			<p class="hero-intro">{sectionCopy.hero.intro}</p>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="shell">
+    <div class="hero__shell">
+      <div>
+        <p class="kicker">{siteConfig.role}</p>
+        <h1 id="hero-title" class="hero__name">{siteConfig.name}</h1>
+        <p class="hero__role">
+          Android since {siteConfig.yearsSince}. Flutter, backend, and
+          infrastructure when the product needs it.
+        </p>
+        <p class="hero__pitch">{siteConfig.pitch}</p>
+        <div class="actions" aria-label="Primary actions">
+          {
+            heroActions.map((action) => (
+              <a
+                href={action.href}
+                class={`action-link action-link--${action.style ?? "text"}`}
+              >
+                {action.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+      <Portrait />
+    </div>
 
-			<div class="hero-actions" aria-label="Primary actions">
-				{
-					heroActions.map((action) => (
-						<a
-							href={action.href}
-							class={`action-link action-link--${action.style ?? 'text'}`}
-							target={action.external ? '_blank' : undefined}
-							rel={action.external ? 'noreferrer' : undefined}
-						>
-							{action.label}
-						</a>
-					))
-				}
-			</div>
-		</div>
-
-		<div class="capability-plate" aria-label="Core capabilities">
-			<div class="capability-plate__head">
-				<span>Operating range</span>
-				<span>12+ years</span>
-			</div>
-			<ol>
-				{capabilities.map(([number, label]) => (
-					<li><span>{number}</span><strong>{label}</strong></li>
-				))}
-			</ol>
-			<div class="capability-plate__signal" aria-hidden="true">
-				<span></span><span></span><span></span><span></span>
-			</div>
-			<p class="capability-plate__foot">Architecture / Delivery / Product judgment</p>
-		</div>
-	</div>
+    <dl class="facts" style="margin-top: clamp(2.5rem, 5vw, 4rem)">
+      {
+        heroFacts.map((fact) => (
+          <div>
+            <dt class="label">{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
 </section>

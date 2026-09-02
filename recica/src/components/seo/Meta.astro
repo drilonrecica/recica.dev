@@ -1,92 +1,127 @@
 ---
-import { siteConfig } from "@/lib/site-content";
+import {
+  credentials,
+  education,
+  expertise,
+  languages,
+  personId,
+  siteConfig,
+} from "@/lib/site-content";
 
 export interface Props {
-    title: string;
-    description: string;
-    image?: string;
-    imageAlt?: string;
-    type?: "website" | "article";
-    canonical?: string;
-    noindex?: boolean;
+  title: string;
+  description: string;
+  image?: string;
+  imageAlt?: string;
+  type?: "website" | "article";
+  canonical?: string;
+  noindex?: boolean;
+  /** Extra schema.org graph nodes for this page. */
+  schema?: Record<string, unknown>[];
 }
 
 const {
-    title,
-    description,
-    image = siteConfig.image,
-    imageAlt = siteConfig.imageAlt,
-    type = "website",
-    canonical,
-    noindex = false,
+  title,
+  description,
+  image = siteConfig.image,
+  imageAlt = siteConfig.imageAlt,
+  type = "website",
+  canonical,
+  noindex = false,
+  schema: extraSchema = [],
 } = Astro.props;
 
 const origin = Astro.site ?? new URL(siteConfig.origin);
 const canonicalURL = new URL(canonical ?? Astro.url.pathname, origin);
 const socialImageUrl = new URL(image, origin).toString();
+const portraitUrl = new URL("/og/portrait.png", origin).toString();
 const indexingEnabled = import.meta.env.PUBLIC_INDEXING_ENABLED === "true";
-const robotsContent = noindex || !indexingEnabled
+const robotsContent =
+  noindex || !indexingEnabled
     ? "noindex, nofollow, noarchive"
     : "index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1";
 
 function serializeJsonLd(value: unknown) {
-    return JSON.stringify(value).replaceAll("<", "\\u003c");
+  return JSON.stringify(value).replaceAll("<", "\\u003c");
 }
 
+const person = {
+  "@type": "Person",
+  "@id": personId,
+  name: siteConfig.name,
+  url: siteConfig.origin,
+  image: portraitUrl,
+  jobTitle: siteConfig.role,
+  description: siteConfig.description,
+  email: `mailto:${siteConfig.email}`,
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Prishtina",
+    addressCountry: siteConfig.countryCode,
+  },
+  knowsLanguage: languages.map((language) => language.name),
+  knowsAbout: [
+    ...expertise,
+    "Android",
+    "Kotlin",
+    "Jetpack Compose",
+    "Flutter",
+    "Legacy modernization",
+    "Mobile accessibility",
+  ],
+  worksFor: {
+    "@type": "Organization",
+    name: siteConfig.currentEmployer,
+  },
+  alumniOf: education.map((entry) => ({
+    "@type": "EducationalOrganization",
+    name: entry.institution,
+  })),
+  hasCredential: credentials.map((credential) => ({
+    "@type": "EducationalOccupationalCredential",
+    name: credential.title,
+    credentialCategory: "certification",
+    recognizedBy: { "@type": "Organization", name: credential.issuer },
+  })),
+  sameAs: siteConfig.socialLinks,
+};
+
 const schema = {
-    "@context": "https://schema.org",
-    "@graph": [
-        {
-            "@type": "WebSite",
-            "@id": `${siteConfig.origin}/#website`,
-            url: siteConfig.origin,
-            name: siteConfig.name,
-            description: siteConfig.description,
-            inLanguage: "en-US",
-        },
-        {
-            "@type": "Person",
-            "@id": `${siteConfig.origin}/#drilon`,
-            name: siteConfig.name,
-            url: siteConfig.origin,
-            image: socialImageUrl,
-            jobTitle: siteConfig.role,
-            sameAs: siteConfig.socialLinks,
-        },
-    ],
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": `${siteConfig.origin}/#website`,
+      url: siteConfig.origin,
+      name: siteConfig.name,
+      description: siteConfig.description,
+      inLanguage: "en-US",
+      publisher: { "@id": personId },
+    },
+    person,
+    ...extraSchema,
+  ],
 };
 ---
 
-<!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link
-    rel="icon"
-    type="image/png"
-    href="/favicon-96x96.png"
-    sizes="96x96"
-/>
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
 <link rel="shortcut icon" href="/favicon.ico" />
-<link
-    rel="apple-touch-icon"
-    sizes="180x180"
-    href="/apple-touch-icon.png"
-/>
-<meta name="apple-mobile-web-app-title" content="recica.dev" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
 <meta name="generator" content={Astro.generator} />
-<meta name="theme-color" content="#0b1014" />
-<meta name="color-scheme" content="dark" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090b0d" />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f5f2" />
+<meta name="color-scheme" content="dark light" />
 <meta name="format-detection" content="telephone=no" />
 <meta name="application-name" content={siteConfig.domain} />
 <meta name="apple-mobile-web-app-title" content={siteConfig.domain} />
 
-<!-- Canonical URL -->
 <link rel="canonical" href={canonicalURL.toString()} />
 <script type="application/ld+json" is:inline set:html={serializeJsonLd(schema)} />
 
-<!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
@@ -95,7 +130,6 @@ const schema = {
 <meta name="robots" content={robotsContent} />
 <meta name="googlebot" content={robotsContent} />
 
-<!-- Open Graph / Facebook -->
 <meta property="og:site_name" content={siteConfig.domain} />
 <meta property="og:locale" content="en_US" />
 <meta property="og:type" content={type} />
@@ -104,9 +138,10 @@ const schema = {
 <meta property="og:description" content={description} />
 <meta property="og:image" content={socialImageUrl} />
 <meta property="og:image:secure_url" content={socialImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
 <meta property="og:image:alt" content={imageAlt} />
 
-<!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:url" content={canonicalURL.toString()} />
 <meta name="twitter:title" content={title} />

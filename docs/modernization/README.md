@@ -57,3 +57,13 @@ Revisit a root workspace only when real shared packages or repeated cross-app bu
 Software versions and crawler identities change. Agents must verify current official documentation before pinning exact Docker digests, GitHub Action SHAs, or crawler-specific rules.
 
 The architectural decisions in this directory are stable. Exact patch versions are maintenance details.
+
+## Post-modernization: flagship redesign (2026-09)
+
+`recica/` was redesigned for hiring managers: narrative case studies with
+decision logs, a facts strip (location, languages, availability), an HTML CV at
+`/cv`, a CSS-only light scheme, per-page social images, and a contrast gate that
+treats axe "incomplete" results as failures. See `recica/README.md`.
+
+Deferred to the next MVP: real case-study screenshots. The content model and
+templates already carry the slot.

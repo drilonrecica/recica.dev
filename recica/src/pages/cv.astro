@@ -1,0 +1,198 @@
+---
+import BaseLayout from "@/layouts/BaseLayout.astro";
+import {
+  credentials,
+  education,
+  employers,
+  expertise,
+  languages,
+  personId,
+  siteConfig,
+} from "@/lib/site-content";
+
+const title = "CV — Drilon Reçica, Senior Mobile & Product Engineer";
+const description =
+  "Curriculum vitae of Drilon Reçica: senior Android and mobile engineering since 2012, legacy modernization, Flutter, backend and infrastructure ownership, based in Prishtina.";
+
+const schema = [
+  {
+    "@type": "ProfilePage",
+    "@id": `${siteConfig.origin}/cv#profile`,
+    url: `${siteConfig.origin}/cv`,
+    name: title,
+    mainEntity: { "@id": personId },
+  },
+  {
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.origin },
+      { "@type": "ListItem", position: 2, name: "CV", item: `${siteConfig.origin}/cv` },
+    ],
+  },
+];
+
+const links = [
+  { label: "Email", href: `mailto:${siteConfig.email}`, text: siteConfig.email },
+  { label: "Web", href: siteConfig.origin, text: siteConfig.domain },
+  {
+    label: "GitHub",
+    href: "https://github.com/drilonrecica",
+    text: "github.com/drilonrecica",
+  },
+  {
+    label: "LinkedIn",
+    href: "https://linkedin.com/in/drilonrecica",
+    text: "linkedin.com/in/drilonrecica",
+  },
+];
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonical="/cv"
+  image="/og/cv.png"
+  imageAlt="CV of Drilon Reçica, senior mobile and product engineer"
+  schema={schema}
+>
+  <article class="shell page cv">
+    <header class="cv__head">
+      <div>
+        <nav aria-label="Breadcrumb" class="print-hidden">
+          <ol class="breadcrumb">
+            <li><a href="/">Home</a></li>
+            <li aria-current="page">CV</li>
+          </ol>
+        </nav>
+        <h1 style="margin-top: 1rem">{siteConfig.name}</h1>
+        <p class="hero__role">{siteConfig.role}</p>
+        <p class="lede" style="margin-top: 1rem">
+          {siteConfig.location} · {siteConfig.timezone} · {siteConfig.workStyle}
+        </p>
+      </div>
+      <div>
+        <dl class="cv__contacts">
+          {
+            links.map((link) => (
+              <div>
+                <dt class="label">{link.label}</dt>
+                <dd>
+                  <a href={link.href}>{link.text}</a>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="actions print-hidden">
+          <a href={siteConfig.cvPath} class="action-link action-link--primary" download>
+            Download PDF
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <section class="cv__section" aria-labelledby="cv-profile">
+      <h2 id="cv-profile">Profile</h2>
+      <div class="prose">
+        <p>
+          Senior mobile and software engineer with professional experience since {siteConfig.yearsSince}, primarily focused on Android, Flutter, and modern
+          backend systems. I began Android development in 2012 by publishing public
+          Play Store apps and have grown alongside the platform, adapting to new
+          architectures, tooling, and engineering standards as the ecosystem evolved.
+        </p>
+        <p>{siteConfig.pitch} {siteConfig.availability}</p>
+      </div>
+    </section>
+
+    <section class="cv__section" aria-labelledby="cv-expertise">
+      <h2 id="cv-expertise">Expertise</h2>
+      <ul class="tags tags--strong">
+        {expertise.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+
+    <section class="cv__section" aria-labelledby="cv-experience">
+      <h2 id="cv-experience">Experience</h2>
+      <div class="record">
+        {
+          employers.map((employer) => (
+            <article class="record__row">
+              <p class="label">{employer.period}</p>
+              <div>
+                <h3>{employer.role}</h3>
+                <p class="record__role">{employer.company}</p>
+                <p class="record__summary">{employer.summary}</p>
+                {employer.products.length > 0 && (
+                  <ul class="record__products" aria-label={`Products at ${employer.company}`}>
+                    {employer.products.map((product) => (
+                      <li>
+                        <span class="label">{product.period}</span>
+                        <span>
+                          {product.caseStudySlug ? (
+                            <a href={`/work/${product.caseStudySlug}`}>{product.name}</a>
+                          ) : (
+                            product.name
+                          )}
+                          <span class="muted"> · {product.summary}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {employer.highlights.length > 0 && (
+                  <ul class="record__highlights">
+                    {employer.highlights.map((highlight) => (
+                      <li>{highlight}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="cv__section" aria-labelledby="cv-education">
+      <h2 id="cv-education">Education and credentials</h2>
+      <ul class="cv__list">
+        {
+          education.map((entry) => (
+            <li>
+              <span class="label">{entry.period}</span>
+              <span>
+                {entry.degree}
+                <p>{entry.institution}</p>
+              </span>
+            </li>
+          ))
+        }
+        {
+          credentials.map((credential) => (
+            <li>
+              <span class="label">{credential.year}</span>
+              <span>
+                {credential.title}
+                <p>{credential.issuer}</p>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="cv__section" aria-labelledby="cv-languages">
+      <h2 id="cv-languages">Languages</h2>
+      <ul class="cv__list">
+        {
+          languages.map((language) => (
+            <li>
+              <span class="label">{language.level}</span>
+              <span>{language.name}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </article>
+</BaseLayout>
