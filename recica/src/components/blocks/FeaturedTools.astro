@@ -1,5 +1,5 @@
 ---
-import { featuredTools, sectionCopy, siteConfig } from "@/lib/site-content";
+import { featuredTools, openSourceHighlight, sectionCopy, siteConfig } from "@/lib/site-content";
 ---
 
 <section id="tools" class="shell section section--split" aria-labelledby="tools-title">
@@ -12,7 +12,7 @@ import { featuredTools, sectionCopy, siteConfig } from "@/lib/site-content";
   <div>
     <div class="tool-list">
       {
-        featuredTools.map((tool) => (
+        [...featuredTools, openSourceHighlight].map((tool) => (
           <a href={tool.href} target="_blank" rel="noreferrer" class="tool-entry">
             <p class="label">{tool.category}</p>
             <h3>{tool.name}</h3>
@@ -30,9 +30,6 @@ import { featuredTools, sectionCopy, siteConfig } from "@/lib/site-content";
       </a>
       <a href={siteConfig.labsUrl} target="_blank" rel="noreferrer" class="text-link">
         Explore Labs
-      </a>
-      <a href={siteConfig.openSourceUrl} target="_blank" rel="noreferrer" class="text-link">
-        Open source &amp; side projects
       </a>
     </div>
   </div>

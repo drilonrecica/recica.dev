@@ -34,8 +34,11 @@ function isCurrent(href: string) {
           <a
             href={resolveHref(item.href)}
             aria-current={isCurrent(item.href) ? "page" : undefined}
+            target={item.external ? "_blank" : undefined}
+            rel={item.external ? "noreferrer" : undefined}
           >
             {item.label}
+            {item.external && <span aria-hidden="true"> ↗</span>}
           </a>
         ))
       }

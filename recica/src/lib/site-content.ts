@@ -1,6 +1,8 @@
 export type NavItem = {
   label: string;
-  href: `#${string}` | `/${string}`;
+  href: `#${string}` | `/${string}` | `https://${string}`;
+  /** Opens in a new tab and shows a ↗ mark. */
+  external?: boolean;
 };
 
 export type ActionLink = {
@@ -174,6 +176,11 @@ export const navigation: NavItem[] = [
   { label: "Tools", href: "#tools" },
   { label: "Contact", href: "#contact" },
   { label: "CV", href: "/cv" },
+  {
+    label: "Open source",
+    href: "https://drilonrecica.github.io/",
+    external: true,
+  },
 ];
 
 export const heroActions: ActionLink[] = [
@@ -341,6 +348,15 @@ export const caseStudies: CaseStudy[] = [
     screenshots: [],
   },
 ];
+
+/** Shown as its own card beside the featured tools: the builder site on GitHub Pages. */
+export const openSourceHighlight: ToolHighlight = {
+  name: "Open source & side projects",
+  href: siteConfig.openSourceUrl,
+  description:
+    "igris, Scouter and Nise & Go: a task runner for Claude Code, a CI status display on a retired Android phone, and a Go application foundation.",
+  category: "Open source",
+};
 
 export const featuredTools: ToolHighlight[] = [
   {
@@ -534,6 +550,7 @@ export const contactLinks: ContactLink[] = [
 export const footerLinks: ActionLink[] = [
   { label: "Tools", href: siteConfig.toolsUrl, external: true },
   { label: "Labs", href: siteConfig.labsUrl, external: true },
+  { label: "Open source", href: siteConfig.openSourceUrl, external: true },
   { label: "CV", href: siteConfig.cvPage },
   { label: "GitHub", href: "https://github.com/drilonrecica", external: true },
   {
