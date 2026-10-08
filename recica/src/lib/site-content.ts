@@ -106,6 +106,7 @@ export const siteConfig = {
   domain: "recica.dev",
   origin: "https://recica.dev",
   labsUrl: "https://labs.recica.dev",
+  openSourceUrl: "https://drilonrecica.github.io/",
   toolsUrl: "https://tools.recica.dev",
   role: "Senior Mobile & Product Engineer",
   title: "Drilon Reçica — Senior Mobile, Android & Product Engineer",
@@ -131,6 +132,7 @@ export const siteConfig = {
     "https://github.com/drilonrecica",
     "https://linkedin.com/in/drilonrecica",
     "https://x.com/drilonre",
+    "https://drilonrecica.github.io/",
   ],
   currentEmployer: "AppDev GmbH",
 } as const;
@@ -421,7 +423,7 @@ export const employers: Employer[] = [
     ],
   },
   {
-    company: "Adrsys GmbH & Co. KG",
+    company: "adorsys GmbH & Co. KG",
     role: "Senior Android Developer",
     period: "2015 — 2020",
     summary:

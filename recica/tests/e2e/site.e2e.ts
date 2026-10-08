@@ -73,6 +73,9 @@ test("homepage keeps public anchors, metadata, and zero presentation scripts", a
   );
   await expect(page.getByText("Prishtina, Kosovo").first()).toBeVisible();
   await expect(page.getByRole("link", { name: "Explore Labs" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Open source & side projects" }),
+  ).toHaveAttribute("href", "https://drilonrecica.github.io/");
 
   for (const anchor of ["work", "experience", "about", "contact", "tools"]) {
     await expect(page.locator(`#${anchor}`)).toHaveCount(1);
