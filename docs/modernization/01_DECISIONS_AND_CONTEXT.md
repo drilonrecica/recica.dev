@@ -330,6 +330,8 @@ Reasoning:
 
 ### D-14 — CI checks before merge; Coolify deploys after merge
 
+> **Superseded 2026-10-08:** all GitHub Actions workflows were removed at the owner's request. Checks run locally (see the root `Makefile`); Coolify still deploys on push to `master`. Dependabot keeps opening npm update PRs, which are no longer checked by CI.
+
 Decision:
 
 - GitHub Actions validates pull requests
