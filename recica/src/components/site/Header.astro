@@ -17,7 +17,11 @@ function isCurrent(href: string) {
 <header class="site-header">
   <div class="shell site-header__shell">
     <a href="/" class="site-brand" aria-label="recica.dev home">
-      <span class="site-brand__mark" aria-hidden="true">DR</span>
+      <svg class="site-brand__mark" viewBox="0 0 64 64" aria-hidden="true">
+        <path class="site-brand__corner" d="M21 59H5V43" />
+        <path d="M43 5H59V21" />
+        <path d="M18 16H30A16 16 0 0 1 46 32A16 16 0 0 1 30 48H18Z" stroke-width="7" />
+      </svg>
       <span>{siteConfig.domain}</span>
     </a>
 

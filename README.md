@@ -1,3 +1,5 @@
+<img src="recica/public/web-app-manifest-512x512.png" width="96" height="96" alt="Window-corner D mark">
+
 # recica.dev Repository
 
 This repository contains the active public web properties for Drilon Reçica.

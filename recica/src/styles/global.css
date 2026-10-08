@@ -332,13 +332,17 @@
   }
 
   .site-brand__mark {
-    display: grid;
+    flex: none;
     width: 2rem;
     height: 2rem;
-    place-items: center;
-    border: 1px solid var(--rule-strong);
-    color: var(--signal);
-    letter-spacing: -0.08em;
+    fill: none;
+    stroke: var(--signal);
+    stroke-width: 5;
+    stroke-linecap: square;
+  }
+
+  .site-brand__corner {
+    stroke: var(--rule-strong);
   }
 
   .site-nav {
@@ -1343,7 +1347,6 @@
 
 @media (forced-colors: active) {
   .action-link,
-  .site-brand__mark,
   .band,
   .hero__portrait,
   .principles li,
