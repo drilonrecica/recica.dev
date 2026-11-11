@@ -68,7 +68,7 @@
 	{/if}
 
 	{#each resolvedSchema as entry, index (index)}
-		<svelte:element this={'script'} type="application/ld+json">
+		<svelte:element this={"script"} type="application/ld+json">
 			{serializeJsonLd(entry)}
 		</svelte:element>
 	{/each}
