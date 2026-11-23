@@ -23,6 +23,10 @@ export interface Props {
 
 const { title, description, image, imageAlt, type, canonical, noindex, schema } =
   Astro.props;
+
+// Self-hosted GoatCounter, the only script the site may load. The production
+// resource sets PUBLIC_ANALYTICS_HOST (gc.recica.dev); unset renders nothing.
+const analyticsHost = import.meta.env.PUBLIC_ANALYTICS_HOST;
 ---
 
 <!doctype html>
@@ -38,6 +42,16 @@ const { title, description, image, imageAlt, type, canonical, noindex, schema } 
       noindex={noindex}
       schema={schema}
     />
+    {
+      analyticsHost && (
+        <script
+          is:inline
+          data-goatcounter={`https://${analyticsHost}/count`}
+          async
+          src={`https://${analyticsHost}/count.js`}
+        />
+      )
+    }
   </head>
   <body data-publication="technical-dossier">
     <a href="#main-content" class="skip-link">Skip to content</a>

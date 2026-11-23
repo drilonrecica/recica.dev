@@ -63,6 +63,10 @@ The canonical origin is fixed in `astro.config.mjs` as
 resource must set `PUBLIC_INDEXING_ENABLED=true`. The 404 document remains
 noindex in every environment.
 
+Analytics is a self-hosted GoatCounter: the production resource sets
+`PUBLIC_ANALYTICS_HOST=gc.recica.dev` and the layout then loads `count.js`
+from that host; while the variable is unset the site ships no script at all.
+
 ## Architecture
 
 | Concern         | Implementation                                        |

@@ -38,6 +38,7 @@ Recommended:
 
 ```text
 PUBLIC_INDEXING_ENABLED=true
+PUBLIC_ANALYTICS_HOST=gc.recica.dev
 ```
 
 Use the app's chosen Astro-compatible variable naming if public-prefix semantics require it.
