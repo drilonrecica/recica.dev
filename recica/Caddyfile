@@ -1,0 +1,86 @@
+# recica.dev — static serving for the Coolify container.
+#
+# Coolify's proxy terminates TLS and forwards to this container on :80;
+# Cloudflare sits in front of that. This file only serves files well.
+# No `log` directive: Caddy writes no access log.
+
+{
+	admin off
+	auto_https off
+}
+
+# Response headers shared by normal responses and the error handler
+# (handle_errors runs its own route, so directives are not inherited).
+(security) {
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		# HTTPS for a year once a browser has seen the site over TLS. No
+		# includeSubDomains or preload: both are hard to undo.
+		Strict-Transport-Security "max-age=31536000"
+		# Scripts run only from this origin, from the self-hosted GoatCounter
+		# (count.js, loaded by src/layouts/BaseLayout.astro when
+		# PUBLIC_ANALYTICS_HOST is set) or when they match the hash of an
+		# inline script in the build. There are no inline scripts today;
+		# adding one changes this list: tests/dist.test.mjs fails and prints
+		# the new script-src to paste here. GoatCounter counts a view with a
+		# beacon (connect-src) or an image request (img-src). Inline styles
+		# stay allowed for Astro's inlined stylesheets and style attributes.
+		Content-Security-Policy "default-src 'self'; script-src 'self' https://gc.recica.dev; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://gc.recica.dev; font-src 'self'; connect-src 'self' https://gc.recica.dev; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests"
+		-Server
+	}
+}
+
+:80 {
+	root * /srv
+
+	# Compression for text assets (woff2 is already compressed and skipped).
+	encode zstd gzip
+
+	# --- Canonical URL hygiene ------------------------------------------
+	# Canonical URLs have no trailing slash and no .html:
+	# /about/ -> /about ; /about/index.html -> /about ; /index.html -> /
+	@trailing path_regexp trailing ^(/.+)/$
+	redir @trailing {re.trailing.1} 301
+
+	@indexhtml path /index.html
+	redir @indexhtml / 301
+
+	@subindex path_regexp subindex ^(/.+)/index\.html$
+	redir @subindex {re.subindex.1} 301
+
+	# --- Caching -----------------------------------------------------------
+	# Hashed build assets (CSS, fonts, images under /_astro) never change at the same URL.
+	@immutable path /_astro/*
+	header @immutable Cache-Control "public, max-age=31536000, immutable"
+
+	# Icons, social images, manifest, robots, sitemap, CV: a day is plenty.
+	@daily path /favicon* /favicons/* /apple-touch-icon.png /web-app-manifest-*.png /og/* /site.webmanifest /robots.txt /sitemap*.xml /cv.pdf
+	header @daily Cache-Control "public, max-age=86400"
+
+	# Everything else (HTML) revalidates on every request; Cloudflare and
+	# browsers may keep a copy but must check with the origin.
+	@html not path /_astro/* /favicon* /favicons/* /apple-touch-icon.png /web-app-manifest-*.png /og/* /site.webmanifest /robots.txt /sitemap*.xml /cv.pdf
+	header @html Cache-Control "public, max-age=0, must-revalidate"
+
+	# --- Security headers --------------------------------------------------
+	import security
+
+	# --- Routing -----------------------------------------------------------
+	# /about -> about/index.html (Astro's directory output); /404 -> 404.html.
+	try_files {path} {path}/index.html {path}.html
+
+	handle_errors {
+		@404 expression {http.error.status_code} == 404
+		rewrite @404 /404.html
+		import security
+		header Cache-Control "public, max-age=0, must-revalidate"
+		encode zstd gzip
+		file_server
+	}
+
+	file_server
+}

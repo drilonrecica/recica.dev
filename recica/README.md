@@ -126,6 +126,7 @@ Quality gates:
 pnpm check
 pnpm lint
 pnpm build
+pnpm test:dist   # after a build: Caddyfile headers and CSP hashes match dist/
 pnpm test:e2e
 pnpm og   # after changing names, roles, or case studies
 ```
@@ -139,12 +140,31 @@ never hide a contrast failure again.
 
 ## Deployment
 
-Recica remains a separate Coolify Nixpacks resource:
+Recica remains a separate Coolify resource, now built from `recica/Dockerfile`:
 
-- build with Node 24 and the pinned pnpm release
-- enable the Coolify static-site option
-- publish `dist/`
+- build pack: **Dockerfile** (replaces Nixpacks and the static-site option)
+- base directory `/recica`, Dockerfile location `/Dockerfile` (relative to the
+  base directory)
+- exposed port **80**: Caddy serves `dist/` with the headers in `recica/Caddyfile`
+- `PUBLIC_INDEXING_ENABLED` and `PUBLIC_ANALYTICS_HOST` must be marked as
+  available at build time: Astro reads them during `astro build`
 - keep `https://recica.dev` as the canonical production origin
 
-No Node process is required after the build. Cloudflare and Coolify remain the
-authoritative production infrastructure layers.
+The image builds with Node 24 and the pinned pnpm release, then copies `dist/`
+into `caddy:2-alpine`. No Node process runs after the build. Cloudflare and
+Coolify remain the authoritative production infrastructure layers.
+
+`recica/Caddyfile` sets the response headers: HSTS, a Content-Security-Policy,
+`nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` and
+`Cross-Origin-Opener-Policy`. The CSP allows scripts only from this origin, the
+GoatCounter host and the SHA-256 hashes of inline scripts in the build.
+`pnpm build && pnpm test:dist` checks that the Caddyfile matches `dist/` and
+prints the `script-src` to paste when it does not.
+
+Local check of the image:
+
+```bash
+podman build -f recica/Dockerfile -t recica-dev recica
+podman run --rm -p 8080:80 recica-dev
+curl -I http://127.0.0.1:8080/
+```
